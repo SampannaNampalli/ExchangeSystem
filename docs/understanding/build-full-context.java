@@ -29,7 +29,7 @@ public class BuildFullContext {
     static final String DASH = String.valueOf((char) 0x2014);      // em dash, without a non-ASCII source character
     static final Set<String> EXCLUDED = Set.of(OUTPUT, "AI-TUTOR-PROMPT.md");
     static final List<String> MODULE_ORDER = List.of("domain-and-commands.md", "book.md", "engine.md", "journal.md",
-            "exchange-and-replay.md", "exchange-service.md", "gateway.md", "client-and-main.md");
+            "exchange-and-replay.md", "ledger-and-snapshots.md", "exchange-service.md", "gateway.md", "client-and-main.md");
 
     record Guide(Path file, String relative, String title, String text, int words) {
     }

@@ -10,19 +10,26 @@ my request, and I am studying it until I can explain how it works, predict how i
 confidence and debug it. You cannot see the repository. The guides I attach are your source of truth about it.
 
 **About the project.** ExchangeServer2 is a Java 17 learning project: a single-instrument stock exchange. Clients
-connect over plain TCP and send text lines (`LOGIN`, `NEW`, `CANCEL`, `SUBSCRIBE`, ...). A gateway parses and
-validates each line (stateless checks only) and hands valid requests to one queue. One writer thread
+connect over TCP (optionally TLS; the server binds 127.0.0.1 unless told otherwise), log in with a participant
+name and a secret checked against salted PBKDF2 hashes (`LOGIN <p> <secret> [COD]`), and send text lines (`NEW`,
+`CANCEL`, `RESEND`, `SUBSCRIBE`, ...). A gateway parses and validates each line (stateless checks plus per-session
+timeouts, an in-flight cap and a rate limit) and hands valid requests to one queue. One writer thread
 ("exchange-writer") takes whatever is waiting as a batch, stamps every request with a sequence number, order id
 and timestamp (the `Sequencer` is the only clock reader and counter), appends the batch to a plain-text
-write-ahead journal with one fsync, and only then runs each command through a deterministic price-time-priority
-matching engine over an order book (a `TreeMap` of price levels, each a doubly linked list of orders with
-sentinels). Replies, passive fills and market data (trades, level-2 updates) go back to clients through bounded
-per-session queues. On restart the journal is replayed through the same engine to rebuild the identical book. It
-supports LIMIT, IOC, FOK, MARKET and POST_ONLY orders, client order ids with duplicate detection, a ±10% price band
-and market collar, a per-participant open-order cap, a poison-pill policy (a command that crashes the engine is
-quarantined with a `SKIP` record and the engine rebuilt), smart batching chosen by JMH measurement, and fail-stop
-on journal errors. Build: Maven wrapper, JUnit 5, JMH benchmarks, PIT mutation testing. Design decisions are
-numbered D1–D65 in `docs/ExchangeServer2_Spec.md`.
+write-ahead journal (every record with a CRC-32C) with one fsync, and only then runs each command through a
+`Ledger`: a deterministic price-time-priority matching engine over an order book (a `TreeMap` of price levels,
+each a doubly linked list of orders with sentinels), a running digest of every output, and per-participant
+numbered private streams (oseq). The private events (replies, maker fills, cancels) go to every session of that
+participant and can be re-requested with `RESEND`; market data (trades, level-2 updates) goes to subscribers. On
+restart the ledger is rebuilt from the snapshot the journal names plus the journal, and `CHECK` records with the
+live run's output digest prove replay produced the same history. It supports LIMIT, IOC, FOK, MARKET and
+POST_ONLY orders, client order ids with duplicate detection, a ±10% price band and market collar (anchored on the
+touch before the first trade), self-trade prevention (the incoming remainder is cancelled), per-participant and
+global resting caps, opt-in cancel-on-disconnect (a journalled `CANCEL_ALL`), offline compaction into a snapshot
+(`--compact`, also how a rules change is crossed), a poison-pill policy (`SKIP` + rebuild), smart batching chosen
+by JMH measurement, and fail-stop on journal errors. Build: Maven wrapper, JUnit 5, JMH benchmarks, PIT mutation
+testing; the suite runs on Windows and on Linux. Design decisions are numbered D1–D77 in
+`docs/ExchangeServer2_Spec.md`.
 
 **How to tutor me:**
 
@@ -43,7 +50,7 @@ numbered D1–D65 in `docs/ExchangeServer2_Spec.md`.
 5. **Check my understanding.** After each explanation, ask me one or two follow-up questions that make me predict
    behaviour or trace code (not recall definitions), wait for my answer, then correct it precisely. Prefer
    concrete numeric scenarios (prices, quantities, sequence numbers).
-6. **Be exact about this code's words.** Use its names (`fillBest`, `Pending.refused`, `SKIP`, `BUSY`) and its
+6. **Be exact about this code's words.** Use its names (`fillBest`, `Pending.refused`, `SKIP`, `BUSY`, `oseq`, `CHECK`) and its
    decision numbers (D-numbers) when the guides give them. Don't import terms from other exchanges or frameworks
    without saying they are not used here.
 7. Keep answers short by default; go deeper when I ask. If I'm wrong, tell me directly and show where the guide
@@ -58,24 +65,25 @@ numbered D1–D65 in `docs/ExchangeServer2_Spec.md`.
 | 02-tech-stack | Java 17 features, java.util.concurrent, NIO, Maven, JUnit 5, JMH, PIT as used here |
 | 03-codebase-map | Every file and what it is for; conventions |
 | 04-running-and-tooling | Build, run, test, debug; every setting; exit codes |
-| 05-core-flows | Six end-to-end traces: new order, cancel, subscribe, startup/recovery, poison pill, shutdown/halt |
-| 06-data-and-state | Data models, journal format, wire protocol, where state lives and who may touch it |
-| 07-modules/domain-and-commands | `Side`, `OrderType`, `Rules`, `OrderRequest`, `Order`, commands, `Sequencer` |
-| 07-modules/book | `OrderBook`, `PriceLevel`, nodes, invariants |
-| 07-modules/engine | `MatchingEngine`, order types, risk checks, outputs |
-| 07-modules/journal | `CommandJournal`, `JournalCodec`, fsync, torn tail, lock |
-| 07-modules/exchange-and-replay | `Exchange` (live path, poison pill), `Replay` |
-| 07-modules/exchange-service | The writer thread, queue, batching, states, futures |
-| 07-modules/gateway | `TcpGateway`, `ClientSession`, `Protocol` |
-| 07-modules/client-and-main | `ExchangeClient`, `ClientMain`, `Main` |
+| 05-core-flows | End-to-end traces of the main flows: trading and the private stream, cancel, market data, startup and recovery, poison pills, shutdown and halt |
+| 06-data-and-state | Data models, journal and snapshot formats, wire protocol, where state lives and who may touch it |
+| 07-modules/domain-and-commands | `Side`, `OrderType`, `Rules`, `OrderRequest`, `Order`, commands (incl. `CancelAll`, `Check`), `Sequencer` |
+| 07-modules/book | `OrderBook`, `PriceLevel`, nodes, invariants, read-only walks |
+| 07-modules/engine | `MatchingEngine`, order types, risk checks and caps, self-trade prevention, outputs, state export/restore |
+| 07-modules/journal | `CommandJournal`, `JournalCodec` (CRC per record), `JournalLock`, `Durable`, fsync, torn tail |
+| 07-modules/ledger-and-snapshots | `Ledger`, output digest and CHECK records, private streams (oseq, RESEND), snapshots and compaction |
+| 07-modules/exchange-and-replay | `Exchange` (live path, poison pill, compaction tool), `Replay` |
+| 07-modules/exchange-service | The writer thread, queue, batching, states, futures, recovery summary |
+| 07-modules/gateway | `TcpGateway`, `ClientSession` (login, limits, timeouts, closing), `Protocol`, `Credentials`, `Tls` |
+| 07-modules/client-and-main | `ExchangeClient`, `ClientMain`, `Main` (flags, tools, exit codes) |
 | 08-cross-cutting | Errors, logging, security, configuration, concurrency, performance |
-| 09-design-decisions | Why it is built this way (decision records) |
-| 10-testing | Test strategy, coverage, mutation results, gaps |
-| 11-risks-and-smells | Known bugs, risks and smells, ranked |
+| 09-design-decisions | Why it is built this way (decision records D1–D77) |
+| 10-testing | Test strategy, coverage, mutation results, the Linux run, gaps |
+| 11-risks-and-smells | Risks and smells, ranked, and what was fixed |
 | 12-change-recipes | How to make common changes, file by file |
 | 13-glossary | Every term, with where it lives in the code |
 | 14-exercises | Self-checks, predict-then-verify, tracing, hands-on, break-it |
-| 15-open-questions | What could not be determined |
+| 15-open-questions | What was resolved, what is still open or unverified |
 
 Start by asking me what I want to work on, or, if I attached a guide without a question, quiz me on its
 "Questions to test yourself" one at a time.

@@ -1,8 +1,8 @@
 # 07 — Module: book
 
-> **Project:** ExchangeServer2 | Single-instrument limit order book: price-time matching engine, write-ahead journal with replay, single writer thread, plain TCP gateway | Stack: Java 17, Maven wrapper, JUnit 5 (+ JMH, PIT)
-> **This guide:** the order book data structure (`OrderBook`, `PriceLevel`, `OrderNode`) and its small result types (`Fill`, `LevelUpdate`, `CancelResult`, `CancelStatus`), its invariants and how they are kept | **Prerequisites:** 01, 07-modules/domain-and-commands | **Related:** 06, 07-modules/engine, 09, 10
-> **Repo layout summary:** `pom.xml` + Maven wrapper (`mvnw`, `mvnw.cmd`) at the root; production code in `src/main/java/exchangeserver/` (packages `domain`, `book`, `engine`, `command`, `journal`, `core`, `gateway`, `client`, plus `Main`); tests mirror it in `src/test/java/exchangeserver/` (plus `bench/` JMH benchmarks and `testing/MutableClock`); design docs in `docs/` (`ExchangeServer2_Vision.md` = purpose/roadmap, `ExchangeServer2_Spec.md` = decisions D1–D65); these guides in `docs/understanding/`.
+> **Project:** ExchangeServer2 | Single-instrument limit order book: price-time matching engine, write-ahead journal with replay, single writer thread, TCP/TLS gateway with authenticated participants | Stack: Java 17, Maven wrapper, JUnit 5 (+ JMH, PIT)
+> **This guide:** the order book data structure (`OrderBook`, `PriceLevel`, `OrderNode`) and its small result types (`Fill`, `LevelUpdate`, `CancelResult`, `CancelStatus`, `RestingOrderView`), its invariants and how they are kept, and the read-only walks the engine uses for self-trade prevention, cancel-all and snapshots | **Prerequisites:** 01, 07-modules/domain-and-commands | **Related:** 06, 07-modules/engine, 09, 10
+> **Repo layout summary:** `pom.xml` + Maven wrapper (`mvnw`, `mvnw.cmd`) at the root; production code in `src/main/java/exchangeserver/` (packages `domain`, `book`, `engine`, `command`, `journal`, `core`, `gateway`, `client`, plus `Main`); tests mirror it in `src/test/java/exchangeserver/` (plus `bench/` JMH benchmarks and `testing/MutableClock`); design docs in `docs/` (`ExchangeServer2_Vision.md` = purpose/roadmap, `ExchangeServer2_Spec.md` = decisions D1–D77); these guides in `docs/understanding/`.
 
 ## Overview
 
@@ -17,6 +17,9 @@ The `book` package is a data structure with a few hard rules (**invariants**) an
 - It does not decide whether two orders match. That is the engine's job (guide 07-modules/engine).
 - It *carries out* what the engine decides, through exactly three mutating entry points: `add`, `fillBest` and
   `cancel`.
+- It lets the engine *look* at individual resting orders only through copies: `walk`, `restingOrders` and
+  `headParticipant` hand out `RestingOrderView` records or a participant name, never the `Order` objects inside
+  the book (added for Spec D67, D71, D72).
 
 **[Verified]** Spec D44 and Vision §4 principles 2 and 9.
 
@@ -24,11 +27,11 @@ The physical shape:
 
 - **Each side** is a `TreeMap<Long, PriceLevel>`, a sorted map keyed by price. The bid map uses
   `Comparator.reverseOrder()`, so `firstEntry()` is the best price on both sides. **[Verified]**
-  `src/main/java/exchangeserver/book/OrderBook.java:40-41`.
+  `src/main/java/exchangeserver/book/OrderBook.java:41-42`.
 - **Each `PriceLevel`** is a hand-written **doubly linked list with sentinels**: dummy `head` and `tail` nodes
   that are never removed, so linking and unlinking need no special cases for the ends. **[Verified]** Spec D6, D7.
 - **An id map `orderId → OrderNode`** lets a cancel find an order's node in O(1) and unlink it in O(1).
-  **[Verified]** `OrderBook.java:42`, Spec D1, D5.
+  **[Verified]** `OrderBook.java:43`, Spec D1, D5.
 
 ```mermaid
 flowchart LR
@@ -59,6 +62,7 @@ flowchart LR
 | `Fill` | Immutable record of what `fillBest` did to one resting order | public record |
 | `LevelUpdate` | Immutable record: one level's state after a command (level-2 market data); volume 0 = gone | public record |
 | `CancelResult` / `CancelStatus` | Outcome of a cancel: `CANCELLED` (with quantity) or `UNKNOWN_ORDER` | public record / enum |
+| `RestingOrderView` | Immutable copy of one resting order (id, owner, client order id, side, type, price, original and filled quantity, timestamp) | public record |
 
 "Level-2 market data" (L2) means aggregated volume per price level, as opposed to individual orders.
 
@@ -66,18 +70,21 @@ flowchart LR
 
 | Member | Visibility | Called by |
 |---|---|---|
-| `OrderBook.add(Order)` | public | `MatchingEngine.process` (rests a LIMIT/POST_ONLY remainder) |
+| `OrderBook.add(Order)` | public | `MatchingEngine.process` (rests a LIMIT/POST_ONLY remainder), `MatchingEngine.restore` (reloads a snapshot's orders) |
 | `OrderBook.fillBest(Side, maxQty) → Fill` | public | `MatchingEngine.process` (the match loop) |
-| `OrderBook.cancel(participant, orderId) → CancelResult` | public | `MatchingEngine.onCancel` |
-| `OrderBook.drainLevelUpdates()` | public | `MatchingEngine.onNewOrder` / `onCancel` (once per command) |
-| `OrderBook.bestLevel(Side)` | public | `MatchingEngine.process` (match loop, post-only check); `MatchingBenchmark` |
-| `OrderBook.levels(Side)` | public | `MatchingEngine.canBeFilled` (FOK), `MatchingEngine.levels` (snapshot) |
-| `OrderBook.openOrders(participant)` | public | `MatchingEngine.process` (open-order cap) |
-| `OrderBook.restingOrderCount()` | public | `MatchingEngine(OrderBook)` constructor (must be 0) |
+| `OrderBook.cancel(participant, orderId) → CancelResult` | public | `MatchingEngine.onCancel`, `MatchingEngine.onCancelAll` (once per collected id) |
+| `OrderBook.drainLevelUpdates()` | public | `MatchingEngine.onNewOrder` / `onCancel` / `onCancelAll` (once per command), `restore` (to discard the reload's updates) |
+| `OrderBook.bestLevel(Side)` | public | `MatchingEngine.process` (match loop, post-only check), `MatchingEngine.matchLimit` (the touch, D66); `MatchingBenchmark` |
+| `OrderBook.levels(Side)` | public | `MatchingEngine.levels` (snapshot) |
+| `OrderBook.walk(Side, Predicate<RestingOrderView>)` | public | `MatchingEngine.fillability` (self-trade-aware FOK/cap check, D67/D68), `MatchingEngine.onCancelAll` (D72), `restingOrders` |
+| `OrderBook.restingOrders()` | public | `MatchingEngine.exportState` (snapshots, D71) |
+| `OrderBook.headParticipant(Side)` | public | `MatchingEngine.process` (self-trade check in the match loop, D67) |
+| `OrderBook.openOrders(participant)` | public | `MatchingEngine.process` (participant cap) |
+| `OrderBook.restingOrderCount()` | public | `MatchingEngine(OrderBook)` constructor (must be 0), `MatchingEngine.process` (`BOOK_FULL` cap, D68) |
 | `volumeAt`, `levelCount`, `isResting` | public | tests only **[Verified]** by grep |
 | `OrderBook.ordersAt`, `checkInvariants()` | package-private | tests only (test seams) |
 | `PriceLevel.getSide/getPrice/getTotalVolume/getOrderCount/isEmpty` | public | engine (read-only) and `OrderBook` |
-| `PriceLevel.addOrder/headNode/fillHead/unlink` | package-private | `OrderBook` only |
+| `PriceLevel.addOrder/headNode/nextNode/fillHead/unlink` | package-private | `OrderBook` only |
 
 Because the engine is in another package, the compiler stops it from calling `PriceLevel` mutators. That is the
 "ownership enforced by packages" rule from `CLAUDE.md`. **[Verified]** Spec D44.
@@ -87,7 +94,7 @@ Because the engine is in another package, the compiler stops it from calling `Pr
 The class comment lists them, and `checkInvariants()` re-derives them from scratch:
 
 ```java
-// src/main/java/exchangeserver/book/OrderBook.java:20-32 (trimmed comment)
+// src/main/java/exchangeserver/book/OrderBook.java:23-28 (trimmed comment)
 Every mutation goes through four methods (add, fillBest, cancel, and the private removeNode they share), so
 these invariants have exactly one place to hold:
 1. An id is in `orders` iff its order is linked in a level.
@@ -105,7 +112,7 @@ these invariants have exactly one place to hold:
    OrderBook unlinking it (both inside one OrderBook.fillBest call).
 ```
 
-Plus, from `checkInvariants` (`OrderBook.java:193-234`): levels are strictly ordered on each side, and the book
+Plus, from `checkInvariants` (`OrderBook.java:226-267`): levels are strictly ordered on each side, and the book
 is never **crossed**, meaning the best bid is below the best ask. **[Verified]** The "never crossed" invariant
 holds because the engine always matches before resting; the book itself does not enforce it on `add`.
 **[Inferred]** from reading `add`, which has no cross check.
@@ -187,7 +194,7 @@ OrderNode addOrder(Order order) {
 ### `fillHead`: fill, never remove
 
 ```java
-// src/main/java/exchangeserver/book/PriceLevel.java:96-113
+// src/main/java/exchangeserver/book/PriceLevel.java:104-121
 long fillHead(long maxQuantity) {
     if (maxQuantity <= 0) { throw new IllegalArgumentException("Fill quantity must be positive"); }
     OrderNode first = headNode();
@@ -210,7 +217,7 @@ window closes inside the same `OrderBook.fillBest` call (below).
 ### `unlink`: O(1) removal, shared by fills and cancels
 
 ```java
-// src/main/java/exchangeserver/book/PriceLevel.java:116-134
+// src/main/java/exchangeserver/book/PriceLevel.java:124-142
 void unlink(OrderNode node) {
     if (node.order == null) { throw new IllegalStateException("Cannot unlink a sentinel"); }
     if (node.level != this) { throw new IllegalStateException("Order ... is not linked in level ..."); }
@@ -243,7 +250,7 @@ same node fail loudly (`node.level != this`), and so does unlinking a node from 
 ### `add`: all-or-nothing
 
 ```java
-// src/main/java/exchangeserver/book/OrderBook.java:48-73
+// src/main/java/exchangeserver/book/OrderBook.java:49-74
 public void add(Order order) {
     if (!order.getOrderType().canRest()) { throw new IllegalStateException("A " + ... + " order never rests: " ...); }
     if (order.getRemainingQuantity() <= 0) { throw new IllegalStateException(... "has nothing left to rest"); }
@@ -276,7 +283,7 @@ the exchange anyway.
 ### `fillBest`: fill, remove the exhausted order, remove an emptied level
 
 ```java
-// src/main/java/exchangeserver/book/OrderBook.java:77-94
+// src/main/java/exchangeserver/book/OrderBook.java:78-95
 public Fill fillBest(Side side, long maxQuantity) {
     Map.Entry<Long, PriceLevel> best = sideOf(side).firstEntry();
     if (best == null) { throw new IllegalStateException("Fill on empty side " + side); }
@@ -297,7 +304,7 @@ public Fill fillBest(Side side, long maxQuantity) {
 
 Line by line:
 1. `side` is the side **of the book being hit**, the resting side, not the incoming order's side. The comment
-   on `bestLevel` says the same (`OrderBook.java:145`). **[Verified]**
+   on `bestLevel` says the same (`OrderBook.java:178`). **[Verified]**
 2. It remembers `head` and `order` before filling, because the head may be unlinked during the call.
 3. `fillHead` fills; then, if the order is exhausted, `removeNode` unlinks it, drops it from the id map,
    decrements the owner's open-order count, and drops the level if it emptied. That closes the invariant-4 window
@@ -310,7 +317,7 @@ Line by line:
 ### `cancel`: owner-only, unknown otherwise
 
 ```java
-// src/main/java/exchangeserver/book/OrderBook.java:96-107
+// src/main/java/exchangeserver/book/OrderBook.java:98-108
 public CancelResult cancel(String participant, long orderId) {
     OrderNode node = orders.get(orderId);
     if (node == null || !node.order.getParticipant().equals(participant)) {
@@ -333,7 +340,7 @@ public CancelResult cancel(String participant, long orderId) {
 ### `removeNode`: the single removal path
 
 ```java
-// src/main/java/exchangeserver/book/OrderBook.java:110-127
+// src/main/java/exchangeserver/book/OrderBook.java:111-128
 private void removeNode(OrderNode node) {
     Order order = node.order;
     PriceLevel level = node.level;
@@ -362,7 +369,7 @@ private void removeNode(OrderNode node) {
 ### `drainLevelUpdates`: deterministic L2 output
 
 ```java
-// src/main/java/exchangeserver/book/OrderBook.java:130-143
+// src/main/java/exchangeserver/book/OrderBook.java:131-144
 public List<LevelUpdate> drainLevelUpdates() {
     if (changed.isEmpty()) {
         return List.of();
@@ -381,18 +388,95 @@ public List<LevelUpdate> drainLevelUpdates() {
 
 - `changed` is a `LinkedHashSet<LevelKey>`, so each touched level appears **once**, in the order it was **first**
   touched. Iteration order is insertion order, never hash order, which keeps outputs deterministic across runs
-  and replays. **[Verified]** `OrderBook.java:44-45`. A plain `HashSet` would iterate in an order that depends on
+  and replays. **[Verified]** `OrderBook.java:45-46`. A plain `HashSet` would iterate in an order that depends on
   hash codes; still repeatable in practice for these keys, but the code avoids relying on that. **[Inferred]**
 - The update carries the **absolute** state after the command (not a delta); a vanished level is reported as
   volume 0, orders 0 (`LevelUpdate.java:7`). **[Verified]**
 - The engine drains once per command, so every output's level updates belong to that command only. **[Verified]**
   `MatchingEngine.onNewOrder`/`onCancel`.
 
+### Read walks: `walk`, `restingOrders`, `headParticipant`
+
+Self-trade prevention, cancel-all and snapshots need to see *individual* resting orders (who owns the next order
+in line, which orders belong to one participant, every order in priority order). The engine must not hold the
+`Order` objects that live in the book, so the book hands out copies.
+
+```java
+// src/main/java/exchangeserver/book/OrderBook.java:146-176
+// Visits the resting orders of `side` in priority order (best level first, time priority within a level) until
+// the visitor returns false. Read-only: the visitor gets copies. Deterministic: it walks the levels, never a
+// hash map.
+public void walk(Side side, Predicate<RestingOrderView> visitor) {
+    for (PriceLevel level : sideOf(side).values()) {
+        for (OrderNode n = level.headNode(); n != null; n = level.nextNode(n)) {
+            if (!visitor.test(view(n.order))) {
+                return;
+            }
+        }
+    }
+}
+
+// Every resting order: bids best first, then asks best first, each level in time priority.
+public List<RestingOrderView> restingOrders() {
+    List<RestingOrderView> all = new ArrayList<>(orders.size());
+    walk(Side.BUY, all::add);
+    walk(Side.SELL, all::add);
+    return all;
+}
+
+// The owner of the order that would trade next on `side`, or null if that side is empty (D67).
+public String headParticipant(Side side) {
+    Map.Entry<Long, PriceLevel> best = sideOf(side).firstEntry();
+    return best == null ? null : best.getValue().headNode().order.getParticipant();
+}
+
+private static RestingOrderView view(Order o) {
+    return new RestingOrderView(o.getOrderId(), o.getParticipant(), o.getClientOrderId(), o.getSide(),
+            o.getOrderType(), o.getPrice(), o.getOriginalQuantity(), o.getFilledQuantity(), o.getTimestamp());
+}
+```
+
+```java
+// src/main/java/exchangeserver/book/PriceLevel.java:94-100
+// The node after `node` in time priority, or null at the end. `node` must be linked here.
+OrderNode nextNode(OrderNode node) {
+    if (node.level != this) {
+        throw new IllegalStateException("Order " + node.order.getOrderId() + " is not linked in level " + side + " " + price);
+    }
+    return node.next == tail ? null : node.next;
+}
+```
+
+Line by line:
+1. **Priority order.** The outer loop walks the `TreeMap` values (best price first, because the bid map is
+   reversed); the inner loop follows `next` pointers from the head (time priority). That is exactly the order in
+   which the match loop would meet the orders. **[Verified]** `OrderBookTest.Walk.visitsInPriorityOrderAndStopsWhenAsked`.
+2. **Stop early.** A visitor that returns `false` ends the walk at once, so the engine's fillability check stops
+   at the first non-crossing level or at the participant's own order without visiting the rest. **[Verified]**
+3. **Deterministic.** It iterates the levels and the lists, never the `orders` `HashMap`. Cancel-all and the
+   snapshot file therefore list orders in the same order on every run and every replay (D12). **[Verified]** by the
+   comment and the code. `MatchingEngine.onCancelAll` relies on this for the order of its level updates.
+4. **Copies, not handles.** Each visit builds a new `RestingOrderView`; `view` reads the order's fields, and
+   `RestingOrderView.remainingQuantity()` derives the remainder (`RestingOrderView.java:17-19`). **[Verified]**
+   The cost is one small allocation per visited order, which is fine for the occasional walk (FOK, a cap check,
+   cancel-all, compaction), not for the hot match loop, which uses `headParticipant` instead. **[Inferred]**
+5. **Do not mutate while walking.** The walk follows live `next` pointers. A visitor that cancelled orders would
+   unlink nodes under the iteration. `onCancelAll` therefore collects ids first and cancels afterwards (guide
+   07-modules/engine). **[Inferred]** from the code; nothing enforces it.
+6. **`nextNode` guards foreign nodes** like `unlink` does: a node linked elsewhere (or not at all) fails loudly
+   instead of walking another list. **[Verified]** `PriceLevelTest.nextNodeWalksInTimePriorityAndRefusesForeignNodes`.
+7. **`restingOrders`: bids, then asks.** That is the order of the ORDER lines in a snapshot file; reloading them
+   in this order through `add` rebuilds every level in time priority (guide 07-modules/engine, `restore`).
+   **[Verified]** `OrderBookTest.Walk.restingOrdersAreCopiesBidsFirst` (it also checks the filled quantity of a
+   partly filled order).
+8. **`headParticipant` is O(log L)**, the same cost as `bestLevel`, and allocates nothing. It returns `null` for an
+   empty side (`OrderBookTest.Walk.headParticipantIsWhoTradesNext`). **[Verified]**
+
 ### Read-only views
 
 `levels(side)` returns `Collections.unmodifiableCollection(sideOf(side).values())`: best first, and removal
 through the view is rejected. `PriceLevel` exposes no public mutators, so the view is read-only twice over.
-**[Verified]** `OrderBook.java:152-154`; `OrderBookTest.levelViewsAreReadOnly`. It is a *live* view, not a copy.
+**[Verified]** `OrderBook.java:185-187`; `OrderBookTest.levelViewsAreReadOnly`. It is a *live* view, not a copy.
 **[Inferred]** Iterating it while the book changes would be unsafe, but only the writer thread ever does either.
 
 ## Worked example
@@ -429,7 +513,7 @@ sequenceDiagram
 
 ## Complexity
 
-**[Verified]** from the class comment (`OrderBook.java:31-32`) and Spec D59:
+**[Verified]** from the class comment (`OrderBook.java:32-33`) and Spec D59:
 
 | Operation | Cost |
 |---|---|
@@ -442,24 +526,26 @@ sequenceDiagram
 ```mermaid
 flowchart LR
     domain["domain: Order, Side, OrderType"] --> book
-    book["book: OrderBook, PriceLevel, OrderNode,<br/>Fill, LevelUpdate, CancelResult, CancelStatus"]
-    book --> engine["engine.MatchingEngine (only production caller)"]
+    book["book: OrderBook, PriceLevel, OrderNode,<br/>Fill, LevelUpdate, CancelResult, CancelStatus, RestingOrderView"]
+    book --> engine["engine.MatchingEngine (only production caller of OrderBook)"]
+    book --> core["core.Snapshot / OutputDigest / OutputLog (RestingOrderView, CancelResult, LevelUpdate)"]
     book --> gw["gateway.Protocol (formats CancelResult, LevelUpdate)"]
     book --> bench["bench.MatchingBenchmark (bestLevel)"]
 ```
 
 **[Verified]** `book` imports only `domain` and the JDK. `LevelUpdate`, `CancelResult` and `CancelStatus` also
-travel outwards inside engine outputs to the gateway.
+travel outwards inside engine outputs to the gateway; `RestingOrderView` travels inside `EngineState` into the
+snapshot file (`core.Snapshot`).
 
 ## How it's tested
 
 | Test class | Groups | Highlights |
 |---|---|---|
-| `book/PriceLevelTest` (21 tests) | `AddOrder`, `FillHead`, `Unlink` (middle, head, tail-then-append, only node, filled order subtracts nothing, links cleared, second unlink refused, foreign node refused, sentinel refused), `realNodeNeedsAnOrder` | Every link/unlink edge, and the `totalVolume` arithmetic |
-| `book/OrderBookTest` (21 tests) | `Add`, `FillBest`, `Cancel` (incl. `cancelInTheMiddleKeepsTimePriority`), `OpenOrders`, `LevelUpdates`, `levelViewsAreReadOnly`, `InvariantsUnderRandomTraffic` | Public behaviour and invariants |
+| `book/PriceLevelTest` (22 tests) | `AddOrder`, `FillHead`, `Unlink` (middle, head, tail-then-append, only node, filled order subtracts nothing, links cleared, second unlink refused, foreign node refused, sentinel refused), `nextNodeWalksInTimePriorityAndRefusesForeignNodes`, `realNodeNeedsAnOrder` | Every link/unlink edge, the `totalVolume` arithmetic, the walk step |
+| `book/OrderBookTest` (24 tests) | `Add`, `FillBest`, `Cancel` (incl. `cancelInTheMiddleKeepsTimePriority`), `OpenOrders`, `LevelUpdates`, `Walk` (priority order and early stop; copies with bids first and the filled quantity; `headParticipant`), `levelViewsAreReadOnly`, `InvariantsUnderRandomTraffic` | Public behaviour and invariants |
 
 The flagship test is `InvariantsUnderRandomTraffic.tenThousandRandomCommands`
-(`src/test/java/exchangeserver/book/OrderBookTest.java:257-299`). **[Verified]** For 3 seeds × 10,000 commands
+(`src/test/java/exchangeserver/book/OrderBookTest.java:295-335`). **[Verified]** For 3 seeds × 10,000 commands
 (30,000 in total):
 - it drives a real `MatchingEngine` with random order types, sides and prices in 95–105;
 - about a quarter of the commands are cancels; a fifth of those are sent by a randomly chosen participant (usually
@@ -469,7 +555,7 @@ The flagship test is `InvariantsUnderRandomTraffic.tenThousandRandomCommands`
 
 `checkInvariants()` and `ordersAt()` are package-private test seams. `ordersAt` walks each level forwards and
 backwards and fails if the two walks disagree, which catches broken `prev` pointers. **[Verified]**
-`OrderBook.java:178-190`. The package is under PIT mutation testing; Spec §7 lists the surviving `book` mutants
+`OrderBook.java:211-223`. The package is under PIT mutation testing; Spec §7 lists the surviving `book` mutants
 as equivalent or test-support only. **[Verified]**
 
 ## Key takeaways
@@ -485,6 +571,8 @@ as equivalent or test-support only. **[Verified]**
 - Cancel is owner-only, and someone else's order reads as `UNKNOWN_ORDER` (D48).
 - Level updates are drained once per command, deduplicated, in first-touched order (`LinkedHashSet`), as absolute
   values.
+- To look at individual orders the engine gets **copies** (`RestingOrderView`) from `walk`/`restingOrders`, in
+  priority order, or just the next owner from `headParticipant`; never the live `Order`.
 
 ## Common confusions
 
@@ -496,6 +584,10 @@ as equivalent or test-support only. **[Verified]**
   `checkInvariants` (tests) verifies the outcome.
 - **"`LevelUpdate` is a delta."** It is the absolute state of the level after the command; 0 means gone.
 - **"`levels()` returns a copy."** It's a live, unmodifiable view.
+- **"`walk` lets the engine change orders it visits."** No: each visit gets a fresh `RestingOrderView` copy. And
+  a visitor must not change the book either (cancel-all collects ids first).
+- **"`restingOrders()` iterates the id map."** No: it walks the levels (bids, then asks), so its order is the book
+  priority order, the same on every run.
 
 ## Questions to test yourself
 
@@ -511,3 +603,7 @@ as equivalent or test-support only. **[Verified]**
    <details><summary>Answer</summary>Inside one `OrderBook.fillBest` call, between `PriceLevel.fillHead` exhausting the head and `removeNode` unlinking it.</details>
 6. What does the D18 check in `removeNode` protect against?
    <details><summary>Answer</summary>Against removing the wrong object from the tree: it asserts `TreeMap.remove(price)` returned exactly the level being emptied, failing loudly if the tree and the level disagree.</details>
+7. Asks: 100 → [x (2), alice (3)], 101 → [y (5)]. In what order does `walk(SELL, …)` visit them, and what does `headParticipant(SELL)` return?
+   <details><summary>Answer</summary>x, alice, y (best price first, time priority within it); `headParticipant(SELL)` is "x", the owner of the head of the best level.</details>
+8. Why does `walk` hand out `RestingOrderView` copies instead of the `Order` objects?
+   <details><summary>Answer</summary>The engine must never hold an object that sits in the book (the same reason `fillBest` returns a `Fill`): it could change it behind the book's invariants. Copies keep ownership with the book (D44).</details>

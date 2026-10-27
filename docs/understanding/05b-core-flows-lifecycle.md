@@ -1,37 +1,26 @@
-# 05b — Core flows, part 2: startup, recovery, poison pills, shutdown
+# 05b — Core flows, part 2: startup, recovery, compaction, poison pills, shutdown
 
-> **Project:** ExchangeServer2 | Single-instrument limit order book: price-time matching engine, write-ahead journal with replay, single writer thread, plain TCP gateway | Stack: Java 17, Maven wrapper, JUnit 5 (+ JMH, PIT)
-> **This guide:** Step-by-step traces of flow 4 (startup and crash recovery), flow 5 (poison pills, live and at startup) and flow 6 (shutdown, halt, backpressure, and closing a connection after its replies), with the data shape at each step | **Prerequisites:** 01, 05a (helpful: 06) | **Related:** 05a, 06, 07-modules/journal, 07-modules/exchange-and-replay, 07-modules/exchange-service, 07-modules/client-and-main, 08-cross-cutting
-> **Repo layout summary:** `pom.xml` + Maven wrapper (`mvnw`, `mvnw.cmd`) at the root; production code in `src/main/java/exchangeserver/` (packages `domain`, `book`, `engine`, `command`, `journal`, `core`, `gateway`, `client`, plus `Main`); tests mirror it in `src/test/java/exchangeserver/` (plus `bench/` JMH benchmarks and `testing/MutableClock`); design docs in `docs/` (`ExchangeServer2_Vision.md` = purpose/roadmap, `ExchangeServer2_Spec.md` = decisions D1–D65); these guides in `docs/understanding/`.
+> **Project:** ExchangeServer2 | Single-instrument limit order book: price-time matching engine, write-ahead journal with replay, single writer thread, TCP/TLS gateway with authenticated participants | Stack: Java 17, Maven wrapper, JUnit 5 (+ JMH, PIT)
+> **This guide:** Step-by-step traces of flow 4 (startup, crash recovery, compaction, crossing a rules change), flow 5 (poison pills, live and at startup) and flow 6 (shutdown, halt, backpressure, timeouts, closing a connection), with the data shape at each step | **Prerequisites:** 01, 05a (helpful: 06) | **Related:** 05a, 06, 07-modules/journal, 07-modules/exchange-and-replay, 07-modules/exchange-service, 07-modules/client-and-main, 08-cross-cutting
+> **Repo layout summary:** `pom.xml` + Maven wrapper (`mvnw`, `mvnw.cmd`) at the root; production code in `src/main/java/exchangeserver/` (packages `domain`, `book`, `engine`, `command`, `journal`, `core`, `gateway`, `client`, plus `Main`); tests mirror it in `src/test/java/exchangeserver/` (plus `bench/` JMH benchmarks and `testing/MutableClock`); design docs in `docs/` (`ExchangeServer2_Vision.md` = purpose/roadmap, `ExchangeServer2_Spec.md` = decisions D1–D77); these guides in `docs/understanding/`.
 
 ## Overview
 
-Guide 05a followed requests through a running exchange. This guide covers how the exchange *gets* running, how it
-rebuilds itself after a crash, what it does when its own engine throws, and how it stops — cleanly, by halting, or
-by refusing work. These paths matter more than their size suggests: they are where "the journal is the truth"
-(Vision principle 5) is actually enforced.
+Guide 05a followed requests through a running exchange. This guide covers how the exchange *gets* running, how it rebuilds itself after a crash, how it keeps its history bounded, what it does when its own engine throws, and how it stops. Terms (also in guide 13):
 
-Terms (also in guide 13):
-
-- **Journal**: the append-only text file of stamped commands (`HEADER`, then `NEW` / `CANCEL` / `SKIP` lines). It is
-  the *only* persistent state; everything else is rebuilt from it.
-- **Replay**: feeding the journalled commands, in order, through a fresh `MatchingEngine`; outputs are discarded.
+- **Journal**: the append-only text file of stamped commands (`HEADER`, then `NEW` / `CANCEL` / `CANCEL_ALL` / `SKIP` / `CHECK`, each ending in a CRC-32C). With the snapshot it names, it is the only exchange state on disk.
+- **Snapshot** (D71): `<journal>.snapshot-<seq>`, the state after command `seq`; the journal header's **base sequence** names the snapshot it continues from (0: none).
+- **Replay**: feeding the journalled commands, in order, through a fresh **Ledger** (engine + output digest + output log); outputs are not delivered.
+- **CHECK** (D70): a journal record carrying the digest of every output before it; replay must reproduce it.
 - **Torn tail**: bytes after the last `\n`, left by a crash in the middle of a write.
-- **fsync**: `FileChannel.force(true)`, which returns only when the bytes are on the disk.
-- **Poison pill**: a journalled command that makes the engine throw — and would make every replay throw too.
-- **Quarantine / SKIP**: a `SKIP,<seq>,<ts>,<skippedSeq>` record telling replay to pass over a command; history is
-  annotated, never edited.
-- **Halt**: the writer thread stops for good after a failure it cannot continue from; the process exits with code 2.
-- **Fail-stop**: after one failed write or fsync, the journal refuses every later append until a restart.
+- **Poison pill / quarantine / SKIP**: a journalled command that makes the engine throw; a `SKIP` record tells replay to pass over it.
+- **Halt / fail-stop**: the writer stops for good after a failure it cannot continue from; the process exits 2.
 
 ---
 
-## Flow 4 — Startup and crash recovery
+## Flow 4 — Startup, crash recovery, compaction
 
-**Trigger:** `java -jar target/exchange-server2-2.0.0-SNAPSHOT.jar --port 9000 --journal exchange.journal`, either
-on a fresh file or on a journal left by a crash. **Final effect:** the book, counters, last trade price and
-client-order-id map are exactly what they were after the last journalled command; new commands continue the
-numbering; the gateway accepts connections.
+**Trigger:** `java -jar target/exchange-server2-2.0.0-SNAPSHOT.jar --port 9000 --journal exchange.journal --users exchange.users`. **Final effect:** the book, counters, last trade price, client-order-id map, output digest and every participant's oseq numbering are what they were after the last journalled command; new commands continue the numbering; clients can log in.
 
 ### Sequence diagram
 
@@ -43,442 +32,293 @@ sequenceDiagram
     participant X as Exchange
     participant J as CommandJournal
     participant R as Replay
-    participant E as new MatchingEngine
     participant W as exchange-writer
-    M->>G: new TcpGateway(port) binds the socket
-    M->>S: ExchangeService.start(journal, gateway)
-    S->>X: Exchange.open(file, clock, interceptor)
-    X->>J: CommandJournal.open(file, Rules.VERSION)
-    J->>J: lock, check header, cut torn tail, write header if empty
-    X->>R: Replay.run(journal, engine, Long.MAX_VALUE)
-    R->>J: read pass 1 (verify)
-    R->>J: read pass 2 (feed)
-    R->>E: onNewOrder or onCancel per record
-    R-->>X: Result(lastSeq, lastOrderId, lastTs, fed, skipped)
-    X->>X: Sequencer.resume(clock, lastSeq, lastOrderId, lastTs)
+    M->>M: Credentials.load(users), optional TLS context
+    M->>G: new TcpGateway(settings): bind (127.0.0.1 by default)
+    M->>G: startAccepting(): sessions answer "starting"
+    M->>S: ExchangeService.start(journal, gateway, settings)
+    S->>X: Exchange.open(file, clock, interceptor, options)
+    X->>J: open: JournalLock, header check (adopt rules if empty), cut torn tail
+    X->>R: Replay.run: snapshot named by the base, verify, feed + CHECKs
+    R-->>X: Result(ledger, lastSeq, lastOrderId, lastTs, fed, skipped, base)
+    X->>X: Sequencer.resume, Recovery summary
     S->>W: writer.start()
-    M->>G: gateway.start(service) starts the acceptor
-    M->>M: print listening line, add shutdown hook, awaitTermination
+    M->>G: attach(service): sessions can log in
+    M->>M: print listening + recovery lines, shutdown hook, awaitTermination
 ```
 
 ### Step by step
 
-**Step 1 — arguments (`Main.main`).** Three options: `--port` (default 9000), `--journal` (default
-`exchange.journal` in the working directory), `--quarantine <seq>` (flow 5). Anything else, or a missing value,
-prints the usage line and exits 1. **[Verified]** `src/main/java/exchangeserver/Main.java:28-45`.
+**Step 1 — arguments and tools (`Main.main`).** Options: `--port`, `--bind`, `--journal`, `--users`, `--tls-keystore`, the session limits, `--check-interval`, `--resend-window`; the tools `--add-user`, `--quarantine`, `--compact` run and exit. An unknown option or a missing value prints usage and exits 1. **[Verified]** `src/main/java/exchangeserver/Main.java:66-118`.
 
-**Step 2 — bind the port first.** `new TcpGateway(port)` creates and binds a `ServerSocket` on *all* interfaces
-(`new InetSocketAddress(port)`), with no acceptor thread yet. **[Verified]**
-`src/main/java/exchangeserver/Main.java:60`, `src/main/java/exchangeserver/gateway/TcpGateway.java:62-68`.
-**[Inferred]** Binding before replay means a port clash fails fast, before a possibly long replay; a client that
-connects during replay waits in the OS backlog until the acceptor starts. Binding to all interfaces with an
-unauthenticated LOGIN is a known, deferred security issue (guide 11).
+**Step 2 — credentials, TLS, bind.** `serve` loads the users file (missing file: a message telling the operator to run `--add-user`), builds a TLS context if `--tls-keystore` is given (password from `ES2_TLS_PASSWORD`), warns when binding a non-loopback address without TLS, and creates the gateway, which binds at once (127.0.0.1 unless `--bind`). Any failure here exits 1. **[Verified]** `src/main/java/exchangeserver/Main.java:120-138`, `src/main/java/exchangeserver/gateway/TcpGateway.java:113-129`.
 
-**Step 3 — `ExchangeService.start` → `Exchange.open` (still the main thread).** Opening, and replaying, happens on
-the caller's thread; only afterwards is the writer thread started. `Exchange.open` creates the journal, engine and
-sequencer *itself*, so no caller ever holds a reference that could bypass the journal (D43). If anything fails, it
-closes the journal (releasing its lock) and rethrows. **[Verified]**
-`src/main/java/exchangeserver/core/ExchangeService.java:117-133`, `src/main/java/exchangeserver/core/Exchange.java:74-92`.
+**Step 3 — accept before replay (L6).** `gateway.startAccepting()` starts the acceptor *before* the journal is replayed; until `attach`, a session answers any request with `ERROR exchange is starting; retry shortly` and closes, instead of leaving the client in silence. **[Verified]** `src/main/java/exchangeserver/Main.java:139`, `src/main/java/exchangeserver/gateway/ClientSession.java:228-232`; test `TcpGatewayTest.Session.beforeTheExchangeIsAttachedSessionsAreToldItIsStarting`.
+
+**Step 4 — `ExchangeService.start` → `Exchange.open` (main thread).** Opening and replaying run on the calling thread; only then is the writer started (`Thread.start()` hands the replayed state to it with a happens-before edge). `Exchange.open` creates the journal, ledger and sequencer itself and closes the journal if anything fails. **[Verified]** `src/main/java/exchangeserver/core/ExchangeService.java:124-136`, `src/main/java/exchangeserver/core/Exchange.java:116-137`.
+
+**Step 5 — `CommandJournal.open`: lock, check, change.** **[Verified]** `src/main/java/exchangeserver/journal/CommandJournal.java:75-127`.
 
 ```java
-// src/main/java/exchangeserver/core/Exchange.java:74-92 (trimmed)
-static Exchange open(Path journalFile, Clock clock, CommandInterceptor interceptor) throws IOException {
-    CommandJournal journal = CommandJournal.open(journalFile, Rules.VERSION);
-    try {
-        MatchingEngine engine = new MatchingEngine();
-        Replay.Result replay = Replay.run(journal, engine, Long.MAX_VALUE, interceptor);
-        Sequencer sequencer = Sequencer.resume(clock, replay.lastSequenceNumber(), replay.lastOrderId(),
-                replay.lastTimestamp());
-        return new Exchange(journal, sequencer, engine, new HashSet<>(replay.skipped()), replay.fed(), interceptor);
-    } catch (IOException | RuntimeException | Error e) {
-        try { journal.close(); } catch (IOException closeFailure) { e.addSuppressed(closeFailure); }
-        throw e;
+// src/main/java/exchangeserver/journal/CommandJournal.java:98-116 (trimmed)
+private static CommandJournal openLocked(Path file, int rulesVersion, JournalLock ownedLock) throws IOException {
+    JournalCodec.Header header = checkHeader(file, rulesVersion);
+    int adoptedFrom = 0;
+    if (header != null && header.rulesVersion() != rulesVersion) {
+        adoptedFrom = header.rulesVersion();            // checkHeader allowed it: no records yet
+        writeFresh(file, rulesVersion, header.baseSequence());
+        header = new JournalCodec.Header(rulesVersion, header.baseSequence());
     }
-}
-```
 
-**Step 4 — `CommandJournal.open`: lock, then check, then change.** The order is deliberate (D64, D65, added in
-this session's fixes). **[Verified]** `src/main/java/exchangeserver/journal/CommandJournal.java:71-103`.
-
-```java
-// src/main/java/exchangeserver/journal/CommandJournal.java:73-103 (trimmed)
-public static CommandJournal open(Path file, int rulesVersion) throws IOException {
-    Lock lock = Lock.acquire(file);
-    FileChannel channel = null;
+    FileChannel channel = FileChannel.open(file, CREATE, WRITE, APPEND);    // APPEND: never overwrite history
     long truncated;
     try {
-        channel = FileChannel.open(file, CREATE, WRITE, APPEND);            // APPEND: never overwrite history
-        checkHeader(file, rulesVersion);
         truncated = cutTornTail(file);
         if (channel.size() == 0) {
-            channel.write(ByteBuffer.wrap(JournalCodec.encodeHeader(rulesVersion).getBytes(UTF_8)));
+            channel.write(ByteBuffer.wrap(JournalCodec.encodeHeader(rulesVersion, 0).getBytes(UTF_8)));
             channel.force(true);
-        }
-    } catch (IOException | RuntimeException e) {
-        // close the channel if it was opened, then lock.release(); failures are added as suppressed
-        throw e;
-    }
-    OPEN.incrementAndGet();
-    return new CommandJournal(file, channel, lock, truncated);
-}
+            Durable.fsyncDirectory(file);           // a new file's directory entry must be durable too
 ```
 
-1. **Lock first** (`Lock.acquire`, `CommandJournal.java:198-252`), *before* the journal itself is even opened. The
-   lock lives on a separate, empty file next to the journal, `<journal>.lock` (e.g. `exchange.journal.lock`), that
-   nothing else ever opens:
-   - create the lock file if missing (`Files.createFile`, which never opens an existing one);
-   - add its real path to a static in-JVM set `HELD`; if it is already there, refuse at once — a second open in the
-     same JVM never touches the lock file;
-   - open the lock file and `tryLock()` the whole of it; if another process holds it, refuse.
+1. **Lock first** (D65, `JournalLock.acquire`, `src/main/java/exchangeserver/journal/JournalLock.java:37-66`): add the lock file's real path to an in-JVM set (`HELD`), then `tryLock()` the whole of `<journal>.lock` through a channel nothing else ever opens. A second open, in this JVM or another process, is refused with "already open". The separate file matters on Linux/macOS, where closing *any* handle on a locked file drops the process's locks on it. **[Verified]** on Windows and Linux (cross-process test passed in a Linux container; live `--quarantine` against a running server refused on both).
+2. **Check the header before changing anything** (D64, `checkHeader`, `CommandJournal.java:241-260`): a complete first record must be a valid v3 header (checksum included). A header of *other* rules is accepted only if the journal has no records yet: the header is then rewritten atomically with this build's rules, keeping the base sequence (D71: "adopted"). Anything else, including a file that is not a journal, is refused and left untouched.
+3. **Cut a torn tail** after the last `\n` and fsync the cut (D38).
+4. **Write a header** if the file is empty, fsync it and fsync the directory (D69).
 
-   The refusal is `IllegalStateException("Journal … is already open (a running exchange, or a --quarantine run)")`.
-   Why a separate file: on Linux and macOS Java's file locks are POSIX locks, and closing *any* handle a process
-   holds on a file drops all of that process's locks on it; the header check, the torn-tail cut and `read()` open
-   and close handles on the journal itself, so a lock taken on the journal would silently vanish. `close()` closes
-   the journal channel, then releases the lock (closing the lock channel and leaving `HELD`); the lock file is left
-   on disk (deleting it would race with the next opener; `*.journal.lock` is git-ignored). **[Verified]** code and the
-   comment at `CommandJournal.java:200-206`, `close()` at `CommandJournal.java:185-196`. Seen running with the final
-   code on Windows: `--quarantine` against a running server was refused, the 0-byte `.lock` file appeared next to
-   the journal, and after a hard kill the server restarted on the same journal despite the leftover lock file.
-   Not yet run on Linux/macOS (guide 15).
-2. **Open the journal in APPEND mode** (creating it if missing): every write goes to the end; history is never
-   overwritten.
-3. **Check the header before changing anything** (`checkHeader`, `CommandJournal.java:256-269`). Read the first
-   record. If it is complete (ends in `\n`), it must parse as `HEADER,2,<rulesVersion>` with *this build's*
-   `Rules.VERSION`, otherwise refuse ("was written under rules version 9; this build uses 1…"). If there is no
-   complete record, the bytes must be a prefix of the expected header (a crash while the file was being created).
-   Anything else is refused, and **the file is left untouched**. **[Verified]** code; seen running (a version-9
-   journal refused, exit 1; a non-journal text file refused and unchanged).
-4. **Cut a torn tail** (`cutTornTail`, `CommandJournal.java:271-282`): scan backwards in 4 KiB blocks for the last
-   `\n` (`endOfLastCompleteRecord`, `CommandJournal.java:284-306`), truncate everything after it, and fsync the cut
-   so new records cannot follow garbage. Cost is proportional to the last record, not the file. Returns the bytes
-   cut. **[Verified]**
-5. **Write the header** if the file is (now) empty, and fsync it.
+*Data shape:* a `CommandJournal{file, channel (APPEND), lock, baseSequence, truncatedBytesOnOpen, adoptedRulesFrom, failed=false}`.
 
-*Data shape:* a `CommandJournal{file, channel (APPEND), lock (the held `<journal>.lock` channel), truncatedBytesOnOpen, failed=false}`; on disk at
-least `HEADER,2,1\n`.
-
-**Step 5 — `Replay.run`: two streaming passes.** The journal is read twice with `CommandJournal.read`, which streams
-bytes in 64 KiB buffers, splits on `\n`, validates (but skips) record 1 as the header, and decodes every other
-record with `JournalCodec.decode`; it never holds the whole file in memory (D60). A *complete* record that does not
-parse throws `IllegalStateException("Corrupt journal record <n>: …")` — it is never silently dropped (D38).
-**[Verified]** `src/main/java/exchangeserver/core/Replay.java:36-43`,
-`src/main/java/exchangeserver/journal/CommandJournal.java:139-171`,
-`src/main/java/exchangeserver/journal/JournalCodec.java:101-126`.
-
-*Pass 1, verify* (`Replay.Verifier`, `Replay.java:66-89`): sequence numbers must be exactly 1, 2, 3, …;
-timestamps must never decrease; it remembers the last sequence number, last timestamp, the last order id *from NEW
-records* (a cancel's id is a target, not an issued id), and the set of skipped sequence numbers from SKIP records.
-Nothing is fed if any of this fails anywhere in the file.
-
-*Pass 2, feed* (`Replay.feed`, `Replay.java:47-64`): every NEW / CANCEL below `stopBefore` that is not skipped goes
-through the test-seam interceptor and then into the real engine; SKIP records themselves are ignored; outputs are
-thrown away (they were delivered in the live run, D41).
+**Step 6 — `Replay.run`: snapshot, verify, feed.** **[Verified]** `src/main/java/exchangeserver/core/Replay.java:39-48`.
 
 ```java
-// src/main/java/exchangeserver/core/Replay.java:47-64 (trimmed)
-static long feed(CommandJournal journal, MatchingEngine engine, long stopBefore, Set<Long> skipped,
-                 CommandInterceptor interceptor) throws IOException {
-    long[] fed = {0};
-    journal.read(command -> {
-        if (command.sequenceNumber() >= stopBefore || command instanceof SkipCommand
-                || skipped.contains(command.sequenceNumber())) {
-            return;
-        }
-        interceptor.beforeEngine(command);
-        if (command instanceof NewOrderCommand n) engine.onNewOrder(n);
-        else if (command instanceof CancelOrderCommand c) engine.onCancel(c);
-        fed[0]++;
-    });
-    return fed[0];
+// src/main/java/exchangeserver/core/Replay.java:39-48
+static Result run(CommandJournal journal, Path journalFile, long stopBefore, CommandInterceptor interceptor,
+                  int retention) throws IOException {
+    Snapshot snapshot = snapshotFor(journal, journalFile);
+    Verifier verifier = new Verifier(snapshot);
+    journal.read(verifier);
+    Ledger ledger = Ledger.from(snapshot, retention);
+    long fed = feed(journal, ledger, stopBefore, verifier.skipped, interceptor);
+    return new Result(ledger, verifier.lastSequenceNumber, verifier.lastOrderId, verifier.lastTimestamp, fed,
+            Set.copyOf(verifier.skipped), journal.baseSequence());
 }
 ```
 
-Because the engine is deterministic (no clock, no counters, no randomness, no hash-iteration order — D12), feeding
-the same commands rebuilds the same book, the same `lastTradePrice` (so the price band comes back), and the same
-client-order-id map (so a resend after a crash is caught as a duplicate, D49). **[Verified]**
-`src/main/java/exchangeserver/engine/MatchingEngine.java:21-36` comment; tests
-`ExchangeTest.rebuildsTheIdenticalBookAndContinuesTheCounters`, `clientOrderIdsSurviveSoAResendAfterRestartIsCaught`.
+- *Snapshot* (`Replay.java:59-69`): base 0 means the empty snapshot; otherwise `<journal>.snapshot-<base>` is read (each line checksummed, an END record proving it is complete) and must hold that sequence number.
+- *Pass 1, verify* (`Replay.java:101-130`): sequence numbers exactly `base+1, base+2, …`; timestamps never decrease; remember the last sequence number, timestamp, last order id from NEW records (skipped ones included: those ids were issued) and the set of skipped sequence numbers. Nothing is fed if any of this fails.
+- *Pass 2, feed* (`Replay.java:72-99`): start a `Ledger` from the snapshot (engine restored with time priority, digest and oseq numbering resumed), then feed every NEW/CANCEL/CANCEL_ALL below `stopBefore` that is not skipped. At each CHECK record, the replayed digest must equal the recorded one, or replay stops with `ReplayException(DIVERGED, seq)` (D70). An engine exception becomes `ReplayException(ENGINE_FAILURE, seq)`.
 
-*Data shape:* `Replay.Result(lastSequenceNumber, lastOrderId, lastTimestamp, fed, skipped)`.
+```java
+// src/main/java/exchangeserver/core/Replay.java:80-95 (trimmed)
+if (command instanceof CheckCommand check) {
+    if (!check.digest().equals(ledger.digest())) {
+        throw new ReplayException(ReplayException.Kind.DIVERGED, seq, "Replay diverged before CHECK " + seq
+                + ": the journal recorded output digest " + check.digest() + ", this build produced "
+                + ledger.digest() + ". This build processes the old commands differently; start it from a "
+                + "snapshot written by the build that wrote this journal (--compact).", null);
+    }
+    return;
+}
+try {
+    interceptor.beforeEngine(command);      // the test seam stands in for the engine here
+    ledger.apply(command);
+} catch (RuntimeException e) {
+    throw new ReplayException(ReplayException.Kind.ENGINE_FAILURE, seq, "Replay failed on command " + seq
+            + " (" + e.getMessage() + ")", e);
+}
+```
 
-**Step 6 — resume the sequencer.** `Sequencer.resume` continues at `lastSequenceNumber + 1` and `lastOrderId + 1`,
-and will never stamp a timestamp earlier than the last journalled one (if the machine's clock is behind, it reuses
-the last timestamp). **[Verified]** `src/main/java/exchangeserver/command/Sequencer.java:38-46`,
-`Sequencer.java:74-81`.
+Because the engine depends only on its commands (no clock, counters, randomness or hash order, D12), the same commands rebuild the same book, last trade price, client-order-id map, digest and oseq numbers. **[Verified]** code; tests `ExchangeTest.Restart.*`, `ExchangeTest.Checkpoints.*`, `TcpGatewayTest.Resend.theStreamSurvivesARestart`.
 
-**Step 7 — start the writer.** `new ExchangeService(...)` creates the non-daemon thread `exchange-writer`
-(non-daemon so the JVM cannot exit with accepted requests unprocessed or the journal open), and `writer.start()`
-runs it. `Thread.start()` is the happens-before edge that safely hands everything the main thread built during
-replay to the writer thread. **[Verified]** `ExchangeService.java:108-115`, `ExchangeService.java:117-118` comment,
-`ExchangeService.java:129-132`.
+*Data shape:* `Replay.Result(ledger, lastSequenceNumber, lastOrderId, lastTimestamp, fed, skipped, baseSequence)`.
 
-**Step 8 — start accepting, then wait.** `gateway.start(service)` starts the daemon thread `gateway-acceptor`;
-`Main` prints `ExchangeServer2 listening on port <p>, journal <absolute path>`, registers a shutdown hook (flow 6)
-and blocks in `service.awaitTermination()` (a `join` on the writer). **[Verified]** `Main.java:71-85`,
-`TcpGateway.java:74-82`. The acceptor loop then accepts sockets, turns on `TCP_NODELAY`, refuses beyond 256
-sessions (`ERROR too many sessions`), and starts a `ClientSession` (sender thread, then reader thread) per
-connection; an `accept()` failure other than "socket closed" is logged and retried after 100 ms. **[Verified]**
-`TcpGateway.java:88-124`, `src/main/java/exchangeserver/gateway/ClientSession.java:68-71`.
+**Step 7 — resume the sequencer.** It continues at `lastSequenceNumber + 1` and `lastOrderId + 1`, and never stamps a timestamp earlier than the last journalled one. **[Verified]** `src/main/java/exchangeserver/command/Sequencer.java:40-46`, `src/main/java/exchangeserver/core/Exchange.java:122-123`.
 
-### Failure exits
+**Step 8 — start the writer, attach, report (L1).** `ExchangeService.start` starts the non-daemon `exchange-writer`; `Main` attaches the service to the gateway (now LOGIN works) and prints two lines: where it listens, and what recovery did. **[Verified]** `src/main/java/exchangeserver/Main.java:150-157`. Seen live after a compaction:
 
-If step 3–6 throws (locked, wrong rules version, not a journal, corrupt record, sequence gap, backwards timestamp,
-or an engine exception on a replayed command), `Main` closes the gateway, prints `Startup failed: <exception>` plus a
-hint about `--quarantine`, and exits **1**. **[Verified]** `Main.java:62-70`. Note the hint is printed for every
-startup failure, including ones that have nothing to do with poison pills, and the version error tells the operator
-to "Start a fresh journal from a snapshot" although snapshots do not exist yet (Spec §8). **[Verified]** (seen
-running; `CommandJournal.java:263-264`).
+```
+ExchangeServer2 listening on 127.0.0.1:9137, journal ...\live3\exchange.journal
+Recovered through sequence 4 from snapshot 4: replayed 0 commands, cut 0 torn bytes
+```
+
+The summary also names quarantined commands and a rules adoption when there are any. **[Verified]** live; `Exchange.Recovery` at `src/main/java/exchangeserver/core/Exchange.java:78-80`.
+
+**Step 9 — hook and wait.** `Main` registers the shutdown hook (flow 6) and blocks in `service.awaitTermination()`. **[Verified]** `src/main/java/exchangeserver/Main.java:159-183`.
+
+### Startup failures
+
+Any failure in steps 4–7 closes the gateway, prints `Startup failed: <message>` and a hint chosen by `Main.hint`, and exits 1 (L2, D77): an `ENGINE_FAILURE` gets the `--quarantine <seq>` advice, a `DIVERGED` gets the compaction advice, anything else (locked journal, other rules with records, not a journal, corrupt record, checksum mismatch, CRLF conversion, sequence gap, missing snapshot) gets "The journal was not changed." **[Verified]** `src/main/java/exchangeserver/Main.java:140-149`, `Main.java:186-198`; tests `MainTest`.
 
 ### Crash recovery, seen running
 
-During this session the server was hard-killed (no shutdown hook ran), half a record was appended
-(`NEW,7,2026-10-27T12:`), and the server restarted on the same file. **[Verified]** (seen running):
-
-- startup succeeded and printed only the usual "listening" line — **the 21-byte cut is not reported**
-  (`Exchange.truncatedBytesOnOpen()` exists but `Main` never prints it);
-- a new subscriber received `BOOK seq=6 last=100 bids=- asks=-`: the empty book and the last trade price were
-  rebuilt by replay;
-- the next order became `NEW,7,…,5,carol,c1,BUY,LIMIT,5,99`: sequence 7 and order id 5 continued correctly.
+Earlier the same day (before D69 changed the format), the server was hard-killed, half a record appended, and the server restarted: the torn bytes were cut, the book and counters came back, and new commands continued the numbering. With D77 the cut is now reported in the recovery line. **[Verified]** live (format v2 then); `ExchangeTest.Operations.recoveryReportsWhatItDid` checks the report.
 
 ### What a crash can and cannot lose
 
 | Crash moment | After restart | Client's view |
 |---|---|---|
-| Before the batch's fsync returned | Records may be missing or torn (cut) | Nobody was answered, so nobody saw an effect: consistent |
-| After fsync, before replies were sent | Commands are replayed and take effect | Client heard nothing; it should resend with the **same** clOrdId and gets DUPLICATE with the original order id (D49) |
-| In the middle of writing a record | Torn tail cut on open | As row 1 |
+| Before the batch's fsync returned | Records missing or torn (cut) | Nobody was answered: consistent |
+| After fsync, before the lines were sent | Commands are replayed and take effect | Client heard nothing; on reconnect `WELCOME oseq=` shows the higher number and `RESEND` delivers the events (D73); a resend of the same clOrdId is rejected as DUPLICATE with the original id (D49, within one journal) |
+| While compacting | The old journal is still in charge (see 4b) | Nothing visible changed |
 
-**[Verified]** Spec §4 failure model ("visible ⇒ durable" holds; "durable ⇒ visible" does not).
+**[Verified]** Spec §4 failure model; RESEND path in 05a flow 3.
+
+### 4b. Compaction (`--compact`, D71)
+
+**Trigger:** `java -jar … --journal exchange.journal --compact`, run while the exchange is stopped. **Final effect:** `<journal>.snapshot-<last>` holds the state after the last command; the old journal is copied to `<journal>.archive-<first>-<last>`; the journal is replaced atomically by one that holds only `HEADER,3,<rules>,<last>`. Recovery afterwards costs the snapshot plus the journal since it, not all history.
+
+```java
+// src/main/java/exchangeserver/core/Exchange.java:174-193 (trimmed)
+public static Compaction compact(Path journalFile) throws IOException {
+    try (JournalLock lock = JournalLock.acquire(journalFile)) {
+        Replay.Result replay;
+        try (CommandJournal journal = CommandJournal.open(journalFile, Rules.VERSION, lock)) {
+            replay = Replay.run(journal, journalFile, Long.MAX_VALUE, CommandInterceptor.NONE,
+                    Options.defaults().outputRetention());
+        }
+        if (replay.lastSequenceNumber() == replay.baseSequence()) {
+            return null;
+        }
+        long last = replay.lastSequenceNumber();
+        Snapshot snapshot = replay.ledger().snapshot(last, replay.lastOrderId(), replay.lastTimestamp());
+        Path snapshotFile = Snapshot.path(journalFile, last);
+        snapshot.write(snapshotFile);
+        Path archive = journalFile.resolveSibling(journalFile.getFileName() + ".archive-"
+                + (replay.baseSequence() + 1) + "-" + last);
+        Durable.copyDurably(journalFile, archive);
+        CommandJournal.writeFresh(journalFile, Rules.VERSION, last);
+        return new Compaction(last, snapshot.orders().size(), snapshotFile, archive);
+    }
+}
+```
+
+1. Take the journal's lock for the whole operation (a running exchange makes it fail: "already open").
+2. Replay the journal fully (with its snapshot, CHECKs verified).
+3. Write the snapshot: header line (last sequence, last order id, last timestamp, last trade price, digest), one ORDER line per resting order in book priority, one OSEQ line per participant (sorted), END with counts; written to a temporary file, fsynced, atomically renamed, directory fsynced (`Durable.writeAtomically`, `src/main/java/exchangeserver/journal/Durable.java:25-36`).
+4. Copy the journal to the archive and fsync it.
+5. Replace the journal atomically with a header-only journal whose base is `last` (`CommandJournal.writeFresh`, `CommandJournal.java:130-132`).
+
+**Why it is crash-safe:** until step 5 the old journal (with its old base) is untouched and still names its own snapshot, so a crash leaves at most stray new files; after step 5 the new journal names a snapshot that is already durable. Each snapshot's name carries its sequence number, so no file is ever overwritten under a journal that needs it. **[Verified]** code; test `ExchangeTest.Compaction.aCrashAfterWritingTheSnapshotLeavesTheOldJournalInCharge`; **[Inferred]** the general argument.
+
+**What compaction ends:** the client-order-id map keeps only resting orders' ids (an id is unique per participant within one journal, revising D49), and RESEND cannot reach events before it (the snapshot keeps each participant's last oseq, not the events). **[Verified]** `ExchangeTest.Compaction.clientOrderIdsAreScopedToTheJournalExceptForRestingOrders`, `outputNumberingContinuesAcrossACompaction`.
+
+Seen live: `--compact` while the server ran was refused (`Compaction failed: Journal … is already open …`, exit 1); after the stop it printed `Compacted through sequence 4: 0 resting orders in …snapshot-4; old journal archived as …archive-1-4`, and the snapshot read:
+
+```
+SNAPSHOT,1,4,3,2026-10-27T14:20:42.045241200Z,100,88a18b6a6365ebe4,d7e6a970
+OSEQ,alice,4,d1453b0b
+OSEQ,bob,1,3d136969
+END,0,2,6a6d3c70
+```
+
+**[Verified]** live run.
+
+### 4c. Crossing a rules change
+
+`Rules.VERSION` (now 2) is in every journal header; a journal with records written under other rules is refused, because replaying it under new rules would silently build a different book (D46). The way across (D71): run `--compact` **with the old build** (its journal is now empty, naming a snapshot), then start the new build: `CommandJournal.open` sees an empty journal of other rules, rewrites its header with the new version, and the recovery line says `journal moved from rules N`. The snapshot is state, not commands, so the new rules never re-judge old orders. **[Verified]** `CommandJournal.java:99-105`, `CommandJournal.java:252-258`; tests `CommandJournalTest.Header.anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase`, `ExchangeTest.Compaction.aRulesChangeIsCrossedWithAnEmptyCompactedJournal`.
 
 ---
 
 ## Flow 5 — Poison pills, live and at startup
 
-**What a poison pill is:** a journalled command on which the engine throws a `RuntimeException` (a bug). Because
-replay runs the same engine on the same command, *every* future startup would throw on it too.
+### 5a. Live: quarantine, rebuild from the snapshot, carry on
 
-### 5a. Live: quarantine, rebuild, carry on
-
-**Trigger:** within a batch, `MatchingEngine` throws on command *k*. **Final effect:** a durable `SKIP` record for
-*k*; the engine is rebuilt to the state just before *k*; the rest of the batch is processed; the caller of *k* gets
-`INTERNAL_ERROR`; nobody else notices.
+**Trigger:** within a batch, `ledger.apply` throws a `RuntimeException` on command *k*. **Final effect:** a durable `SKIP` record for *k*; the ledger rebuilt to the state just before *k*; the rest of the batch processed; the caller of *k* gets `INTERNAL_ERROR`; nobody else notices.
 
 ```mermaid
 sequenceDiagram
     participant W as exchange-writer
     participant X as Exchange.process
-    participant E as old engine
     participant J as CommandJournal
-    participant R as Replay.feed
-    participant E2 as rebuilt engine
+    participant R as Replay.rebuild
     W->>X: process(batch k-1, k, k+1)
-    X->>J: appendAll(k-1, k, k+1) and fsync
-    X->>E: apply(k-1) succeeds, reply and listener
-    X->>E: apply(k) throws RuntimeException
-    X->>J: append SKIP (new seq, skips k) and fsync
-    X->>R: feed(journal, new engine, stopBefore k, skipped)
-    R->>E2: every command below k, minus skipped
-    X->>X: engine = rebuilt, fail k with INTERNAL_ERROR
-    X->>E2: apply(k+1), reply and listener
+    X->>J: appendAll(k-1, k, k+1) + fsync
+    X->>X: apply(k-1): listener, then future
+    X->>X: apply(k) throws RuntimeException
+    X->>J: append SKIP(next seq, skips k) + fsync
+    X->>R: rebuild: snapshot + every command before k, minus skipped
+    X->>X: ledger = rebuilt; fail k with INTERNAL_ERROR
+    X->>X: apply(k+1) on the rebuilt ledger
 ```
 
-**Step by step.** **[Verified]** `src/main/java/exchangeserver/core/Exchange.java:149-158`,
-`Exchange.java:178-189`.
-
 ```java
-// src/main/java/exchangeserver/core/Exchange.java:149-158 (trimmed)
-EngineOutput output;
-try {
-    interceptor.beforeEngine(p.command);
-    output = apply(p.command);
-} catch (RuntimeException bug) {
-    quarantine(p.command, bug);
-    p.fail(new ExchangeException(ExchangeException.Reason.INTERNAL_ERROR,
-            "command " + p.command.sequenceNumber() + " failed and was quarantined", bug));
-    continue;
-}
-
-// src/main/java/exchangeserver/core/Exchange.java:178-189 (trimmed)
+// src/main/java/exchangeserver/core/Exchange.java:278-287 (trimmed)
 private void quarantine(Command poison, RuntimeException cause) throws IOException {
     LOG.log(Level.ERROR, "Engine failed on command " + poison.sequenceNumber() + "; quarantining it", cause);
     journal.append(sequencer.stampSkip(poison.sequenceNumber()));
     skipped.add(poison.sequenceNumber());
-    MatchingEngine rebuilt = new MatchingEngine();
-    Replay.feed(journal, rebuilt, poison.sequenceNumber(), skipped, interceptor);
-    engine = rebuilt;
+    ledger = Replay.rebuild(journal, journalFile, poison.sequenceNumber(), skipped, interceptor, options.outputRetention());
 }
 ```
 
-1. The engine may have thrown half-way through *k* (some fills applied, others not), so the old engine is thrown
-   away rather than "rolled back".
-2. A `SKIP` is stamped with the *next* sequence number — after the whole batch, since the batch was stamped first —
-   and appended with its own fsync. Example from `ExchangeTest.failingCommandIsQuarantinedAndTheExchangeCarriesOn`:
-   orders at seq 1 and 2 (2 is the poison) → the journal gains `SKIP,3,<ts>,2`, and the next order becomes seq 4.
-3. `Replay.feed` alone (no verification pass: the file was verified at open, and only this thread has appended
-   since; review finding 9) rebuilds a new engine from every command before *k*, minus everything already skipped.
-   That is exactly the history clients have seen, because *k*'s outputs were never emitted — outputs are only sent
-   after `apply` returns.
-4. The caller of *k* is failed with `ExchangeException(INTERNAL_ERROR)`; through the gateway this is
-   `ERROR clOrdId=<id> INTERNAL_ERROR` (`ClientSession.failureLine`, `ClientSession.java:316-319`). The listener
-   never hears of *k*.
-5. The loop continues with the rebuilt engine; later commands of the same batch see the book as if *k* had never
-   existed. `ExchangeTest.poisonInTheMiddleOfABatchDoesNotDisturbTheOthers` checks exactly this: a buy after the
-   poison matches the sell before it, and the listener sees sequence numbers 1 and 3 only.
+1. The engine may have thrown half-way through *k*, so the old ledger is discarded, not rolled back. The whole ledger is replaced, so engine, digest and oseq numbering cannot disagree.
+2. The SKIP gets the next sequence number *after the whole batch* (the batch was stamped first), with its own fsync.
+3. `Replay.rebuild` starts from the journal's snapshot and feeds every command before *k* minus the skip set, in one pass (the journal was verified at open; only this thread has appended since). **[Verified]** `src/main/java/exchangeserver/core/Replay.java:52-57`; test `ExchangeTest.Compaction.aPoisonAfterACompactionRebuildsFromTheSnapshot`.
+4. *k*'s outputs were never sent (the listener runs only after `apply` returns), so the rebuilt history is exactly what clients saw. **[Verified]** `src/main/java/exchangeserver/core/Exchange.java:235-251`.
 
-*Data shape:* new journal line `SKIP,<n>,<ts>,<k>`; `Exchange.skipped` gains *k*.
+An `Error` (out of memory, stack overflow) is not caught here: it propagates and halts the writer (flow 6). **[Verified]** `Exchange.java:239` catches `RuntimeException` only.
 
-**What is not quarantined:** an `Error` (for example `OutOfMemoryError`, `StackOverflowError`, an `AssertionError`)
-is not a `RuntimeException`, so it propagates out of `process` and halts the writer (flow 6). The same happens if
-appending the SKIP fails. **[Verified]** `Exchange.java:153` catches only `RuntimeException`;
-`ExchangeTest.errorsAreNotQuarantinedTheyPropagate`.
+### 5b. At startup: stop, then the operator decides
 
-### 5b. At startup: stop and let an operator decide
+**Trigger:** replay throws `ReplayException(ENGINE_FAILURE, k)` on a command with no SKIP. **Final effect:** startup fails (exit 1) with the hint `Replay failed on command k (a poison pill?). Inspect it, then run --quarantine k and start again.`; after `--quarantine k` the next start skips it.
 
-**Trigger:** the journal contains a command, *without* a SKIP, on which today's engine throws during replay (for
-example written by an older build, or a crash before the SKIP was durable). **Final effect:** startup fails (exit 1);
-after inspecting the record the operator appends a SKIP with `--quarantine <seq>`; the next startup succeeds.
+A failing record is never skipped automatically at startup: the code cannot tell a true poison from a command that succeeded under older code and whose effects clients saw (D51). `Exchange.quarantine` opens the journal (refused while the exchange runs: lock), reads every record, requires *k* to be a NEW, CANCEL or CANCEL_ALL, **refuses a command already quarantined** (L3), and appends `SKIP(last+1, ts, k)`. **[Verified]** `src/main/java/exchangeserver/core/Exchange.java:141-166`, `src/main/java/exchangeserver/Main.java:101-107`; tests `ExchangeTest.PoisonPill.*`, `ExchangeTest.Operations.quarantineRefusesACommandAlreadyQuarantined`.
 
-Why not skip it automatically? At startup the code cannot tell a true poison from a command that *succeeded* under
-older code (and whose effects clients saw); skipping the latter would silently rebuild a different book (D51).
-**[Verified]** Spec D51.
-
-```mermaid
-sequenceDiagram
-    participant Op as operator
-    participant M as Main
-    participant X as Exchange.quarantine
-    participant J as CommandJournal
-    Op->>M: java -jar ... (normal start)
-    M-->>Op: Startup failed (replay threw on seq k), exit 1
-    Op->>M: java -jar ... --journal f --quarantine k
-    M->>X: Exchange.quarantine(f, k, clock)
-    X->>J: open (lock, header check)
-    X->>J: read all, find last seq, last ts, does k exist
-    X->>J: append SKIP(last+1, ts, k) and fsync
-    M-->>Op: Quarantined command k in path
-    Op->>M: java -jar ... (normal start), replay skips k
-```
-
-**Step by step.** **[Verified]** `src/main/java/exchangeserver/Main.java:47-58`,
-`src/main/java/exchangeserver/core/Exchange.java:94-114`.
-
-```java
-// src/main/java/exchangeserver/core/Exchange.java:96-114 (trimmed)
-public static void quarantine(Path journalFile, long sequenceNumber, Clock clock) throws IOException {
-    try (CommandJournal journal = CommandJournal.open(journalFile, Rules.VERSION)) {
-        long[] last = {0};
-        Instant[] lastTimestamp = {null};
-        boolean[] exists = {false};
-        journal.read(c -> {
-            last[0] = c.sequenceNumber();
-            lastTimestamp[0] = c.timestamp();
-            if (c.sequenceNumber() == sequenceNumber && !(c instanceof SkipCommand)) exists[0] = true;
-        });
-        if (!exists[0]) throw new IllegalArgumentException("No new-order or cancel record with sequence number " + sequenceNumber);
-        Sequencer sequencer = Sequencer.resume(clock, last[0], 0, lastTimestamp[0]);
-        journal.append(sequencer.stampSkip(sequenceNumber));
-    }
-}
-```
-
-1. `CommandJournal.open` takes the lock. If the exchange is running on that file, the tool is refused; since this
-   session's fix `Main` prints `Quarantine failed: Journal … is already open (a running exchange, or a --quarantine
-   run)` and exits 1. **[Verified]** seen running with the final code (lock file, `Main.java:48-55`): against a
-   live server the tool printed exactly that line, exited 1, and appended nothing.
-2. It reads every record (not through the engine), remembering the last sequence number and timestamp and whether
-   *k* is a NEW or CANCEL record. Quarantining a SKIP, or a number that does not exist, is refused.
-3. It stamps `SKIP(last + 1, ts, k)` with a sequencer resumed at the end of the file and appends it (fsync).
-4. On the next normal start, the verify pass collects *k* into the skip set and the feed pass passes over it.
-
-Limits **[Verified]**:
-- A record that does not even *parse* cannot be quarantined: `journal.read` throws on it first. A corrupt complete
-  record always stops startup (D38).
-- The tool does not check whether *k* is already skipped; running it twice appends a second, harmless SKIP (seen in
-  this session's scratch journal: `SKIP,8,…,7` then `SKIP,9,…,7`; recorded in Spec §8).
+A `DIVERGED` replay is different: no single record is at fault; the build changed. The hint says to compact with the old build first (4c). A record that does not even parse cannot be quarantined: `journal.read` throws on it first, and startup always stops (D38).
 
 ---
 
-## Flow 6 — Shutdown, halt, backpressure, and closing a connection
+## Flow 6 — Shutdown, halt, backpressure, timeouts, closing a connection
 
 ### 6a. The service state machine
-
-`ExchangeService` has four states. "Refused" and "never lost" hold together because the state check and the
-enqueue happen under one lock, and `stop()` flips the state and enqueues the `STOP` marker under that same lock:
-every accepted request is therefore ahead of `STOP` in the queue (D56). **[Verified]**
-`src/main/java/exchangeserver/core/ExchangeService.java:35-47`, `ExchangeService.java:182-217`.
 
 ```mermaid
 stateDiagram-v2
     [*] --> RUNNING: start()
-    RUNNING --> STOPPING: stop() adds STOP under the lock
-    STOPPING --> STOPPED: writer reaches STOP, closes journal
+    RUNNING --> STOPPING: stop() adds the stop marker under the lock
+    STOPPING --> STOPPED: writer reaches the marker, closes the journal
     RUNNING --> HALTED: writer throws (journal failure, Error, interrupt)
     STOPPING --> HALTED: writer throws while draining
     STOPPED --> [*]
     HALTED --> [*]
 ```
 
-| State | New request | Already queued | Journal / writer |
-|---|---|---|---|
-| RUNNING | accepted (or BUSY if the queue is at capacity) | processed | open / running |
-| STOPPING | refused `STOPPED` | processed (all are before STOP) | open / running |
-| STOPPED | refused `STOPPED` | none left | closed / ended |
-| HALTED | refused `HALTED` | refused `HALTED` | closed / ended |
+"Refused" and "never lost" hold together because the state check and the enqueue share one lock with `stop()`'s state flip and marker (D56). `stop()` refuses to run on the writer thread itself (it would wait for its own end, L6). **[Verified]** `src/main/java/exchangeserver/core/ExchangeService.java:211-257`.
 
-### 6b. Clean shutdown (Ctrl+C)
+### 6b. Clean shutdown (Ctrl+C, SIGTERM)
 
-**Trigger:** SIGINT / Ctrl+C. **Final effect:** connections dropped, every accepted request processed, journal
-closed (lock released) by the writer as its last act. **Not exercised in this session** (the server could only be
-hard-killed from the tool environment); the trace below is from code. **[Verified]** code. **Exit code: uncertain.**
-`Main`'s comment and the README say 0, but when the JVM shuts down because of a signal the exit status normally comes
-from the signal (130 for SIGINT on Linux/macOS), not from `main` returning; see guide 15 (open questions) for how
-to check. **[Inferred]**
-
-```mermaid
-sequenceDiagram
-    participant OS as OS signal
-    participant H as shutdown hook thread
-    participant G as TcpGateway
-    participant S as ExchangeService
-    participant W as exchange-writer
-    participant M as main thread
-    OS->>H: Ctrl+C, JVM runs hooks
-    H->>G: close(): server socket, closeNow every session
-    H->>S: stop(10 s): state STOPPING, queue.add(STOP)
-    W->>W: process remaining batches, STOP is last
-    W->>W: exchange.close() closes journal, state STOPPED
-    H->>H: writer.join returns true
-    M->>M: awaitTermination returns, state is STOPPED, main returns
+```java
+// src/main/java/exchangeserver/Main.java:159-177 (trimmed)
+Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+    int status = 0;
+    try {
+        gateway.close();
+        if (!service.stop(Duration.ofSeconds(10))) {
+            System.err.println("Writer thread did not stop within 10 s");
+            status = 1;
+        }
+    } catch (IOException | InterruptedException e) {
+        System.err.println("Shutdown: " + e);
+        status = 1;
+    }
+    if (service.state() == ExchangeService.State.HALTED) {
+        status = 2;
+    }
+    System.out.flush();
+    System.err.flush();
+    Runtime.getRuntime().halt(status);     // the documented code, whatever started the shutdown
+}, "shutdown"));
 ```
 
-1. The hook (`Main.java:74-83`) closes the gateway first: `TcpGateway.close` closes the server socket (the acceptor's
-   `accept()` throws, sees the socket closed, and returns) and calls `closeNow()` on every session: mark closed,
-   unregister, close the socket, interrupt the sender. Queued outgoing lines are dropped. **[Verified]**
-   `TcpGateway.java:209-216`, `ClientSession.java:94-110`.
-2. It then calls `service.stop(Duration.ofSeconds(10))`: under the lock, RUNNING → STOPPING and `STOP` is added
-   (the queue itself is unbounded, so this never blocks even when the capacity is reached); then `writer.join` with
-   the timeout. Returns `false` (and `Main` prints "Writer thread did not stop within 10 s") if the writer is still
-   alive. Idempotent. **[Verified]** `ExchangeService.java:206-217`.
-3. The writer keeps taking batches. `STOP` is always the last thing in the queue, so the batch that contains it is
-   the last batch: `batch.remove(STOP)` sets `stopping`, the remaining requests are processed, and the loop ends.
-   Replies for sessions already closed are silently dropped (`send` checks `closed`). **[Verified]**
-   `ExchangeService.java:250-265`, `ClientSession.java:78-81`.
-4. In `finally`, the writer closes the `Exchange` (which closes the journal and releases the lock) — only the writer
-   ever closes it, so nothing can be using it (D58) — and sets STOPPED under the lock. **[Verified]**
-   `ExchangeService.java:268-282`.
-5. `Main`'s main thread, blocked in `awaitTermination`, returns; the state is not HALTED, so `main` returns.
+1. Close the gateway: the server socket closes and every session is closed at once (`closeNow`). Each close runs `TcpGateway.removed`, so participants that asked for cancel-on-disconnect get their `CANCEL_ALL` queued now, ahead of the stop marker (05a flow 2b). **[Verified]** `src/main/java/exchangeserver/gateway/TcpGateway.java:313-319`; **[Inferred]** COD on shutdown from the order of calls.
+2. `stop(10 s)`: STOPPING, marker queued; the writer processes everything accepted before it, then closes the journal (releasing the lock) as its last act and sets STOPPED (D58). **[Verified]** `ExchangeService.java:245-257`, `ExchangeService.java:286-323`.
+3. `Runtime.halt(status)` ends the process with the documented code: 0, or 1 if the writer did not stop in time, or 2 if halted. Without it, a JVM ending on a signal reports the signal's status (130 for SIGINT, 143 for SIGTERM). **[Verified]** in a Linux container: exit status 0 after SIGINT and after SIGTERM.
 
 ### 6c. Halt
 
-**Trigger:** the writer catches any `Throwable` that escaped `exchange.process`: a journal `IOException` (disk
-full, I/O error), the fail-stopped journal's `IllegalStateException`, an `Error` from the engine, a failure while
-appending a SKIP, an interrupt, or a bug outside the engine. **Final effect:** HALTED, everyone waiting is told,
-journal closed, process exits **2**; the journal is the truth on restart (fail-stop over limping, Vision principle
-10). **[Verified]** `ExchangeService.java:266-271`, `ExchangeService.java:301-319`, `Main.java:85-90`.
+**Trigger:** the writer catches any `Throwable` that escaped `Exchange.process`: a journal I/O error (or the fail-stopped journal's refusal), an `Error`, a failure while appending a SKIP, an interrupt. **Final effect:** HALTED, everyone waiting refused, journal closed, process exits 2. **[Verified]** `src/main/java/exchangeserver/core/ExchangeService.java:306-311`, `ExchangeService.java:342-359`, `src/main/java/exchangeserver/Main.java:179-183`.
 
 ```java
-// src/main/java/exchangeserver/core/ExchangeService.java:302-319 (trimmed)
+// src/main/java/exchangeserver/core/ExchangeService.java:342-358 (trimmed)
 private void halt(Throwable cause, List<Pending<?>> batch) {
     LOG.log(Level.ERROR, "Exchange halted", cause);
     synchronized (lock) {
@@ -486,147 +326,101 @@ private void halt(Throwable cause, List<Pending<?>> batch) {
         state = State.HALTED;           // from here on enqueue() refuses, so the drain below is final
     }
     ExchangeException refusal = new ExchangeException(ExchangeException.Reason.HALTED, "exchange halted", cause);
-    for (Pending<?> p : batch) p.fail(refusal);       // no-op for those already completed
+    for (Pending<?> p : batch) {
+        p.fail(refusal);                // no-op for those already completed
+    }
     List<Pending<?>> left = new ArrayList<>();
     queue.drainTo(left);
-    for (Pending<?> p : left) if (p != STOP) p.fail(refusal);
-}
-```
-
-1. Under the lock: record the cause, set HALTED. From now on `enqueue` refuses with `HALTED`, so draining the queue
-   afterwards is final — nothing can slip in behind the drain.
-2. Fail every request in the current batch (those already completed are unaffected: `completeExceptionally` on a
-   done future is a no-op) and everything still queued.
-3. `finally` closes the journal; the state stays HALTED.
-4. `Main` sees HALTED after `awaitTermination`, prints `Exchange halted: <cause>`, closes the gateway, and calls
-   `System.exit(2)` (which also runs the shutdown hook; `stop` then just joins a dead thread).
-
-**The gap a halt leaves:** commands of the failing batch were journalled (or partly), but their callers were told
-`HALTED`. On restart they replay and take effect — "durable ⇒ visible" does not hold. Clients reconcile by resending
-with the same client order id (D49). **[Verified]** Spec §4, `ExchangeException.java:9-11`.
-
-### 6d. Backpressure: BUSY
-
-`enqueue` refuses when `queue.size() >= queueCapacity` (100,000 by default), *without blocking the caller*, and
-journals nothing; the caller should retry later. Through the gateway the refusal callback runs on the session's
-reader thread and the client sees `ERROR clOrdId=<id> BUSY` (or `ERROR orderId=<n> BUSY` for a cancel). The capacity
-is global — one queue for all sessions, with no per-session fairness (a deferred finding; guide 11). **[Verified]**
-`ExchangeService.java:59-70`, `ExchangeService.java:182-202`, `ClientSession.java:316-319`;
-`ExchangeServiceTest.fullQueueRefusesWithBusyAndJournalsNothing`.
-
-A different kind of backpressure protects the writer from *slow readers*: each session's outbound queue holds at
-most 10,000 lines; when an `offer` fails, that session is disconnected immediately (D54). **[Verified]**
-`ClientSession.java:77-86`, `TcpGateway.java:58-60`.
-
-### 6e. Closing a connection only after its replies (D63)
-
-**Trigger:** the session's reader stops reading — the client sent `QUIT`, closed its sending side (end of stream),
-or sent an over-long line. **Final effect:** every request that session already handed in is answered first; then
-`BYE` (for QUIT only); then the connection closes. **[Verified]** `ClientSession.java:114-153`,
-`ClientSession.java:199-201`; regression tests `TcpGatewayTest.quitAnswersEveryEarlierRequestBeforeBye`,
-`endOfStreamStillGetsTheReplies`; seen running:
-
-```
-> LOGIN dave / NEW d1 BUY LIMIT 1 95 / NEW d2 BUY LIMIT 1 96 / QUIT     (one write)
-< WELCOME participant=dave
-< ORDER orderId=6 clOrdId=d1 status=RESTED filled=0 remaining=1
-< ORDER orderId=7 clOrdId=d2 status=RESTED filled=0 remaining=1
-< BYE
-```
-
-Before this session's fix, `QUIT` sent `BYE` and closed at once; a client sending NEW then QUIT lost the ORDER reply
-for an order that had executed (199 of 200 replies lost in the regression test run against the old code).
-
-```java
-// src/main/java/exchangeserver/gateway/ClientSession.java:114-153 (trimmed)
-private void readLoop() {
-    boolean answerFirst = false;
-    String farewell = null;
-    try {
-        InputStream in = new BufferedInputStream(socket.getInputStream());
-        String line;
-        while ((line = readLine(in)) != null) {
-            if (!handle(line)) { farewell = "BYE"; break; }        // handle() returns false only for QUIT
+    for (Pending<?> p : left) {
+        if (p != stopMarker) {
+            p.fail(refusal);
         }
-        answerFirst = true;                     // QUIT or end of stream
-    } catch (ProtocolException e) {             // over-long line
-        send(Protocol.error(e.getMessage()));
-        answerFirst = true;
-    } catch (IOException e) {
-        // connection gone: nobody left to answer
-    } finally {
-        if (answerFirst) closeAfterReplies(farewell); else close();
     }
 }
+```
 
-private void closeAfterReplies(String farewell) {
-    gateway.service().snapshot(1, (snapshot, failure) -> {
-        if (farewell != null) send(farewell);
+The batch that failed may be journalled while its callers were told HALTED; on restart those commands replay (durable ⇒ visible does not hold). Clients reconcile with `RESEND` after logging in again (D73) or by resending with the same client order id (D49). **[Verified]** Spec §4.
+
+### 6d. Backpressure and limits
+
+| Refusal | Where | Scope | Journalled? |
+|---|---|---|---|
+| `BUSY` | `ExchangeService.enqueue`, queue at 100,000 | whole exchange | no |
+| `STOPPED` / `HALTED` | `ExchangeService.enqueue` | whole exchange | no |
+| `SESSION_BUSY` | `ClientSession.admit`, 1,000 requests in flight | one session | no |
+| `RATE_LIMITED` | `ClientSession.admit`, token bucket 1,000/s, burst 2,000 | one session | no |
+| slow consumer | `ClientSession.send`, outbound queue of 10,000 lines full | one session, disconnected | no |
+
+**[Verified]** `src/main/java/exchangeserver/core/ExchangeService.java:222-233`, `src/main/java/exchangeserver/gateway/ClientSession.java:116-124`, `ClientSession.java:279-291`. The per-session limits (D75) stop one pipelining client from filling the global queue so that everyone gets BUSY.
+
+### 6e. Timeouts (D75)
+
+The reader's socket read timeout is the login timeout (10 s) until a successful LOGIN, then the idle timeout (300 s; any line, PING included, resets it). On expiry the session sends `ERROR login timeout; disconnecting` or `ERROR idle timeout; disconnecting` and closes after its in-flight requests. **[Verified]** `src/main/java/exchangeserver/gateway/ClientSession.java:157`, `ClientSession.java:166-168`, `ClientSession.java:308`; tests `TcpGatewayTest.Limits.aConnectionThatNeverLogsInIsDisconnected`, `anIdleSessionIsDisconnected`.
+
+### 6f. Closing a connection only after its requests complete (D76)
+
+**Trigger:** the reader stops: QUIT, end of stream, an overlong line, a failed login, a timeout. **Final effect:** every request the session handed in completes and its lines go out; then `BYE` (for QUIT); then the connection closes. A broken connection (I/O error) closes at once.
+
+```java
+// src/main/java/exchangeserver/gateway/ClientSession.java:421-442 (trimmed)
+private <T> BiConsumer<T, Throwable> tracked(BiConsumer<T, Throwable> callback) {
+    inFlight.incrementAndGet();
+    return (value, failure) -> {
+        try {
+            callback.accept(value, failure);
+        } finally {
+            inFlight.decrementAndGet();
+            finishIfIdle();
+        }
+    };
+}
+
+private void finishIfIdle() {
+    if (readerDone && inFlight.get() == 0 && finished.compareAndSet(false, true)) {
+        String last = farewell;
+        if (last != null) {
+            send(last);
+        }
         close();
-    });
+    }
 }
 ```
 
-How it works: the exchange queue is FIFO and processed in order, so a depth-1 snapshot read queued *now* completes
-after every request this session queued earlier, and their reply callbacks have already offered their lines to the
-outbound queue. The read's own callback then offers `BYE` and calls `close()`, which puts the `CLOSE` sentinel
-behind them; the sender writes everything, then closes the socket. A broken connection (`IOException`) still closes
-at once — there is nobody to answer. During shutdown the read is refused immediately, so the session closes without
-waiting (the gateway drops connections then anyway). **[Verified]** code and Spec D63.
+How it works: every request a session hands in is counted until its callback has run, and since D76 a callback runs only after the listener has offered the request's lines. When the reader stops it sets `readerDone` and tries `finishIfIdle`; the last callback to bring the count to zero also tries it; the compare-and-set makes exactly one of them close. This also holds during shutdown: requests accepted before `stop()` are still processed, and refused ones complete at once. The D63 version (queue a snapshot read as a barrier) did not, because the exchange refuses reads once stopping. **[Verified]** code; tests `TcpGatewayTest.Session.quitAnswersEveryEarlierRequestBeforeBye`, `endOfStreamStillGetsTheReplies`, `quitDuringShutdownStillGetsTheRepliesOfAcceptedRequests`.
 
 ---
 
 ## Key takeaways
 
-- Startup = bind port → open journal (lock → header check → torn-tail cut → header) → two-pass replay (verify, then
-  feed) → resume sequencer → start writer → start acceptor. Any failure exits 1 and leaves the journal untouched
-  except for a legitimate torn-tail cut.
-- Replay rebuilds *everything* (book, counters, last trade price, client-order-id map) because the engine is
-  deterministic; the journal is the only persistent state.
-- Only one process may have a journal open (D65); a non-journal or other-rules file is refused unchanged (D64).
-- Live poison pill: SKIP (fsynced) → rebuild from commands before it → carry on; caller gets INTERNAL_ERROR. At
-  startup a failing record is never skipped automatically; the operator runs `--quarantine <seq>`.
-- `Error`s and journal failures are not quarantined: they halt the writer, every waiting request is refused
-  HALTED, and the process exits 2.
-- `stop()` is safe against racing producers because the state flip and the `STOP` marker share the enqueue lock;
-  everything accepted before `STOP` is processed.
-- BUSY is non-blocking backpressure at hand-in; slow *readers* are disconnected instead of being waited for.
-- QUIT, end of stream and an over-long line close a session only after its earlier requests are answered (D63).
+- Startup = credentials and TLS → bind → accept ("starting") → lock → header check (adopt rules if the journal is empty) → torn-tail cut → snapshot + verify + feed with CHECK comparison → sequencer resume → attach → recovery summary.
+- The journal names its snapshot by sequence number; recovery costs the snapshot plus the journal since it.
+- `--compact` (exchange stopped) writes the snapshot, archives the journal and atomically replaces it with an empty one; it is crash-safe at every step and is the only way across a rules change.
+- A CHECK mismatch (`DIVERGED`) means this build behaves differently from the one that wrote the journal; an `ENGINE_FAILURE` at startup is a poison pill for the operator to quarantine.
+- Live poison pill: SKIP (fsynced), rebuild the whole ledger from the snapshot, carry on; the caller gets INTERNAL_ERROR.
+- A signal-triggered stop exits 0 (verified on Linux); a halt exits 2; startup and tool failures exit 1.
+- Sessions close only after their in-flight requests complete, during shutdown too; refusals at every level are stateless and never journalled.
 
 ## Common confusions
 
-- **"The torn-tail cut is reported somewhere."** It is not printed; only `Exchange.truncatedBytesOnOpen()` knows,
-  and only tests read it.
-- **"A SKIP removes the poison from the file."** It does not; the poison stays, and the SKIP (with its own,
-  later sequence number) tells replay to pass over it.
-- **"The SKIP gets the poison's sequence number + 1."** It gets the next number *after the whole batch*, because the
-  batch was stamped before processing began.
-- **"STOPPED and HALTED are the same."** STOPPED processes everything already accepted; HALTED refuses everything
-  still queued, and its batch may contain commands that are journalled but whose callers were told HALTED.
-- **"`stop()` waits forever."** It waits at most the timeout and returns `false` if the writer is still alive.
-- **"Closing a connection cancels its orders."** No cancel-on-disconnect exists; resting orders stay.
-- **"The writer's stats are up to date when my future completes."** They are updated after the batch's futures;
-  read them after `stop()` (that is what fixed the flaky test).
+- **"Compaction can run next to the exchange."** No: it takes the journal's lock; a running exchange makes it fail.
+- **"A snapshot depends on the rules version."** It is state, not commands; that is why it can carry the book across a rules change.
+- **"RESEND after a compaction reaches the old events."** The snapshot keeps each participant's last oseq, not the events.
+- **"A DIVERGED replay can be quarantined."** No single record is at fault; compact with the old build instead.
+- **"Exit code 0 after Ctrl+C is automatic."** It is enforced by the hook's `Runtime.halt(status)`; without it the JVM reports the signal's status.
 
 ## Questions to test yourself
 
-1. The server crashed after fsyncing a batch but before replying. Bob never got his ORDER. What should bob's client do, and what will it see?
-<details><summary>Answer</summary>Resend the same NEW with the same client order id. Replay already applied the original, so the engine rejects the resend as DUPLICATE_CLIENT_ORDER_ID and the ORDER line carries the original order id, which bob can then use (e.g. to cancel).</details>
+1. The journal's header says base 120 and `exchange.journal.snapshot-120` is missing. What happens at startup?
+<details><summary>Answer</summary>`Snapshot.read` fails with "Snapshot … is missing: the journal continues from it"; startup stops with exit 1 and the hint "The journal was not changed."</details>
 
-2. A batch holds commands with sequence numbers 10, 11, 12. The engine throws on 11. What new journal record appears, and what engine state does 12 run against?
-<details><summary>Answer</summary>`SKIP,13,<ts>,11` (13 because 10–12 were stamped before processing). Command 12 runs against a new engine rebuilt by `Replay.feed` from every command below 11 minus earlier skips — i.e. the state after 10.</details>
+2. A crash hits compaction after the snapshot was written but before the journal was replaced. What does the next start load?
+<details><summary>Answer</summary>The old journal, with its old base and snapshot, exactly as before; the new snapshot file is a stray (the next compaction overwrites or reuses it). Tested by `aCrashAfterWritingTheSnapshotLeavesTheOldJournalInCharge`.</details>
 
-3. Why does `CommandJournal.open` lock a separate `<journal>.lock` file instead of the journal itself, and why is there also an in-JVM `HELD` set?
-<details><summary>Answer</summary>On Linux/macOS Java file locks are POSIX locks: closing any handle the process has on the locked file drops the process's locks on it, and `open`/`read` open and close handles on the journal all the time, so a lock on the journal would vanish. A lock file nothing else opens keeps the lock alive. `HELD` refuses a second open in the same JVM before it opens (and later closes) the lock file, for the same reason — and because the OS lock alone would not stop a second open in the same process.</details>
+3. Commands 10, 11, 12 share a batch; the engine throws on 11. What new record appears, and what state does 12 run against?
+<details><summary>Answer</summary>`SKIP,13,<ts>,11,<crc>`. Command 12 runs on a ledger rebuilt from the snapshot plus every command below 11 (minus earlier skips), i.e. the state after 10.</details>
 
-4. You point `--journal` at `notes.txt` (two lines, no trailing newline). What happens to the file now, and what happened before D64?
-<details><summary>Answer</summary>Now: the first record is complete but not a header, so `open` refuses and the file is unchanged (seen running). Before: the torn-tail cut ran first and removed the unterminated last line, then the header check refused it.</details>
+4. You upgrade to a build with `Rules.VERSION` 3. What are the steps, and what does the new build print?
+<details><summary>Answer</summary>Stop the old build, run `--compact` with it, start the new build. The empty journal adopts rules 3; the recovery line ends with ", journal moved from rules 2".</details>
 
-5. During shutdown a client sends NEW after `stop()` was called. What does it get, and is anything journalled?
-<details><summary>Answer</summary>`enqueue` sees STOPPING and refuses with STOPPED, on the reader thread: `ERROR clOrdId=<id> STOPPED`. Nothing is journalled. (In practice the gateway is closed first, so the client is usually disconnected before it can send.)</details>
-
-6. Why is an `Error` from the engine not quarantined like a `RuntimeException`?
-<details><summary>Answer</summary>`Exchange.process` catches only `RuntimeException`. An `Error` (out of memory, stack overflow) says the JVM itself may be unhealthy, so the code fail-stops: the writer halts, everyone waiting gets HALTED, and the process exits 2.</details>
-
-7. A client sends 200 NEW lines followed by QUIT in one write. In what order do lines come back, and why is that guaranteed?
-<details><summary>Answer</summary>200 ORDER lines (plus any FILL lines), then BYE, then the connection closes. QUIT makes the session queue a depth-1 snapshot read behind its 200 requests; the queue is processed in order, so that read's callback (which sends BYE and closes) runs after every earlier reply callback.</details>
+5. A client sends NEW and then QUIT while the operator presses Ctrl+C. Does it get its ORDER line?
+<details><summary>Answer</summary>If the NEW was accepted before `stop()`, yes: it is processed, the listener sends the ORDER line, its callback brings the in-flight count to zero and only then the session sends BYE and closes (D76). The gateway's `closeNow` during shutdown can still drop lines already queued, since shutdown closes connections.</details>

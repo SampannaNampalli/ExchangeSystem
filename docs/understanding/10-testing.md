@@ -1,22 +1,24 @@
 # 10 — Testing
 
-> **Project:** ExchangeServer2 | Single-instrument limit order book: price-time matching engine, write-ahead journal with replay, single writer thread, plain TCP gateway | Stack: Java 17, Maven wrapper, JUnit 5 (+ JMH, PIT)
-> **This guide:** test strategy, seams, how to run and write tests, what is and isn't covered, mutation-testing results, and the critical untested paths | **Prerequisites:** 03, 04 | **Related:** 07-modules/*, 08, 11, 14
-> **Repo layout summary:** `pom.xml` + Maven wrapper (`mvnw`, `mvnw.cmd`) at the root; production code in `src/main/java/exchangeserver/` (packages `domain`, `book`, `engine`, `command`, `journal`, `core`, `gateway`, `client`, plus `Main`); tests mirror it in `src/test/java/exchangeserver/` (plus `bench/` JMH benchmarks and `testing/MutableClock`); design docs in `docs/` (`ExchangeServer2_Vision.md` = purpose/roadmap, `ExchangeServer2_Spec.md` = decisions D1–D65); these guides in `docs/understanding/`.
+> **Project:** ExchangeServer2 | Single-instrument limit order book: price-time matching engine, write-ahead journal with replay, single writer thread, TCP/TLS gateway with authenticated participants | Stack: Java 17, Maven wrapper, JUnit 5 (+ JMH, PIT)
+> **This guide:** test strategy, seams, how to run and write tests, what is and isn't covered, mutation testing, and the paths still untested (as of the risk fixes D66–D77) | **Prerequisites:** 03, 04 | **Related:** 07-modules/*, 08, 09b, 11, 14
+> **Repo layout summary:** `pom.xml` + Maven wrapper (`mvnw`, `mvnw.cmd`) at the root; production code in `src/main/java/exchangeserver/` (packages `domain`, `book`, `engine`, `command`, `journal`, `core`, `gateway`, `client`, plus `Main`); tests mirror it in `src/test/java/exchangeserver/` (plus `bench/` JMH benchmarks and `testing/MutableClock`); design docs in `docs/` (`ExchangeServer2_Vision.md` = purpose/roadmap, `ExchangeServer2_Spec.md` = decisions D1–D77); these guides in `docs/understanding/`.
 
 ## Overview
 
-The suite is large relative to the code: about 4,300 lines of tests for about 3,300 lines of production code. It is the main evidence that the code behaves as the Spec says. Status as of 2026-10-27:
+The suite is the main evidence that the code behaves as the Spec says. Status on 2026-10-27, after the risk fixes:
 
-- **334 tests, all green**, on a clean build with `-Xlint:all` and no warnings [Verified — Spec header; the 333-test run was observed directly in this session, and the parent session added the 334th test (`CommandJournalTest.Exclusive.anotherProcessIsRefusedWhileTheJournalIsOpen`) afterwards].
-- **History worth knowing:** the Spec used to say "326 tests, all green (three consecutive runs)". The first full run while writing these guides gave **325/326**: `ExchangeServiceTest$Batching.waitingRequestsShareOneBatch` failed with `expected: <50> but was: <1>`. Re-running that class alone passed 8/8, so it was an intermittent (flaky) failure [Verified — observed]. The cause and fix are in §6.
-- **Mutation testing** (PIT, explained in §5): final run 496 mutations, 454 killed (92%), test strength 94%, line coverage 94% for the mutated packages (see §5) [Verified — observed].
+- **453 tests, all green on Windows; the suite also passed on Linux (446 tests at the time)**, on a clean build with `-Xlint:all` and no warnings [Verified — observed: Windows locally; Linux in an `eclipse-temurin:17` Docker container, where the repo was copied, `mvnw` converted to LF, and `./mvnw -B test` run].
+- 23 test classes (one per production class that has behaviour of its own) with 387 annotated test methods; parameterized and repeated tests expand them to 453 executions [Verified — grep of `src/test`].
+- **Mutation testing** (PIT, §5): final run **702 mutations, 644 killed (92%), test strength 94%, line coverage 94% (1290/1368)** [Verified — observed]. Earlier runs on the same day are in the table in §5.
 
-The testing rules are written in CLAUDE.md and Spec §1 [Verified]:
+History worth knowing. The Spec once said "326 tests, all green (three consecutive full runs)"; the first full run while writing these guides gave 325/326 because of a flaky test (§6). Lesson: "N runs green" is weak evidence for concurrent code.
+
+The testing rules are in CLAUDE.md and Spec §1 [Verified]:
 1. One test class per production class, `@Nested` groups per behaviour; tests mirror the main packages.
 2. Every wait in a concurrent test has a timeout; never synchronise with `Thread.sleep`.
 3. After a behavioural change, run `-Pmutation` and explain survivors in Spec §7.
-4. Expected noise: tests that inject poison pills or fatal errors log stack traces ("simulated engine bug", `OutOfMemoryError: simulated`). These are not failures.
+4. Expected noise: tests that inject poison pills or fatal errors log stack traces ("simulated engine bug", `OutOfMemoryError: simulated`, "callback bug"). These are not failures.
 
 ---
 
@@ -26,284 +28,272 @@ The testing rules are written in CLAUDE.md and Spec §1 [Verified]:
 
 ```mermaid
 flowchart TB
-    U["Unit tests per class<br/>(domain, book, engine, command, journal codec)"] --> C["Component tests with real files<br/>(CommandJournalTest, ExchangeTest, ReplayTest)"]
-    C --> T["Concurrency tests with real writer thread<br/>(ExchangeServiceTest)"]
-    T --> E["End-to-end: real sockets + writer + journal<br/>(TcpGatewayTest, ClientSessionTest)"]
-    P["Property-style: random traffic + invariant re-derivation<br/>(OrderBookTest), determinism (MatchingEngineTest)"] -.-> U
+    U["Unit tests per class<br/>(domain, book, engine, command, codec, digest, output log, credentials)"] --> C["Component tests with real files<br/>(CommandJournalTest, ExchangeTest, ReplayTest, SnapshotTest, DurableTest)"]
+    C --> T["Concurrency tests with a real writer thread<br/>(ExchangeServiceTest)"]
+    T --> E["End to end: real sockets (and TLS) + writer + journal<br/>(TcpGatewayTest, ExchangeClientTest)"]
+    X["Cross-process: a child JVM runs Main<br/>(CommandJournalTest.Exclusive)"] -.-> E
+    P["Property-style: random traffic + invariant re-derivation,<br/>determinism, export/restore equivalence"] -.-> U
     M["Mutation testing (PIT) over domain..core"] -.-> U & C & T
     B["JMH benchmarks (bench/, not run by surefire)"]
 ```
 
 | Layer | What it proves | Example |
 |---|---|---|
-| Unit | Each class's contract, including its refusals | `PriceLevelTest.Unlink.refusesASentinel` |
-| Invariant / property | The book's invariants hold after every one of 30,000 random commands (3 seeds × 10,000), all five order types, wrong-owner cancels included; every trade has exactly one passive fill | `src/test/java/exchangeserver/book/OrderBookTest.java:254-299` |
-| Determinism | The same 2,000 commands give equal outputs from two fresh engines | `src/test/java/exchangeserver/engine/MatchingEngineTest.java:601-627` |
-| Durability / recovery | Visible ⇒ durable; restart rebuilds the identical book; torn tail cut; corrupt record never dropped; version refused | `ExchangeTest.LivePath.visibleImpliesDurable` (`src/test/java/exchangeserver/core/ExchangeTest.java:80`), `ExchangeTest.Restart.*`, `CommandJournalTest.Recovery.*` |
-| Concurrency | Each caller gets its own result; stop never loses a request; BUSY backpressure; halt refuses everything; batching shapes | `ExchangeServiceTest.*` |
-| End to end | The protocol, routing, ordering of lines, subscription races, restart behind a new gateway | `TcpGatewayTest.*` |
-| Regression | One test per review/survey finding, each checked to fail on the old code | Spec §9, §10 |
+| Unit | Each class's contract, including its refusals | `ResponseTest.selfTradePreventedGoesWithCancelledOnly` |
+| Invariant / property | The book's invariants hold after every one of 30,000 random commands, all five order types | `src/test/java/exchangeserver/book/OrderBookTest.java:293` |
+| Determinism | Same commands → equal outputs; a restored engine behaves like the original | `src/test/java/exchangeserver/engine/MatchingEngineTest.java:818`; `MatchingEngineTest.SnapshotState` |
+| Durability / recovery | Visible ⇒ durable; restart and compaction rebuild the same state; checksums, CRLF, torn tails, divergence | `ExchangeTest.Restart`, `ExchangeTest.Compaction`, `ExchangeTest.Checkpoints`, `JournalCodecTest.Corrupt`, `ReplayTest.Check` |
+| Concurrency | Own results per caller; stop never loses a request; BUSY; halt; batching; callback errors; listener-before-callback | `ExchangeServiceTest.*` |
+| End to end | Protocol, routing, the private stream, security, limits, cancel-on-disconnect, subscription races | `TcpGatewayTest.*` |
+| Cross-process | `--quarantine` is refused while another JVM holds the journal (the POSIX lock question) | `src/test/java/exchangeserver/journal/CommandJournalTest.java:312` |
+| Regression | One test per review/survey finding | Spec §9, §10, §11 |
 
-### 1.2 Test classes and sizes
+### 1.2 Test classes
 
-Counts are annotated test methods (`@Test`, `@ParameterizedTest`, `@RepeatedTest`); parameterized and repeated tests expand into more executions, which is how they add up to 334 [Verified — grep of `src/test`].
-
-| Package | Test class | Methods | Notable groups (`@Nested`) |
+| Package | Test class | Methods | `@Nested` groups (new ones in **bold**) |
 |---|---|---|---|
-| domain | `RulesTest` | 6 | band edges, overflow at max price |
-| domain | `OrderRequestTest` | 16 | `Factories`, `Validation` |
-| domain | `OrderTest` | 8 | `Construction`, `Price`, `Fill` |
-| book | `PriceLevelTest` | 21 | `AddOrder`, `FillHead`, `Unlink` |
-| book | `OrderBookTest` | 21 | `Add`, `FillBest`, `Cancel`, `OpenOrders`, `LevelUpdates`, `InvariantsUnderRandomTraffic` |
-| engine | `MatchingEngineTest` | 54 | `Limit`, `Ioc`, `Fok`, `Market`, `PostOnly`, `Cancel`, `Risk`, `Outputs`, `Snapshot`, `Guards`, `Determinism` |
-| engine | `ResponseTest` | 9 | constructor invariants |
-| command | `SequencerTest` | 18 | `Stamping`, `InvalidInputUsesUpNothing`, `Clock`, `Resume`, `CommandValidation` |
-| journal | `JournalCodecTest` | 10 | `RoundTrip`, `Header`, `Corrupt` |
-| journal | `CommandJournalTest` | 24 | `Header`, `AppendAndRead`, `Recovery`, `Exclusive`, `FailStop` |
-| core | `ReplayTest` | 10 | verify/feed passes |
-| core | `ExchangeTest` | 23 | `LivePath`, `Restart`, `PoisonPill` |
-| core | `ExchangeServiceTest` | 20 | `HandIn`, `Stop`, `Backpressure`, `Failures`, `Batching` |
-| gateway | `ProtocolTest` | 13 | `Parse`, `Format` |
+| (root) | **`MainTest`** | 2 | operator hints (L2) |
+| domain | `RulesTest`, `OrderRequestTest`, `OrderTest` | 6, 16, 8 | `Factories`, `Validation`, `Construction`, `Price`, `Fill` |
+| book | `PriceLevelTest` | 22 | `AddOrder`, `FillHead`, `Unlink` (+ `nextNode`) |
+| book | `OrderBookTest` | 24 | `Add`, `FillBest`, `Cancel`, `OpenOrders`, `LevelUpdates`, **`Walk`**, `InvariantsUnderRandomTraffic` |
+| engine | `MatchingEngineTest` | 73 | `Limit`, `Ioc`, `Fok`, `Market`, `PostOnly`, `Cancel`, `Risk`, **`SelfTrade`**, **`Caps`**, **`CancelAll`**, **`SnapshotState`**, `Outputs`, `Snapshot`, `Guards`, `Determinism` |
+| engine | `ResponseTest` | 10 | reason pairing (D67) |
+| command | `SequencerTest` | 21 | `Stamping`, `InvalidInputUsesUpNothing`, `Clock`, `Resume`, `CommandValidation` (+ CANCEL_ALL, CHECK) |
+| journal | `JournalCodecTest` | 16 | `RoundTrip`, `Header`, `Corrupt` (+ checksum, CRLF) |
+| journal | `CommandJournalTest` | 25 | `Header` (+ rules adoption), `AppendAndRead`, `Recovery`, `Exclusive`, `FailStop` |
+| journal | **`DurableTest`** | 3 | atomic write, copy, directory fsync |
+| core | `ReplayTest` | 15 | **`Verify`**, **`Feed`**, **`Check`** |
+| core | `ExchangeTest` | 36 | `LivePath`, `Restart`, `PoisonPill`, **`Checkpoints`**, **`Compaction`**, **`Operations`** |
+| core | `ExchangeServiceTest` | 24 | `HandIn`, `Stop`, `Backpressure`, `Failures`, `Batching`, **`Robustness`** |
+| core | **`OutputDigestTest`**, **`OutputLogTest`**, **`SnapshotTest`** | 5, 5, 6 | digest sensitivity; numbering and retention; snapshot file round trip and corruption |
+| gateway | `ProtocolTest` | 17 | `Parse`, `Format` (oseq lines, LOGIN with secret, RESEND) |
 | gateway | `ClientSessionTest` | 5 | `ReadLine` |
-| gateway | `TcpGatewayTest` | 23 | `Session`, `Trading`, `MarketData` |
-| — | `bench/MatchingBenchmark`, `bench/BatchingBenchmark` | (JMH) | excluded from surefire |
+| gateway | **`CredentialsTest`** | 5 | verify, salted file, weak input, missing or corrupt file |
+| gateway | `TcpGatewayTest` | 40 | `Session`, **`Security`**, **`Limits`**, `Trading`, **`Resend`**, **`CancelOnDisconnect`**, `MarketData` |
+| client | **`ExchangeClientTest`** | 3 | `linesUntil` consumes exactly its lines (L4) |
+| — | `bench/MatchingBenchmark`, `bench/BatchingBenchmark` | (JMH) | excluded from surefire; still compile |
 
-There is no test class for `Main`, `ClientMain`, `ExchangeClient` (used as a test helper), `TcpGateway` beyond `TcpGatewayTest`, or the small records and enums (exercised indirectly) [Verified].
+No test class: `ClientMain`, `Tls` (covered end to end by `TcpGatewayTest.Security.tlsRoundTrip`), `JournalLock` (covered by `CommandJournalTest.Exclusive`), `Ledger` (covered through `ReplayTest` and `ExchangeTest`), and small records and enums [Verified].
 
 ---
 
 ## 2. Test seams
 
-A *seam* is a place where a test can change or observe behaviour without editing production code. All of these are package-private or test-only, so production callers cannot use them [Verified].
+A *seam* is a place where a test can change or observe behaviour without editing production code. All are package-private or test-only [Verified].
 
 | Seam | Where | Used for |
 |---|---|---|
-| `CommandInterceptor` (package-private functional interface, `NONE` in production) | `src/main/java/exchangeserver/core/CommandInterceptor.java:5-17` | Runs before the engine processes each command, live and during replay. Tests throw from it (poison pill) or block in it (hold the writer) |
-| `Gate` (an interceptor that blocks on any order whose client order id starts with `HOLD`) | `src/test/java/exchangeserver/core/ExchangeServiceTest.java:88-108` | Holds the writer mid-batch so the test can queue requests behind it: batching shapes, BUSY, cancelled futures |
-| `POISON` (throws `IllegalStateException("simulated engine bug")` for client order ids starting with `POISON`) | `src/test/java/exchangeserver/core/ExchangeTest.java:55-59` | Drives the poison-pill policy, live and on restart |
-| `MutableClock` (a `java.time.Clock` tests can set, advance or move backwards; thread-safe) | `src/test/java/exchangeserver/testing/MutableClock.java` | Deterministic timestamps; backwards-clock tests |
-| `OrderBook.checkInvariants()`, `ordersAt(side, price)` | `src/main/java/exchangeserver/book/OrderBook.java:177-234` | Re-derive every book invariant from scratch; walk a level's list both ways |
-| `MatchingEngine.book()`, `MatchingEngine(OrderBook)` constructor | `src/main/java/exchangeserver/engine/MatchingEngine.java:52-59, 101-104` | Inspect the book behind an engine (same package only) |
-| `Exchange.engine()`, `Exchange.process(batch, listener)`, `Pending` | `src/main/java/exchangeserver/core/Exchange.java:118, 237` | Hand-build a batch (e.g. poison in the middle of one) |
-| `ExchangeService.start(..., interceptor)` (package-private overload) | `src/main/java/exchangeserver/core/ExchangeService.java:125-133` | Start the service with an interceptor |
-| `CommandJournal.openJournals()` (count of open journals in this JVM) | `src/main/java/exchangeserver/journal/CommandJournal.java:105-107` | Prove a journal handle was released. On Windows, deleting a file proves nothing, because Java opens files with delete sharing |
-| `TcpGateway.participantsRegistered()`, `subscriberCount()` | `src/main/java/exchangeserver/gateway/TcpGateway.java:168-174` | Registry leaks, subscription state |
-| `TcpGateway(0)` (port 0 = OS picks a free port) | `src/test/java/exchangeserver/gateway/TcpGatewayTest.java:42` | Parallel-safe end-to-end tests |
-| `ExchangeClient` (`await`, `awaitPrefix`, `linesUntil`, `isClosedByServer`, `field`) | `src/main/java/exchangeserver/client/ExchangeClient.java` | Line client with timeouts that keeps lines it skipped |
-| `@TempDir` (JUnit creates and deletes a temporary directory per test) | every journal-touching test | Isolated journal files |
+| `CommandInterceptor` (package-private, `NONE` in production) | `src/main/java/exchangeserver/core/CommandInterceptor.java:5-17` | Runs before the engine on each command, live and during replay. Tests throw from it (poison pill) or block in it |
+| `Gate` interceptor (blocks on client order ids starting `HOLD`) | `src/test/java/exchangeserver/core/ExchangeServiceTest.java:88` | Hold the writer mid-batch (batching shapes, BUSY, cancelled futures) |
+| `POISON` interceptor | `src/test/java/exchangeserver/core/ExchangeTest.java:55` | Drive the poison-pill policy |
+| **`Hold` listener** (an `OutputListener` wrapper that blocks once, right after the output of the command it was armed for) | `src/test/java/exchangeserver/gateway/TcpGatewayTest.java:69` | Gateway tests cannot reach the package-private interceptor; holding the writer *after* a command keeps later requests in flight (in-flight limit, D76 during shutdown) |
+| **`MatchingEngine.Limits`** (package-private constructor with small caps) | `src/main/java/exchangeserver/engine/MatchingEngine.java:50-53`, `73` | Reach `MAX_OPEN_ORDERS` and `BOOK_FULL` with a handful of orders instead of a million |
+| **`TcpGateway.drainingSessions()`** | `src/main/java/exchangeserver/gateway/TcpGateway.java:275`; `ClientSession.draining()` `src/main/java/exchangeserver/gateway/ClientSession.java:111` | Wait until a session's reader stopped (QUIT read) while requests are still in flight |
+| **`Credentials.of(map, 1_000)`** | `src/test/java/exchangeserver/gateway/TcpGatewayTest.java:52` | Few PBKDF2 iterations so hundreds of logins stay fast |
+| **`Exchange.Options(checkInterval, retention)`** | `Exchange.open(..., options)` | CHECK every command or two; tiny RESEND retention to provoke `RESEND_GAP` |
+| `MutableClock` | `src/test/java/exchangeserver/testing/MutableClock.java` | Deterministic timestamps |
+| `OrderBook.checkInvariants()`, `ordersAt()` | `src/main/java/exchangeserver/book/OrderBook.java:211`, `226` | Re-derive every book invariant from scratch |
+| `MatchingEngine.book()`, `Exchange.engine()`, `Exchange.digest()`, `Exchange.process(batch, listener)`, `Pending` | `src/main/java/exchangeserver/engine/MatchingEngine.java:174`; `src/main/java/exchangeserver/core/Exchange.java:198`, `347`, `351` | Inspect state on the owning thread; hand-build a batch |
+| `ExchangeService.start(..., interceptor)` | `src/main/java/exchangeserver/core/ExchangeService.java:130` | Start the service with an interceptor |
+| `CommandJournal.openJournals()` | `src/main/java/exchangeserver/journal/CommandJournal.java:134` | Prove a handle was released (deleting a file proves nothing on Windows) |
+| `TcpGateway.participantsRegistered()`, `subscriberCount()` | `src/main/java/exchangeserver/gateway/TcpGateway.java:266`, `270` | Registry leaks, subscription state |
+| `ExchangeClient` (timed `await`, `linesUntil`, `isClosedByServer`; TLS via a `SocketFactory`) | `src/main/java/exchangeserver/client/ExchangeClient.java` | Line client for end-to-end tests |
+| `keytool` from `java.home` | `TcpGatewayTest.Security.tlsRoundTrip` | Generate a self-signed PKCS#12 keystore for the TLS test |
 
-The `Gate` pattern, in full, because many concurrency tests rely on it:
+The `Hold` listener, because the gateway tests that need a busy writer rely on it:
 
 ```java
-// src/test/java/exchangeserver/core/ExchangeServiceTest.java:88-108 (trimmed)
-private static final class Gate implements CommandInterceptor {
+// src/test/java/exchangeserver/gateway/TcpGatewayTest.java:69-91 (trimmed)
+private static final class Hold implements OutputListener {
+    volatile OutputListener next = NONE;
+    volatile boolean armed;
     final CountDownLatch reached = new CountDownLatch(1);
     final CountDownLatch release = new CountDownLatch(1);
 
     @Override
-    public void beforeEngine(exchangeserver.command.Command command) {
-        if (command instanceof NewOrderCommand n && n.request().getClientOrderId().startsWith("HOLD")) {
+    public void onOutput(EngineOutput output, List<PrivateEvent> events) {
+        next.onOutput(output, events);
+        if (armed) {
+            armed = false;
             reached.countDown();
-            if (!release.await(WAIT.toSeconds(), TimeUnit.SECONDS)) {
-                throw new IllegalStateException("gate never released");
+            try {
+                release.await(WAIT.toSeconds(), TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
-    }
-    void awaitReached() throws InterruptedException {
-        assertTrue(reached.await(WAIT.toSeconds(), TimeUnit.SECONDS), "writer never reached the gate");
     }
 }
 ```
 
-Typical use: submit a `HOLD` order, `awaitReached()` (the writer is now blocked *inside* processing, after journalling that batch), submit more requests (they queue up), then `release.countDown()`.
+Because the listener runs **before** the request's future completes (D76), holding it keeps that request, and everything queued behind it, in flight.
 
 ---
 
 ## 3. Running tests
 
-All commands run from the repo root. Use `mvnw.cmd` on Windows and `./mvnw` elsewhere. Don't run two Maven builds at once: they share `target/` [Verified — CLAUDE.md].
+From the repo root; `mvnw.cmd` on Windows, `./mvnw` elsewhere. Never two Maven builds at once (shared `target/`).
 
-| Goal | Command | Notes |
-|---|---|---|
-| Everything | `mvnw.cmd test` | ~1–2 min; ends `Tests run: 334, Failures: 0 ...` and `BUILD SUCCESS` |
-| One class (with all its `@Nested` groups) | `mvnw.cmd test -Dtest=MatchingEngineTest` | [Verified — CLAUDE.md; used in this session] |
-| One method | `mvnw.cmd test -Dtest=RulesTest#oppositeSide` | [Verified — CLAUDE.md] |
-| One `@Nested` group | `mvnw.cmd test "-Dtest=MatchingEngineTest$Market"` | Nested classes compile to `Outer$Inner`; quote the argument so the shell doesn't expand `$` [Inferred — standard surefire/JUnit 5 behaviour, not run in this session] |
-| One method in a group | `mvnw.cmd test "-Dtest=MatchingEngineTest$Market#emptyBookCancelsAll"` | [Inferred, as above] |
-| Several classes | `mvnw.cmd test "-Dtest=CommandJournalTest,ExchangeTest,TcpGatewayTest"` | [Verified — used in this session] |
-| Mutation testing | `mvnw.cmd -Pmutation test` | Several minutes; report at `target/pit-reports/index.html` |
-| Clean first | `mvnw.cmd clean test` | Needed after restoring files with older timestamps: Maven compiles incrementally by modification time, and a stale class was the cause of a false alarm in this session [Verified — CLAUDE.md] |
+| Goal | Command |
+|---|---|
+| Everything | `mvnw.cmd test` (ends `Tests run: 453, Failures: 0 ...`, `BUILD SUCCESS`) |
+| One class with its groups | `mvnw.cmd test -Dtest=MatchingEngineTest` |
+| One method | `mvnw.cmd test -Dtest=RulesTest#oppositeSide` |
+| One `@Nested` group | `mvnw.cmd test "-Dtest=MatchingEngineTest$SelfTrade"` (quote it: `$`) [Inferred — standard surefire behaviour] |
+| Several classes | `mvnw.cmd test "-Dtest=ExchangeTest,ReplayTest,CommandJournalTest"` [Verified — used] |
+| Mutation testing | `mvnw.cmd -Pmutation test` → `target/pit-reports/index.html` |
+| Clean first | `mvnw.cmd clean test` (after restoring files with older timestamps) |
+| Linux, from Windows | Docker: copy the repo into an `eclipse-temurin:17` container, `sed -i 's/\r$//' mvnw`, `./mvnw -B test` [Verified — done on 2026-10-27] |
 
-On Windows, if a `clean` fails with "Failed to delete ...\target\pit-reports", some process (even a shell whose working directory is inside `target/`) holds the folder [Verified — happened in this session].
-
-Reading the output: per-class lines like `Tests run: 24, Failures: 0, Errors: 0, Skipped: 0 -- in exchangeserver.core.ExchangeServiceTest`, then a summary. Stack traces for "simulated engine bug" and `OutOfMemoryError: simulated` are expected. In the IDE (IntelliJ: File › Open › `pom.xml`) the `@Nested` groups show as a tree.
+`.gitattributes` now pins `mvnw` to LF, so a fresh clone works on Linux even when Windows git has `core.autocrlf` on [Verified — `.gitattributes`].
 
 ---
 
 ## 4. Writing a new test
 
-Follow the house style. A template for an engine behaviour:
+House style, with an example from the self-trade group:
 
 ```java
-// in src/test/java/exchangeserver/engine/MatchingEngineTest.java, inside the existing class
+// src/test/java/exchangeserver/engine/MatchingEngineTest.java (trimmed)
 @Nested
 class SelfTrade {                                   // one @Nested group per behaviour
 
     @Test
-    void sameParticipantOrdersStillTrade() {        // the name states the behaviour as a sentence
-        limit("a", SELL, 100, 5);                   // existing helpers stamp seq/id like the sequencer
+    void aLimitThatWouldCrossItsOwnOrderIsCancelledNotRested() {
+        limit("a", SELL, 100, 5);                   // helpers stamp seq/id like the sequencer
         Response r = limit("a", BUY, 100, 5);
-        assertEquals(OrderStatus.FILLED, r.status());
-        assertEquals(1, r.trades().size());
+        assertEquals(OrderStatus.CANCELLED, r.status());
+        assertEquals(Reason.SELF_TRADE_PREVENTED, r.reason());
+        assertEquals(5, book.volumeAt(SELL, 100), "the resting order is untouched");
     }
 }
 ```
 
-Checklist [Verified as house style, from the existing tests and CLAUDE.md]:
-1. **Put it in the test class that mirrors the production class** (same package, so package-private seams are visible).
-2. **Use a `@Nested` group per behaviour**, and name tests as statements (`refusesASecondUnlink`, `bandIsInclusiveAroundTheLastTrade`).
-3. **Use the class's helpers.** `MatchingEngineTest` has `limit/ioc/fok/market/postOnly/cancel` that stamp sequence numbers and ids [Verified — `src/test/java/exchangeserver/engine/MatchingEngineTest.java:37-80`].
-4. **Concurrency:** every wait has a timeout (`f.get(WAIT...)`, `latch.await(WAIT...)`, `ExchangeClient.await(..., WAIT)`); use `Gate` rather than sleeps; inspect state through a future (`service.snapshot(...)`), never by reading the book from the test thread; read writer stats only after `stop()`.
-5. **Files:** use `@TempDir`; prove a handle was released with `CommandJournal.openJournals()`, not by deleting the file.
-6. **Book changes:** call `checkInvariants()` (book package) after mutations.
-7. **Regression tests:** put the old code back and confirm the test fails (the project's practice in Spec §9/§10), then add a comment naming the finding or D-number.
-8. **Afterwards:** run `-Pmutation`; explain any new survivors in Spec §7.
+Checklist [Verified as house style]:
+1. **Mirror the production class** (same package, so package-private seams are visible).
+2. **One `@Nested` group per behaviour**; test names are statements.
+3. **Use the helpers**: `MatchingEngineTest` has `submit/limit/ioc/fok/market/postOnly/cancel` [Verified — `src/test/java/exchangeserver/engine/MatchingEngineTest.java:39-74`]; `TcpGatewayTest` has `login(participant[, " COD"])`, `restart(settings..., hold)`.
+4. **Concurrency:** every wait has a timeout; hold the writer with `Gate` (core) or `Hold` (gateway), never a sleep; inspect state through a future; read writer stats only after `stop()`.
+5. **Files:** `@TempDir`; write journals with **LF** (`Files.writeString(file, String.join("\n", lines) + "\n", UTF_8)`), because `Files.write(path, lines)` uses CRLF on Windows and the journal now refuses CRLF (this tripped a test during the fixes) [Verified — `src/test/java/exchangeserver/core/ExchangeTest.java:402`]. A tampered record must get a recomputed CRC (`Checksums.crcHex`) unless the test is about the checksum.
+6. **Gateway logins** need a secret from the test's `Credentials`.
+7. **Regression tests:** prove they fail on the old code where the API allows it (Spec §9/§10 practice).
+8. **Afterwards:** run `-Pmutation`; explain new survivors in Spec §7.
 
 ---
 
 ## 5. Mutation testing (PIT)
 
-**What it is.** PIT (pitest) makes small automatic changes ("mutants") to the compiled production code, e.g. `<` → `<=`, removing a method call, returning `0`, and reruns the tests that cover each change. A mutant is **killed** if some test fails, and **survives** if all tests still pass. A survivor shows either a missing test or a change that cannot be observed. It is "breaking the code on purpose", automated [Verified — `pom.xml:126-169` comment].
+**What it is.** PIT makes small automatic changes ("mutants") to the compiled production code (`<` → `<=`, remove a call, return `0`) and reruns the covering tests. A mutant is **killed** if a test fails; a **survivor** means a missing test or an unobservable change.
 
-**Scope.** Packages `domain`, `book`, `engine`, `command`, `journal`, `core` (`pom.xml:143-150`). **Not mutated: `gateway`, `client`, `Main`.** The gateway is covered only by end-to-end tests [Verified — Spec §7].
+**Scope.** `domain`, `book`, `engine`, `command`, `journal`, `core` [Verified — `pom.xml:143-150`]. **Not mutated: `gateway`, `client`, `Main`** (covered by end-to-end tests only).
 
-**Results** [Verified — Spec §7 and runs observed in this session]:
+**Results** [Verified — Spec §7 and runs observed on 2026-10-27]:
 
 | run | mutations | killed | test strength | line coverage |
 |---|---|---|---|---|
 | first (rewrite) | 476 | 432 (91%) | 94% | 94% |
 | after code-review fixes | 478 | 444 (93%) | 95% | 95% |
-| after survey fixes D63/D64 and the first D65 (2026-10-27) | 486 | 450 (93%) | 95% | 95% (846/891 lines) |
-| **final: after the D65 rework to `<journal>.lock` (2026-10-27)** | **496** | **454 (92%)** | **94%** | **94% (864/920 lines)** |
+| after survey fixes D63–D65 | 496 | 454 (92%) | 94% | 94% |
+| first run after the risk fixes D66–D77 (before the gap-closing tests below) | 705 | 640 (91%) | 93% | 94% (1290/1369) |
+| **final** (after the PIT-driven tests) | 702 | 644 (92%) | 94% | 94% (1290/1368) |
 
-*Test strength* = killed ÷ mutants that some test covers. In the final run 15 mutants had no covering test at all (11 before the rework). The rework's 10 new mutants: the in-JVM paths are killed; the 3 in `Lock.acquire`'s "another process holds the lock" branch have **no coverage**, because that branch only runs inside the child JVM of `CommandJournalTest.anotherProcessIsRefusedWhileTheJournalIsOpen`, which PIT does not instrument.
+The first post-fix run pointed at real gaps, which got tests: a CANCEL_ALL or CHECK record with an extra field; FOK volume **behind** the participant's own order must not count (`SelfTrade.volumeBehindItsOwnOrderDoesNotMakeAFokFillable`); CANCEL_ALL's sequence check; every output field changes the digest (`OutputDigestTest.eachFieldChangesTheDigest`, `cancelResultsAreInTheDigest`). One equivalent mutant was removed by simplifying code (`selfTradePrevented && remaining > 0` → `selfTradePrevented`), and a dead overload (`ExchangeService.start(path, listener)`) was deleted [Verified — Spec §7, §11].
 
-**The survivors, by kind** [Verified — PIT report observed; classification follows Spec §7]:
-
-| Kind | Survivors | Why it survives |
-|---|---|---|
-| Not observable by a unit test | Removed `force()` (fsync) in `open`, `cutTornTail`, `appendAll`; removed log calls (`Exchange.quarantine`, `ExchangeService.halt`, `run` [no coverage], `Exchange.process` listener-failure log [no coverage]); removed `addSuppressed` (`Exchange.open`, `CommandJournal.open`); `awaitTermination` (only `Main` calls it; no coverage) | Durability needs a power cut to test; logs aren't asserted |
-| Equivalent (no behaviour change) | `<=` vs `<` where a second check throws anyway (`OrderBook.add`, `PriceLevel.addOrder` overflow guard, `PriceLevel.fillHead`); linger and journal scan-loop boundaries that only change an extra iteration (`ExchangeService.linger` ×2, `run`, `cutTornTail`, `endOfLastCompleteRecord`); `StringBuilder` initial capacity in `appendAll`; the 1,024-byte header-length cap in `readFirstRecord` | Equivalent mutants can't be killed |
-| Test support / cosmetic | `OrderBook.checkInvariants` boundaries ×4 (test-only code); `toString` (`Order`, `PriceLevel`, `OrderRequest`); `OrderRequest.hashCode` → 0 (still correct, just slow); `OrderRequest.equals` `this == o` shortcut; `CommandJournal.getFile` (unused); the callback-less `ExchangeService.cancel` future variant (no test calls it) | Not worth a test, or (for `getFile`) dead code |
-
-**A survivor that was briefly killable.** "Removed `channel.close()` on the failed-open path" is unobservable (the open-journal counter only counts successful opens). With the *first* D65 (lock on the journal itself) a leaked channel kept the lock, so a reopen killed it; after the rework the lock lives on a separate channel, so it survives again, with its `channel != null` guard. The reopen line in `CommandJournalTest.otherRulesVersionIsRefusedAndTheFileIsReleased` now kills "removed `lock.release()`" instead [Verified — final PIT report; `src/test/java/exchangeserver/journal/CommandJournalTest.java:72-80`].
+**Survivors, by kind** [Verified — PIT report; classification as in Spec §7]:
+- **Unobservable by a unit test**: removed `force()` and `fsyncDirectory` calls (journal, `Durable`); removed log calls; `addSuppressed`; `awaitTermination`.
+- **Covered only in a child JVM**: `JournalLock.acquire`'s "another process holds the lock" branch runs only in the child JVM of `anotherProcessIsRefusedWhileTheJournalIsOpen`, which PIT does not instrument (no coverage).
+- **Equivalent**: boundaries where a second check throws anyway, scan-loop and linger boundaries, `StringBuilder` capacities, snapshot reader boundaries that both end in "corrupt", the fillability walk's early-stop boundary, the `matchLimit` branch for an empty opposite side (nothing trades either way).
+- **Test support / cosmetic**: `checkInvariants` boundaries, `toString`, `hashCode` → 0.
 
 ---
 
-## 6. The flaky test and its fix
+## 6. The flaky test and its fix (survey, 2026-10-27)
 
-**Symptom.** In a full run, `waitingRequestsShareOneBatch` failed with `expected: <50> but was: <1>`; it passed 8/8 when run alone [Verified — observed].
+**Symptom.** In a full run `waitingRequestsShareOneBatch` failed with `expected: <50> but was: <1>`; alone it passed 8/8.
 
-**Cause.** The writer loop updates its statistics **after** `exchange.process(batch, ...)` returns, but each request's future is completed **inside** `process`:
+**Cause.** The writer updates `batches`, `processed`, `largestBatch` **after** `exchange.process` returns, but each request's future completes **inside** `process`, so a test thread woken by the last future could read stale stats [Verified — `src/main/java/exchangeserver/core/ExchangeService.java:296-305`; timing Inferred].
 
-```java
-// src/main/java/exchangeserver/core/ExchangeService.java:259-264
-if (!batch.isEmpty()) {
-    exchange.process(batch, listener);      // completes every future in the batch
-    batches++;                              // ...then updates the stats
-    processed += batch.size();
-    largestBatch = Math.max(largestBatch, batch.size());
-}
-```
-
-A test thread woken by the last future could read `largestBatch` before the writer had updated it. Under full-suite load that window was wide enough to be hit once. The same race existed in five assertions across `ExchangeServiceTest` [Verified — code; the timing explanation is Inferred but consistent with the observed failure and passes].
-
-**Fix (tests only).** Each of those tests now calls `assertTrue(service.stop(WAIT))` before reading the stats. `stop()` joins the writer thread, and `Thread.join` is a happens-before edge, so the final values are visible. A class comment records the rule, and the production field comment now says the stats lag the replies [Verified — `src/test/java/exchangeserver/core/ExchangeServiceTest.java:38-40`; `src/main/java/exchangeserver/core/ExchangeService.java:101-106`]. One consequence: `manyThreadsEachGetTheirOwnResult` now expects `threads * each + 1` processed, because the snapshot read it makes before stopping is counted too.
-
-**Lesson.** "N runs green" is weak evidence for concurrent code. The Spec's "three consecutive full runs" claim hid this flake.
+**Fix (tests only).** Read stats after `assertTrue(service.stop(WAIT))`: `stop()` joins the writer, a happens-before edge. The class comment states the rule [Verified — `src/test/java/exchangeserver/core/ExchangeServiceTest.java:40-42`].
 
 ---
 
-## 7. Coverage map: what is and isn't tested
+## 7. Coverage map
 
 | Area | Covered by | Gaps |
 |---|---|---|
-| Order types × fill outcomes (LIMIT/IOC/FOK/MARKET/POST_ONLY × full/partial/none) | `MatchingEngineTest` groups per type, "all six price relations" | — |
-| Risk checks (duplicate, band, collar, cap, post-only cross) | `MatchingEngineTest.Risk`, `Market`, `PostOnly` | Interaction of the cap with a fully fillable LIMIT is tested as a rule, not questioned |
-| Book invariants | Unit tests + 30,000 random commands with full re-derivation | — |
-| Journal format, torn tail, corrupt record, version, header-before-cut (D64) | `JournalCodecTest`, `CommandJournalTest.Header/Recovery` | **CRLF-converted journal**: no test (observed live: startup fails) |
-| Journal exclusivity (D65) | `CommandJournalTest.Exclusive` (in-JVM, plus a child JVM running `Main --quarantine` after the holder has called `read()`), `ExchangeTest.quarantineToolRefusesWhileTheExchangeIsRunning` | Run on **Windows only**; the POSIX behaviour that motivated the redesign is untested |
-| Fail-stop | `CommandJournalTest.FailStop`, `ExchangeServiceTest.Failures` | A real disk error (tests simulate with a closed channel / thrown `Error`) |
-| Replay & recovery | `ReplayTest`, `ExchangeTest.Restart` | Very large journals (time/memory) |
-| Poison pill | `ExchangeTest.PoisonPill`, `ExchangeServiceTest.Failures.poisonIsQuarantinedAndTheServiceCarriesOn` | — |
-| Service concurrency (hand-in, stop races, BUSY, halt, batching, D61) | `ExchangeServiceTest` | `stop()` called from the writer itself (documented limitation) |
-| Protocol parse/format | `ProtocolTest` | — |
-| Gateway end to end (login, trading, routing, market data, subscription races, D63 QUIT/EOF, restart) | `TcpGatewayTest`, `ClientSessionTest` | See §8 |
+| Order types × outcomes | `MatchingEngineTest` per type | — |
+| Risk checks, caps (D68), collar (D66) | `Risk`, `Caps` (small `Limits`), `Market` | The real 1,000,000 cap (tested only through the seam) |
+| Self-trade prevention (D67) | `MatchingEngineTest.SelfTrade`, `TcpGatewayTest.Trading.selfTradeIsPreventedOverTheWire` | — |
+| Book invariants | Unit tests + 30,000 random commands | Random traffic does not include CANCEL_ALL |
+| Journal format v3 (CRC, CRLF, header, rules adoption) | `JournalCodecTest`, `CommandJournalTest.Header` | Directory fsync (unobservable) |
+| Journal exclusivity (D65) | `CommandJournalTest.Exclusive` (in-JVM and a child JVM), `ExchangeTest.PoisonPill.quarantineToolRefusesWhileTheExchangeIsRunning` | macOS not run; network file systems |
+| Replay, CHECK digests (D70) | `ReplayTest`, `ExchangeTest.Checkpoints` | A real code change between builds (simulated by tampering) |
+| Snapshots, compaction (D71) | `SnapshotTest`, `ExchangeTest.Compaction` (restart equality, id scope, oseq continuity, chains, crash after snapshot, rules crossing, poison after compaction, corrupt snapshot) | A crash **during** the atomic rename (relies on the OS) |
+| Private stream, RESEND (D73) | `OutputLogTest`, `TcpGatewayTest.Resend`, `ExchangeTest.Operations` | — |
+| Cancel-on-disconnect (D72) | `TcpGatewayTest.CancelOnDisconnect` | COD during a clean shutdown (only by reasoning) |
+| Authentication, TLS (D74) | `CredentialsTest`, `TcpGatewayTest.Security` | TLS with a real CA and hostname checks; `--bind` to a non-loopback address |
+| Session limits (D75) | `TcpGatewayTest.Limits` | Limits under many concurrent sessions |
+| D76 close after in-flight | `TcpGatewayTest.Session.quitAnswersEveryEarlierRequestBeforeBye`, `endOfStreamStillGetsTheReplies`, `quitDuringShutdownStillGetsTheRepliesOfAcceptedRequests` | — |
+| Operations (D77) | `MainTest` (hints), `ExchangeTest.Operations`, `ExchangeServiceTest.Robustness` | The recovery summary line itself (printed by `Main`, not asserted) |
 
 ---
 
-## 8. Critical untested paths
+## 8. Untested or only hand-checked paths
 
-Each item below was checked by searching `src/test` for the relevant names, constants and messages on 2026-10-27 [Verified unless marked].
+Checked against `src/test` on 2026-10-27 [Verified unless marked]:
 
-1. **`Main` end to end.** Argument parsing, startup failure (exit 1), halt (exit 2), clean stop via the shutdown hook (exit 0). The only automated run of `Main` is the `--quarantine` refusal in `CommandJournalTest.Exclusive.anotherProcessIsRefusedWhileTheJournalIsOpen` (child JVM, expects exit 1 and "already open"). In this session, the startup and refusal paths were exercised by hand, but **a clean Ctrl+C shutdown was never exercised** (the server was only hard-killed).
-2. **Linux/macOS.** Nothing has been run off Windows. That matters most for D65 (POSIX lock semantics were the reason for the redesign) and for anything timing-related (Windows timer resolution shaped the batching numbers).
-3. **Slow-consumer disconnect** (`ClientSession.send` when the outbound queue is full). No test constructs a gateway with a small `outboundCapacity`; both `TcpGatewayTest` gateways use `new TcpGateway(0)` with the 10,000-line default [Verified — `src/test/java/exchangeserver/gateway/TcpGatewayTest.java:42, 414`].
-4. **"Too many sessions"** (the 257th connection gets `ERROR too many sessions`). Not tested.
-5. **Acceptor back-off** after a transient `accept()` failure (Spec §9 finding 2 says "not unit-testable; reviewed").
-6. **A listener that throws.** `Exchange.process` logs and ignores it; PIT reports that log call as having no coverage, and no test passes a throwing listener [Verified — PIT report; grep].
-7. **Halt while the listener or callbacks are running**, and requests whose callbacks were already run when a later command halts.
-8. **The gateway under mutation.** `gateway`, `client` and `Main` are excluded from PIT, so their test strength is unknown.
-9. **`ClientMain`** (interactive console client): no test.
-10. **Benchmarks**: the JMH numbers in Spec §5 were not re-run for these guides.
-11. **CRLF journal** (see §7) and **double `SKIP`** of the same command (accepted; observed live).
+1. **`Main` as a whole.** `MainTest` covers `hint`; the child-JVM test covers the `--quarantine` refusal. The server mode, `--add-user` and `--compact` were exercised **by hand** (live on Windows: login refusal, oseq lines, cancel-on-disconnect with RESEND, compaction refused while running then done after the stop, restart from the snapshot). The exit code after a **signal** was checked by hand on Linux in Docker: 0 after SIGINT and after SIGTERM. **Windows Ctrl+C itself was never exercised** [Verified — hand runs].
+2. **macOS**: never run. **Linux**: the full suite (446 green) and a live `--quarantine` refusal against a running server [Verified].
+3. **Slow-consumer disconnect** and **"too many sessions"**: still no test.
+4. **Acceptor back-off and its ERROR after 10 failures**: not unit-testable; reviewed.
+5. **A throwing listener**: logged and ignored; still no test (a throwing *callback* is now tested).
+6. **The gateway under mutation**: excluded from PIT.
+7. **`ClientMain`**: no test.
+8. **Benchmarks**: not re-run after the fixes; they still compile (part of the test sources). Allocation per command grew (digest encoding, event records), so the Spec §5 numbers are optimistic [Inferred].
+9. **Network file systems** for the journal lock: never tried; locks there are unreliable in general [Inferred].
+
+**Regression notes.** The D66 test inverted an old one: `withoutAReferencePriceSweepsEveryLevel` asserted the full sweep that D66 removes, and was replaced by `beforeTheFirstTradeTheCollarIsAnchoredOnTheTouch` [Verified]. Two Windows findings came from running things, not reading code: PowerShell's `Files.write`-style CRLF (a test that wrote a journal with `Files.write` was refused by the new CRLF check) and PowerShell's byte-order mark on piped stdin (`--add-user` rejected the secret until the BOM was dropped) [Verified — observed].
 
 ---
 
 ## 9. Test-side smells
 
-- **A spin-wait without a deadline**: `racingStopNeverLosesARequest` busy-waits `while (handedIn.get() < producers * each / 3) Thread.onSpinWait();` with no timeout. If the producers died early, the test would hang instead of failing, which breaks the project's own "every wait has a timeout" rule [Verified — `src/test/java/exchangeserver/core/ExchangeServiceTest.java:348-350`]. The other two spin-waits do have deadlines [Verified — `src/test/java/exchangeserver/core/ExchangeServiceTest.java:279-282`; `src/test/java/exchangeserver/gateway/TcpGatewayTest.java:168-171`].
-- **`Thread.sleep(50)` to shape a batch** in `lingerCollectsLateArrivalsIntoTheSameBatch`. The Spec allows it explicitly, because it only affects batching inside a 300 ms linger window, never correctness. It could still flake on a very slow machine (if the sleep overran the window, the assertion `batches == 1` would fail) [Verified — `src/test/java/exchangeserver/core/ExchangeServiceTest.java:525`; the flake risk is Inferred].
-- **`ExchangeClient.linesUntil`** uses `skipped.removeAll(lines)`, which removes **every** equal string, so a duplicate line (e.g. two `PONG`s) skipped earlier could vanish [Verified — `src/main/java/exchangeserver/client/ExchangeClient.java:86-97`; impact Inferred]. It lives in production code because `ExchangeClient` doubles as the test client.
-- **Timing-based end-to-end tests.** `quitAnswersEveryEarlierRequestBeforeBye` relies on 200 requests arriving faster than the writer can answer them, to show the old bug. Against the old code it failed reliably in this session (1 of 200 replies arrived), but it is a probabilistic reproduction [Verified — observed; Inferred about robustness].
-- **Assertions on log noise.** None: expected stack traces in the output are not asserted, so a real unexpected one would go unnoticed if the test still passed [Inferred].
+- **`Thread.sleep(50)` shapes a linger batch** in `lingerCollectsLateArrivalsIntoTheSameBatch`; allowed by the Spec, and the assertion holds whether or not the sleep "worked", so it is not flaky, but it does not prove linger either [Verified — `src/test/java/exchangeserver/core/ExchangeServiceTest.java:528`; the "does not prove" point is Inferred].
+- **Bounded spin-waits** remain in three places (all with deadlines now, L5) [Verified — `src/test/java/exchangeserver/core/ExchangeServiceTest.java:282`; `src/test/java/exchangeserver/gateway/TcpGatewayTest.java:235`, `279`].
+- **Probabilistic reproductions**: `quitAnswersEveryEarlierRequestBeforeBye` shows the old bug by racing 200 requests against one QUIT; the deterministic version is the `Hold`-based shutdown test [Verified].
+- **Log noise is not asserted**, except the one test that captures the callback-failure log [Verified].
 
 ---
 
 ## Key takeaways
 
-- **334 tests**, one class per production class with `@Nested` behaviour groups, from unit to real-socket end-to-end; plus PIT at **92% killed / 94% strength** (final run, 496 mutations).
-- **Seams**: `CommandInterceptor` (the `Gate` and `POISON` patterns), `MutableClock`, package-private `checkInvariants`/`ordersAt`/`engine()`/`book()`, `openJournals()`.
-- **The strongest tests** are the 30,000-command random invariant test, the determinism test, and the restart-equality tests.
-- **A flaky test hid behind "326 green"**: stats are written after futures complete; read them after `stop()`.
-- **Regression tests are proven** by running them against the old code (all 7 survey tests failed there).
-- **Biggest gaps**: `Main`/shutdown/exit codes, Linux/macOS (incl. D65), slow-consumer and too-many-sessions paths, throwing listeners, and the unmutated gateway.
-- Use `mvnw.cmd clean test` after swapping files; use `-Dtest=Class#method` for one test.
+- **453 tests, green on Windows (and on Linux)**; 23 test classes, `@Nested` groups per behaviour.
+- **New seams**: the `Hold` listener (gateway), `MatchingEngine.Limits` (small caps), `drainingSessions()`, `Credentials.of(map, 1_000)`, `Exchange.Options`.
+- **The cross-process lock test now ran on Linux**, the platform whose POSIX lock semantics motivated it.
+- **Mutation testing found real gaps after the fixes** (FOK volume behind an own order, digest fields, codec field counts); they now have tests. Final numbers: Spec §7.
+- **Still untested**: Windows Ctrl+C, macOS, slow-consumer and too-many-sessions paths, a throwing listener, TLS with a real CA, the gateway under mutation; benchmarks not re-run.
+- **Write journals in tests with LF and valid CRCs**; log in with a test secret.
 
 ## Common confusions
 
-- *"Line coverage 95% means 95% of the code is tested."* It is 95% of lines in the **mutated packages only**; `gateway`, `client` and `Main` are excluded.
-- *"A surviving mutant is a bug."* Many are equivalent or unobservable (fsync, logs); the Spec classifies each kind.
-- *"`Thread.sleep` is banned."* For *synchronisation* it is; one sleep only shapes a batch inside a 300 ms window.
-- *"The 334th test is a unit test."* It starts a child JVM running `exchangeserver.Main --quarantine`, so it also covers part of `Main`.
-- *"Green once means not flaky."* The batching test passed 8/8 alone and still failed under full-suite load.
+- *"453 tests means 453 `@Test` methods."* 387 annotated methods; parameterized and repeated ones expand to 453 executions.
+- *"The child-JVM test proves the lock everywhere."* It proves it on the OS it runs on: now Windows and Linux, not macOS or network file systems.
+- *"`Hold` and `Gate` are the same."* `Gate` blocks *inside* the engine step (core tests); `Hold` blocks *after* the output in the listener (gateway tests), which keeps the request's future incomplete.
+- *"Line coverage 94% covers the gateway."* PIT's numbers are for the mutated packages only.
 
 ## Questions to test yourself
 
-1. Why must `ExchangeServiceTest` read `largestBatch()` after `stop()` rather than after awaiting all futures?
-<details><summary>Answer</summary>The writer updates the stats after `exchange.process` returns, while futures complete inside `process`. A completed future gives no happens-before edge to the later stats write; `stop()` joins the writer thread, which does.</details>
+1. Why does `TcpGatewayTest` need `Hold` instead of the `Gate` interceptor?
+<details><summary>Answer</summary>`CommandInterceptor` is package-private in `core`, so gateway tests cannot pass one. `Hold` wraps the gateway's `OutputListener` (public), and because the listener runs before the request's future completes (D76), blocking it keeps that request in flight.</details>
 
-2. How does a test hold the writer thread in the middle of processing, and what state is the journal in at that moment?
-<details><summary>Answer</summary>Submit an order whose client order id starts with `HOLD` to a service started with a `Gate` interceptor; `beforeEngine` blocks on a latch. The interceptor runs after the batch was journalled and fsynced, so the held command (and its batch) is already on disk.</details>
+2. How does `quitDuringShutdownStillGetsTheRepliesOfAcceptedRequests` make the old D63 bug deterministic?
+<details><summary>Answer</summary>It holds the writer after bob's order, queues alice's order, starts `stop()` and waits for state STOPPING, sends alice's QUIT and waits until `drainingSessions() == 1` (QUIT was read), then releases. Under D63 the barrier read would have been refused while stopping and the session closed at once; under D76 the session waits for a1's completion and the ORDER arrives before BYE.</details>
 
-3. Which PIT survivors are expected and why can't a unit test kill "removed call to `FileChannel::force`"?
-<details><summary>Answer</summary>Removing an fsync changes nothing observable unless the machine loses power between the write and the OS flushing it; a unit test can't simulate that. Other expected ones: log calls, `addSuppressed`, equivalent boundary mutants, test-only `checkInvariants`, `toString`/`hashCode`.</details>
+3. A new test writes a journal with `Files.write(path, lines, UTF_8)` and startup fails with a CRLF message. Why?
+<details><summary>Answer</summary>`Files.write` with a list of lines uses the platform line separator, CRLF on Windows. Journal format v3 refuses a record ending in `\r` (D69). Join with `"\n"` and use `Files.writeString`.</details>
 
-4. How would you run only the market-order tests?
-<details><summary>Answer</summary>`mvnw.cmd test "-Dtest=MatchingEngineTest$Market"` (nested class name with `$`, quoted). Not run in this session; check the output lists only the `Market` tests.</details>
+4. Which mutants are expected to survive or be uncovered because of where code runs?
+<details><summary>Answer</summary>The `JournalLock.acquire` branch for "another process holds the lock" runs only in the child JVM, which PIT does not instrument; fsync/directory-fsync removals and log calls are unobservable in a unit test.</details>
 
-5. Name three production behaviours with no automated test and how you would test one of them.
-<details><summary>Answer</summary>Any three of: slow-consumer disconnect, too-many-sessions refusal, a throwing listener, clean shutdown via the hook/exit codes, acceptor back-off. E.g. slow consumer: create `new TcpGateway(0, 256, 5)`, connect a raw socket that never reads, subscribe, generate enough market data to overflow 5 lines, assert the server closes the connection (and that other clients still trade).</details>
-
-6. What does `CommandJournal.openJournals()` give you that deleting the journal file in a test doesn't?
-<details><summary>Answer</summary>Proof that the channel was closed: on Windows Java opens files with delete sharing, so a file can be deleted while still open; the counter decrements only on close.</details>
+5. Name two things verified only by hand on 2026-10-27, and how you would automate one.
+<details><summary>Answer</summary>Exit 0 after SIGINT/SIGTERM (Linux, Docker); `--compact` and restart from the snapshot through `Main`. To automate the exit code: a test that starts `Main` in a child JVM (as the lock test does), waits for "Recovered", sends `ProcessHandle.destroy()` (SIGTERM on Linux) and asserts `exitValue() == 0`; on Windows `destroy` is not a console signal, so it would need to be Linux-only.</details>

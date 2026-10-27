@@ -1,256 +1,292 @@
 # 14 — Exercises
 
-> **Project:** ExchangeServer2 | Single-instrument limit order book: price-time matching engine, write-ahead journal with replay, single writer thread, plain TCP gateway | Stack: Java 17, Maven wrapper, JUnit 5 (+ JMH, PIT)
+> **Project:** ExchangeServer2 | Single-instrument limit order book: price-time matching engine, write-ahead journal with replay, single writer thread, TCP/TLS gateway with authenticated participants | Stack: Java 17, Maven wrapper, JUnit 5 (+ JMH, PIT)
 > **This guide:** active learning from easy to hard: self-check questions, predict-then-verify runs, debugger traces, hands-on changes and break-it experiments | **Prerequisites:** 01, 05 (do the rest as each exercise's tags say) | **Related:** all guides, especially 05, 07, 10, 11, 12
-> **Repo layout summary:** `pom.xml` + Maven wrapper (`mvnw`, `mvnw.cmd`) at the root; production code in `src/main/java/exchangeserver/` (packages `domain`, `book`, `engine`, `command`, `journal`, `core`, `gateway`, `client`, plus `Main`); tests mirror it in `src/test/java/exchangeserver/` (plus `bench/` JMH benchmarks and `testing/MutableClock`); design docs in `docs/` (`ExchangeServer2_Vision.md` = purpose/roadmap, `ExchangeServer2_Spec.md` = decisions D1–D65); these guides in `docs/understanding/`.
+> **Repo layout summary:** `pom.xml` + Maven wrapper (`mvnw`, `mvnw.cmd`) at the root; production code in `src/main/java/exchangeserver/` (packages `domain`, `book`, `engine`, `command`, `journal`, `core`, `gateway`, `client`, plus `Main`); tests mirror it in `src/test/java/exchangeserver/` (plus `bench/` JMH benchmarks and `testing/MutableClock`); design docs in `docs/` (`ExchangeServer2_Vision.md` = purpose/roadmap, `ExchangeServer2_Spec.md` = decisions D1–D77); these guides in `docs/understanding/`.
 
 ## Overview
 
-Five kinds of exercise, easiest first. Each one is tagged with the guides it reinforces, e.g. `[05, 07-engine]`. Answers are hidden in `<details>` blocks: commit to an answer before you open one.
+Five kinds of exercise, easiest first, each tagged with the guides it reinforces, e.g. `[05, 07-engine]`. Answers are hidden in `<details>`: commit to an answer before you open one.
 
 **Setup used throughout** (Windows; on macOS/Linux use `./mvnw` and `/`):
 
 ```
 mvnw.cmd -q package -DskipTests
-java -jar target/exchange-server2-2.0.0-SNAPSHOT.jar --port 9000 --journal study.journal
+java -jar target/exchange-server2-2.0.0-SNAPSHOT.jar --users study.users --add-user alice     (repeat for bob, carol, dave)
+java -jar target/exchange-server2-2.0.0-SNAPSHOT.jar --port 9000 --journal study.journal --users study.users
 java -cp target/exchange-server2-2.0.0-SNAPSHOT.jar exchangeserver.client.ClientMain localhost 9000
 ```
 
-`ClientMain` sends what you type and prints every server line with `< ` in front **[Verified]** (`src/main/java/exchangeserver/client/ClientMain.java:20-50`). Open two client windows for two participants. Delete `study.journal` to start fresh (journals are git-ignored, `.gitignore`). Stop the server with Ctrl+C (exit code 0).
+`--add-user` asks for the secret twice on a terminal, or reads one line from standard input **[Verified]** (`src/main/java/exchangeserver/Main.java:212-235`). Below, `<secret>` means the secret you chose for that participant. `ClientMain` sends what you type and prints server lines with `< ` **[Verified]** (`src/main/java/exchangeserver/client/ClientMain.java`). Delete `study.journal*` to start fresh (git-ignored). Stop with Ctrl+C: exit code 0 **[Verified on Linux]** (SIGINT and SIGTERM, Spec §11).
 
-For code changes: work on a throwaway branch (`git switch -c study/<name>`), then `git switch main` and `git branch -D study/<name>` when done. After swapping files around, build with `mvnw.cmd clean …` (incremental compilation goes by timestamp, `CLAUDE.md`). Never run two Maven builds at once.
+For code changes: a throwaway branch (`git switch -c study/<name>`); after swapping files around build with `mvnw.cmd clean …` (incremental compilation goes by timestamp, `CLAUDE.md`). Never run two Maven builds at once.
 
 ---
 
 ## (a) Self-check questions
 
-1. `[01, 05]` In what order does the writer thread do these for a batch: process in the engine, fsync, stamp, reply?
-<details><summary>Answer</summary>Stamp every request (Sequencer) → append all with one write and one fsync → for each: engine → complete the future/callback (reply) → OutputListener. <code>src/main/java/exchangeserver/core/Exchange.java:118-166</code>.</details>
+1. `[01, 05]` In what order does the writer thread do these for a batch: stamp, fsync, engine, listener, future?
+<details><summary>Answer</summary>A CHECK if due, then stamp every request → append all with one fsync → for each: ledger (engine, digest, private events) → OutputListener → complete the future/callback (D76). <code>src/main/java/exchangeserver/core/Exchange.java:198-253</code>.</details>
 
-2. `[07-domain-and-commands]` Which single class reads the clock? What happens if the system clock steps back one second?
-<details><summary>Answer</summary><code>command.Sequencer</code> (<code>Sequencer.java:74-81</code>). If the clock goes back, it reuses the previous timestamp, so journal timestamps never decrease (D33).</details>
+2. `[07-domain-and-commands]` Which single class reads the clock? What happens if the clock steps back?
+<details><summary>Answer</summary><code>command.Sequencer</code>; it reuses the previous timestamp, so journal timestamps never decrease (D33). <code>src/main/java/exchangeserver/command/Sequencer.java:86-93</code>.</details>
 
 3. `[07-book]` Why does a `PriceLevel` need sentinel nodes?
-<details><summary>Answer</summary>With a dummy head and tail, every real node always has a non-null <code>prev</code> and <code>next</code>, so append and unlink are four pointer assignments with no "is this the first/last node?" branches (<code>PriceLevel.java:11-15, 115-134</code>).</details>
+<details><summary>Answer</summary>Every real node always has non-null <code>prev</code>/<code>next</code>, so append and unlink need no edge-case branches.</details>
 
-4. `[07-engine, 06]` A BUY LIMIT 4 @ 101 hits an ask of 10 @ 100. At what price is the trade, and who gets which lines?
-<details><summary>Answer</summary>At 100, the resting price (<code>Trade.java:10</code>). The buyer gets <code>FILL … side=BUY price=100 qty=4 leaves=0 liquidity=TAKER</code> then <code>ORDER … status=FILLED</code>; the seller gets <code>FILL … leaves=6 liquidity=MAKER</code>; subscribers get <code>TRADE</code> and <code>LEVEL … qty=6</code>.</details>
+4. `[07-engine, 06]` A BUY LIMIT 4 @ 101 from bob hits alice's ask of 10 @ 100. Price, and who gets which lines?
+<details><summary>Answer</summary>At 100 (the resting price). bob's private stream: <code>FILL oseq=… side=BUY price=100 qty=4 leaves=0 liquidity=TAKER</code>, then <code>ORDER oseq=… status=FILLED</code>; alice's stream: <code>FILL oseq=… leaves=6 liquidity=MAKER</code> — to every session of each participant (D73); subscribers: <code>TRADE</code> and <code>LEVEL … qty=6</code>.</details>
 
-5. `[07-engine, 09]` Why is a cancel of someone else's order answered `UNKNOWN_ORDER` and not `NOT_OWNER`?
-<details><summary>Answer</summary>D48: a distinct status would let any participant probe which order ids are live; the caller's next action is the same either way.</details>
+5. `[07-engine, 09]` Why is a cancel of someone else's order answered `UNKNOWN_ORDER`?
+<details><summary>Answer</summary>D48: a distinct status would let any participant probe which order ids are live.</details>
 
-6. `[07-journal]` What are the steps of `CommandJournal.open`, in order, and why that order?
-<details><summary>Answer</summary>Lock the separate <code>&lt;journal&gt;.lock</code> file (D65) → open the journal channel → check the header (D64) → cut a torn tail → write a header if the file is empty (<code>CommandJournal.java:71-103</code>). Lock first so no other process races; check before cut so a file that is not our journal is never modified; lock a separate file because on Linux/macOS closing any handle on the journal (which <code>read()</code> does) would drop a POSIX lock taken on the journal itself.</details>
+6. `[07-journal]` What does `CommandJournal.open` do, in order?
+<details><summary>Answer</summary>Take the <code>JournalLock</code> (<code>&lt;journal&gt;.lock</code>, D65) → check the header (refuse a foreign file or other rules with records; let an empty journal adopt new rules, D64, D71) → open the journal channel → cut a torn tail → write a header if empty and fsync the directory (D69). <code>src/main/java/exchangeserver/journal/CommandJournal.java:75-128</code>.</details>
 
-7. `[07-exchange-service, 08]` Name the four `ExchangeException` reasons and say which ones mean "this request may be in the journal".
-<details><summary>Answer</summary>BUSY and STOPPED: nothing journalled. HALTED: maybe journalled (resend with the same client order id after restart to find out, D49). INTERNAL_ERROR: it was journalled and then quarantined with a SKIP (<code>ExchangeException.java:5-14</code>).</details>
+7. `[07-exchange-service, 08]` Which refusals mean "this request may be in the journal"?
+<details><summary>Answer</summary>BUSY, STOPPED, RATE_LIMITED, SESSION_BUSY: never journalled. HALTED: maybe (resend with the same client order id, or RESEND the private stream after restart). INTERNAL_ERROR: journalled, then quarantined.</details>
 
-8. `[07-exchange-and-replay]` Why does replay make two passes over the file?
-<details><summary>Answer</summary>Pass 1 verifies the whole history (contiguous sequence numbers, non-decreasing timestamps) and collects the SKIP set, which must be complete before feeding because a SKIP comes after the command it skips; pass 2 feeds. Streaming twice keeps memory constant (D60).</details>
+8. `[07-exchange-and-replay]` Where does replay start, and what does it compare along the way?
+<details><summary>Answer</summary>From the snapshot the header's base names (or empty), then the journal: pass 1 verifies sequence from base + 1 and timestamps, pass 2 feeds the ledger and compares every CHECK digest (D70, D71). <code>src/main/java/exchangeserver/core/Replay.java:39-99</code>.</details>
 
-9. `[07-gateway]` Why does the writer thread never block on a client?
-<details><summary>Answer</summary>Replies and market data are only <code>offer</code>ed to a bounded per-session queue; if it is full the session is disconnected (D54, <code>ClientSession.java:77-86</code>). One slow client must not stall the exchange.</details>
+9. `[07-gateway]` Name the three per-session limits and what each answers.
+<details><summary>Answer</summary>Login/idle timeouts (<code>ERROR login timeout; disconnecting</code> / <code>idle timeout</code>), in-flight cap (<code>SESSION_BUSY</code>), rate limit (<code>RATE_LIMITED</code>) — D75, <code>src/main/java/exchangeserver/gateway/ClientSession.java:279-291</code>.</details>
 
-10. `[10]` Why do `ExchangeServiceTest` assertions on `batches()` come after `stop()`?
-<details><summary>Answer</summary>The writer updates the stats after the batch's futures complete (<code>ExchangeService.java:259-263</code>), so a test woken by a future can see stale values; <code>stop()</code> joins the writer, a happens-before edge. Without it, <code>waitingRequestsShareOneBatch</code> was flaky (Spec §10 #1).</details>
+10. `[07-gateway, 09]` Why does a session's request callback run *after* the listener?
+<details><summary>Answer</summary>So when the last callback brings the in-flight count to 0 and the session closes, the request's own lines were already offered (D76). The old D63 barrier read was refused during shutdown and lost replies.</details>
 
 ---
 
 ## (b) Predict, then verify
 
-For each: write your prediction down, run it, then open the answer. The answers are the real outputs recorded on 2026-10-27 (timestamps and order ids depend on a fresh journal).
+Write your prediction down, run it, then open the answer.
 
 ### b1. The README session `[05, 06, 07-gateway]`
-Fresh journal. Window **alice**: `LOGIN alice`, `NEW a1 SELL LIMIT 10 100`, `SUBSCRIBE`. Window **bob**: `LOGIN bob`, `NEW b1 BUY LIMIT 4 101`. Predict every line each window prints.
+Fresh journal. **alice**: `LOGIN alice <secret>`, `NEW a1 SELL LIMIT 10 100`, `SUBSCRIBE`. **bob**: `LOGIN bob <secret>`, `NEW b1 BUY LIMIT 4 101`. Predict every line.
 <details><summary>Answer</summary>
 
 ```
-alice < WELCOME participant=alice
-alice < ORDER orderId=1 clOrdId=a1 status=RESTED filled=0 remaining=10
+alice < WELCOME participant=alice oseq=0
+alice < ORDER oseq=1 orderId=1 clOrdId=a1 status=RESTED filled=0 remaining=10
 alice < SUBSCRIBED
 alice < BOOK seq=1 last=0 bids=- asks=100x10
-bob   < WELCOME participant=bob
-bob   < FILL orderId=2 clOrdId=b1 side=BUY price=100 qty=4 leaves=0 liquidity=TAKER
-bob   < ORDER orderId=2 clOrdId=b1 status=FILLED filled=4 remaining=0
-alice < FILL orderId=1 clOrdId=a1 side=SELL price=100 qty=4 leaves=6 liquidity=MAKER
+bob   < WELCOME participant=bob oseq=0
+bob   < FILL oseq=1 orderId=2 clOrdId=b1 side=BUY price=100 qty=4 leaves=0 liquidity=TAKER
+bob   < ORDER oseq=1 orderId=2 clOrdId=b1 status=FILLED filled=4 remaining=0
+alice < FILL oseq=2 orderId=1 clOrdId=a1 side=SELL price=100 qty=4 leaves=6 liquidity=MAKER
 alice < TRADE seq=2 price=100 qty=4 aggressor=BUY
 alice < LEVEL seq=2 side=SELL price=100 qty=6 orders=1
 ```
-</details>
+<strong>[Verified]</strong> (<code>TcpGatewayTest.Trading.restThenCrossFillsBothSides</code>, <code>MarketData.snapshotThenIncrementalUpdates</code>; a live run on 2026-10-27 printed the same lines). Each participant's oseq starts at 1.</details>
 
-### b2. Duplicate, band, protocol error `[07-engine, 07-gateway]`
-Continue as bob: `NEW b1 BUY LIMIT 4 101`, then `NEW b2 BUY LIMIT 1 200`, then `NEW b3 BUY MARKET 1 100`. Predict each reply, including the `orderId` values.
+### b2. Wrong secret `[07-gateway, 09 D74]`
+New window: `LOGIN alice guessed-secret`. Then try `PING`.
+<details><summary>Answer</summary><code>ERROR login failed</code>, and the connection closes: one attempt per connection, and the same answer whether the name or the secret was wrong <strong>[Verified]</strong> (live run; <code>TcpGatewayTest.Security</code>).</details>
+
+### b3. Duplicate, band, protocol error `[07-engine, 07-gateway]`
+Continue as bob: `NEW b1 BUY LIMIT 4 101`, `NEW b2 BUY LIMIT 1 200`, `NEW b3 BUY MARKET 1 100`.
 <details><summary>Answer</summary>
 
 ```
-ORDER orderId=2 clOrdId=b1 status=REJECTED filled=0 remaining=4 reason=DUPLICATE_CLIENT_ORDER_ID
-ORDER orderId=4 clOrdId=b2 status=REJECTED filled=0 remaining=1 reason=PRICE_OUTSIDE_BAND
+ORDER oseq=2 orderId=2 clOrdId=b1 status=REJECTED filled=0 remaining=4 reason=DUPLICATE_CLIENT_ORDER_ID
+ORDER oseq=3 orderId=4 clOrdId=b2 status=REJECTED filled=0 remaining=1 reason=PRICE_OUTSIDE_BAND
 ERROR NEW takes 4 field(s), got 5
 ```
-The duplicate answers with the <em>original</em> id 2, but used up id 3 (every new order consumes an id). 200 is outside ±10% of the last trade 100. A MARKET order has no price field, so the line fails parsing at the gateway and never reaches the journal.</details>
+The duplicate reports the original id 2 but used up id 3. 200 is outside ±10% of 100. A MARKET order has no price field: refused at the gateway, never journalled. <strong>[Inferred from code]</strong> (the same session without oseq was run live before D73).</details>
 
-### b3. Cancels and market data `[05 flow 2, 07-book]`
-bob: `CANCEL 1`. alice: `CANCEL 1`. Predict both replies and alice's market data. Then look at `study.journal`: how many records, and of which kinds?
+### b4. Cancels and the journal `[05 flow 2, 07-journal]`
+bob: `CANCEL 1`. alice: `CANCEL 1`. Then open `study.journal`.
 <details><summary>Answer</summary>
 
 ```
-bob   < CANCEL_REJECT orderId=1 reason=UNKNOWN_ORDER
-alice < CANCELLED orderId=1 qty=6
+bob   < CANCEL_REJECT oseq=4 orderId=1 reason=UNKNOWN_ORDER
+alice < CANCELLED oseq=3 orderId=1 qty=6
 alice < LEVEL seq=6 side=SELL price=100 qty=0 orders=0
 ```
-Journal: `HEADER,2,1`, then NEW 1–4 (both rejects included: state-dependent rejects are journalled, D13), CANCEL 5 (bob's, also journalled), CANCEL 6. The protocol error is not there.</details>
+Journal: <code>HEADER,3,2,0,&lt;crc&gt;</code>, NEW 1–4 (both rejects too, D13), CANCEL 5 and 6 — every line ending in <code>,&lt;8 hex digits&gt;</code> (D69). bob's rejected cancel consumed his oseq 4.</details>
 
-### b4. QUIT right after NEW `[07-gateway, 09 D63]`
-In one paste (or one TCP write): `LOGIN dave`, `NEW d1 BUY LIMIT 1 95`, `NEW d2 BUY LIMIT 1 96`, `QUIT`. Predict the order of the lines.
+### b5. Self-trade prevention `[07-engine, 09 D67]`
+Fresh journal. x sells 2 @ 100 (`NEW x1 SELL LIMIT 2 100`), alice sells 3 @ 100, y sells 5 @ 100 (use three participants). alice: `NEW a9 BUY LIMIT 9 100`. Then a second case: x sells 2, y sells 3, alice sells 5 (alice last); alice buys 4 @ 100.
+<details><summary>Answer</summary>Case 1: alice trades 2 with x, then the next order in time priority is her own: matching stops; <code>ORDER … status=CANCELLED filled=2 remaining=7 reason=SELF_TRADE_PREVENTED</code>; y's order is never reached (STP stops, it does not skip). Case 2: she takes 2 from x and 2 from y and never reaches her own: <code>FILLED</code>. <strong>[Verified]</strong> (<code>MatchingEngineTest.SelfTrade.tradesWithOthersAheadThenStopsAtItsOwnOrder</code>; case 2 by the same code path).</details>
+
+### b6. QUIT right after NEW `[07-gateway, 09 D76]`
+In one paste: `LOGIN dave <secret>`, `NEW d1 BUY LIMIT 1 95`, `NEW d2 BUY LIMIT 1 96`, `QUIT`.
 <details><summary>Answer</summary>
 
 ```
-< WELCOME participant=dave
-< ORDER orderId=… clOrdId=d1 status=RESTED …
-< ORDER orderId=… clOrdId=d2 status=RESTED …
+< WELCOME participant=dave oseq=0
+< ORDER oseq=1 orderId=… clOrdId=d1 status=RESTED …
+< ORDER oseq=2 orderId=… clOrdId=d2 status=RESTED …
 < BYE
 ```
-Since D63 the session queues a read behind the two orders and sends BYE only from that read's callback. Before the fix, BYE could come first and the ORDER lines were lost (199 of 200 in the regression test).</details>
+The session counts the two orders in flight and sends BYE when the last callback ran (D76). <strong>[Verified]</strong> (<code>TcpGatewayTest.Session.quitAnswersEveryEarlierRequestBeforeBye</code>; live before oseq existed).</details>
 
-### b5. Crash and replay `[05 flow 4, 07-journal]`
-Kill the server hard (close its window, or `taskkill /F`). Append half a record to the journal without a newline, e.g. in PowerShell:
-`[IO.File]::AppendAllText("study.journal", "NEW,7,2026-10-27T12:", (New-Object Text.UTF8Encoding($false)))`.
-Restart, log in as carol, `SUBSCRIBE`, `NEW c1 BUY LIMIT 5 99`. Predict the BOOK line, carol's orderId and the LEVEL `seq`.
+### b7. RESEND after a disconnect `[07-gateway, 09 D73]`
+alice (logged in with `COD`): `NEW a1 SELL LIMIT 10 100`, `NEW a2 BUY LIMIT 5 100`; bob buys 4 @ 100; alice `QUIT`. Then a new alice window: `LOGIN alice <secret>`, `RESEND 1`.
 <details><summary>Answer</summary>
 
 ```
+alice2 < WELCOME participant=alice oseq=4
+alice2 < ORDER oseq=1 orderId=1 clOrdId=a1 status=RESTED filled=0 remaining=10 resend=1
+alice2 < ORDER oseq=2 orderId=2 clOrdId=a2 status=CANCELLED filled=0 remaining=5 reason=SELF_TRADE_PREVENTED resend=1
+alice2 < FILL oseq=3 orderId=1 clOrdId=a1 side=SELL price=100 qty=4 leaves=6 liquidity=MAKER resend=1
+alice2 < CANCELLED oseq=4 orderId=1 qty=6 reason=CANCEL_ALL resend=1
+alice2 < RESENT last=4
+```
+a2 would have crossed her own ask (STP). On QUIT her last COD session closed, so the gateway submitted CANCEL_ALL (event 4). <strong>[Verified]</strong> (live run, 2026-10-27).</details>
+
+### b8. Crash and replay `[05 flow 4, 07-journal]`
+After b4, kill the server hard (`taskkill /F` or close its window). Append half a record: `[IO.File]::AppendAllText("study.journal", "NEW,7,2026-10-27T12:", (New-Object Text.UTF8Encoding($false)))`. Restart. Predict the startup lines; then carol: `SUBSCRIBE`, `NEW c1 BUY LIMIT 5 99`.
+<details><summary>Answer</summary>
+
+```
+ExchangeServer2 listening on 127.0.0.1:9000, journal …\study.journal
+Recovered through sequence 6: replayed 6 commands, cut 20 torn bytes
 < BOOK seq=6 last=100 bids=- asks=-
-< ORDER orderId=5 clOrdId=c1 status=RESTED filled=0 remaining=5
+< ORDER oseq=1 orderId=5 clOrdId=c1 status=RESTED filled=0 remaining=5
 < LEVEL seq=7 side=BUY price=99 qty=5 orders=1
 ```
-The torn tail is cut silently (nothing printed: <code>Main</code> does not report it). The sequencer resumes from the last journalled values (seq 6, order id 4).</details>
+The torn bytes are cut and now reported (D77). <strong>[Inferred]</strong> from code (the same steps were run live before D77 added the summary line).</details>
 
-### b6. Wrong rules version `[07-journal, 09 D46]`
-Copy the journal, change its first line to `HEADER,2,9` keeping LF line endings, and start the server on the copy. Predict the output and exit code. Then compare with the original file.
-<details><summary>Answer</summary>`Startup failed: java.lang.IllegalStateException: Journal … was written under rules version 9; this build uses 1. Start a fresh journal from a snapshot.` then the generic poison-pill hint; exit code 1. The file is unchanged (D64).</details>
+### b9. Editing the header by hand `[07-journal, 09 D69]`
+Copy the journal and change the header's rules version from 2 to 9 in a text editor that keeps LF. Start on the copy.
+<details><summary>Answer</summary><code>Startup failed: Bad journal header "HEADER,3,9,0,…": checksum mismatch (expected …, found …)</code> and <code>The journal was not changed.</code>, exit 1. The CRC covers the header too, so a hand edit is caught before the version check. (To really test a version mismatch, use <code>CommandJournal.writeFresh</code> with another version, as <code>CommandJournalTest</code> does.) <strong>[Inferred from code]</strong>, <code>src/main/java/exchangeserver/journal/JournalCodec.java:63-85</code>, <code>:171-187</code>.</details>
 
-### b7. Quarantine against a running server `[07-exchange-and-replay, 09 D65]`
-With the server running on `study.journal`, run `java -jar target/exchange-server2-2.0.0-SNAPSHOT.jar --journal study.journal --quarantine 2`. Predict.
-<details><summary>Answer</summary>`Quarantine failed: Journal … is already open (a running exchange, or a --quarantine run)`, exit 1, journal unchanged. Before D65 the tool appended a SKIP with its own sequence number next to the running server's.</details>
+### b10. Tools against a running server `[07-exchange-and-replay, 09 D65]`
+With the server running: `--journal study.journal --quarantine 2`, then `--compact`.
+<details><summary>Answer</summary><code>Quarantine failed: Journal … is already open (a running exchange, or a --quarantine or --compact run)</code> and the same for <code>Compaction failed:</code>, exit 1, nothing written. <strong>[Verified]</strong> live on Windows and (quarantine) on Linux.</details>
 
-### b8. A JUnit prediction `[07-engine]`
-Add temporarily to `MatchingEngineTest` and predict `status`, `filled`, the trade count, and what is left on the book:
+### b11. Compaction and restart `[05 flow 4, 09 D71]`
+Stop the server, run `--journal study.journal --compact`, list the files, start again.
+<details><summary>Answer</summary><code>Compacted through sequence N: K resting orders in study.journal.snapshot-N; old journal archived as study.journal.archive-1-N</code>; files: <code>study.journal</code> (one header line, base N), the archive, the snapshot, the lock file. Restart prints <code>Recovered through sequence N from snapshot N: replayed 0 commands, cut 0 torn bytes</code>. A second <code>--compact</code> says nothing to compact. <strong>[Verified]</strong> (live run with N = 4).</details>
+
+### b12. A JUnit prediction: the collar `[07-engine]`
+Add temporarily to `MatchingEngineTest` and predict status, filled and the book:
 
 ```java
 @Test
-void studyMarketCollar() {
+void studyCollarBeforeFirstTrade() {
     limit("s", SELL, 100, 1);
-    limit("b", BUY, 100, 1);                    // trade at 100: band reference = 100
-    limit("s", SELL, 105, 2);
-    limit("s", SELL, 111, 2);
-    Response r = market("b", BUY, 10);
-    System.out.println(r);
+    limit("s", SELL, 110, 1);
+    limit("s", SELL, 500, 1);
+    System.out.println(market("b", BUY, 3));
 }
 ```
-Run: `mvnw.cmd test -Dtest=MatchingEngineTest#studyMarketCollar` (nested classes need `MatchingEngineTest*` patterns; a top-level method works as shown).
-<details><summary>Answer</summary>Trap: the sell at 111 arrives after the trade at 100, so the band applies to it: <code>111 × 100 = 11,100 > 100 × 110 = 11,000</code> → it is REJECTED <code>PRICE_OUTSIDE_BAND</code> and never rests. The market buy's collar is <code>100 × 110 / 100 = 110</code>; it takes 2 @ 105 and finds nothing else. <code>status=CANCELLED, filled=2, remaining=8</code>, one trade, empty ask side. (To see the collar stop a market order, rest the far ask <em>before</em> the first trade, as <code>MatchingEngineTest$Market.buyCollarStopsAtReferencePlusBand</code> does.)</details>
+Run `mvnw.cmd test -Dtest=MatchingEngineTest#studyCollarBeforeFirstTrade`.
+<details><summary>Answer</summary>No trade yet, so the collar is anchored on the touch (100): buys up to 110. It takes 100 and 110, then stops: <code>CANCELLED filled=2 remaining=1</code>; 500 stays. Before D66 it swept all three. <strong>[Verified]</strong> (<code>MatchingEngineTest.Market.beforeTheFirstTradeTheCollarIsAnchoredOnTheTouch</code>).</details>
 
 ---
 
 ## (c) Tracing with a debugger
 
-Use IntelliJ (File › Open › `pom.xml`) or VS Code with the Java extension. Debug a test, or start `Main` in debug mode with program arguments `--port 9000 --journal study.journal` and drive it with `ClientMain`. Thread names you will see: `exchange-writer`, `gateway-acceptor`, `session-N-reader`, `session-N-sender`, `ForkJoinPool.commonPool-worker-*`, `shutdown`.
+IntelliJ (File › Open › `pom.xml`) or VS Code with the Java extension. Threads you will see: `exchange-writer`, `gateway-acceptor`, `session-N-reader`, `session-N-sender`, `ForkJoinPool.commonPool-worker-*`, `shutdown`.
 
-c1. `[05 flow 1, 08]` **A NEW order end to end.** Breakpoints: `ClientSession.newOrder` (`src/main/java/exchangeserver/gateway/ClientSession.java:245`), `ExchangeService.enqueue` (`core/ExchangeService.java:182`), `Exchange.process` (`core/Exchange.java:118`), `CommandJournal.appendAll` (`journal/CommandJournal.java:114`), `MatchingEngine.process` (`engine/MatchingEngine.java:106`), `TcpGateway.onOutput` (`gateway/TcpGateway.java:183`). Send one crossing NEW. Record which thread hits each breakpoint, and the value of `p.command` before and after stamping.
-<details><summary>What you should see</summary>The first two on <code>session-N-reader</code>; the rest on <code>exchange-writer</code>. <code>p.command</code> is null until <code>stampNewOrder</code>, then a <code>NewOrderCommand</code> with seq, timestamp, order id. <code>appendAll</code> returns before <code>MatchingEngine.process</code> is entered.</details>
+c1. `[05 flow 1, 08]` **A NEW order end to end.** Breakpoints: `ClientSession.newOrder` (`src/main/java/exchangeserver/gateway/ClientSession.java:329`), `ExchangeService.enqueue` (`src/main/java/exchangeserver/core/ExchangeService.java:211`), `Exchange.process` (`src/main/java/exchangeserver/core/Exchange.java:198`), `CommandJournal.appendAll` (`src/main/java/exchangeserver/journal/CommandJournal.java:143`), `MatchingEngine.process` (`src/main/java/exchangeserver/engine/MatchingEngine.java:178`), `TcpGateway.onOutput` (`src/main/java/exchangeserver/gateway/TcpGateway.java:286`). Send one crossing NEW. Which thread hits each? What is in `events` at `onOutput`?
+<details><summary>What you should see</summary>The first two on <code>session-N-reader</code>, the rest on <code>exchange-writer</code>. <code>appendAll</code> returns before the engine runs. <code>events</code> holds an <code>OrderReply</code> for the taker and a <code>MakerFill</code> per passive fill, each with its participant's next oseq.</details>
 
-c2. `[07-book]` **Watch a level empty.** Breakpoint in `OrderBook.removeNode` (`book/OrderBook.java:110`). Rest one sell, then send a buy that takes it fully. Step through `level.unlink`, then the `level.isEmpty()` branch. Watch `asks.size()` before and after, and the node's `prev/next/level` after unlink.
-<details><summary>What you should see</summary>The node's three links become null; the level is removed from the TreeMap in the same call; <code>TreeMap.remove</code> returned that same level (D18).</details>
+c2. `[07-book]` **Watch a level empty.** Breakpoint in `OrderBook.removeNode` (`src/main/java/exchangeserver/book/OrderBook.java:111`). Rest one sell, take it fully; step through `unlink` and the empty-level removal.
 
-c3. `[07-exchange-and-replay]` **A poison pill.** Debug `ExchangeTest$PoisonPill.poisonInTheMiddleOfABatchDoesNotDisturbTheOthers`. Breakpoint in `Exchange.quarantine` (private, `core/Exchange.java:178`). Inspect `poison.sequenceNumber()`, the SKIP's sequence number, and the `skipped` set before `Replay.feed`.
-<details><summary>What you should see</summary>Poison seq 2, SKIP stamped as seq 4 (the batch had used 1–3), <code>skipped = {2}</code>; the rebuilt engine is fed only seq 1; the batch then continues with seq 3 on the rebuilt engine.</details>
+c3. `[07-exchange-and-replay]` **A poison pill.** Debug `ExchangeTest$PoisonPill.poisonInTheMiddleOfABatchDoesNotDisturbTheOthers`; breakpoint in the private `Exchange.quarantine` (`src/main/java/exchangeserver/core/Exchange.java:278`).
+<details><summary>What you should see</summary>Poison seq 2, SKIP stamped as seq 4, <code>skipped = {2}</code>; <code>Replay.rebuild</code> builds a new ledger from the snapshot (none here) plus seq 1; the batch continues with seq 3.</details>
 
-c4. `[07-exchange-service]` **Stop draining.** Debug `ExchangeServiceTest$Stop.drainsEverythingAcceptedAndRefusesTheRest`. Breakpoints at `ExchangeService.stop` (`core/ExchangeService.java:208`) and at `stopping = batch.remove(STOP)` (`:258`). Confirm STOP is the last element of the batch it appears in.
+c4. `[07-exchange-service]` **Stop draining.** Debug `ExchangeServiceTest$Stop.drainsEverythingAcceptedAndRefusesTheRest`; breakpoints at `stop` (`src/main/java/exchangeserver/core/ExchangeService.java:245`) and `stopping = batch.remove(stopMarker)` (`:298`).
 
-c5. `[07-gateway]` **Subscribe race.** In `ClientSession.subscribe` (`gateway/ClientSession.java:276`) set a breakpoint inside the snapshot callback, then from the client send `SUBSCRIBE` and `UNSUBSCRIBE` quickly. Observe `mine` vs `subscriptionNumber` and `subscriptionActive` when the callback runs.
+c5. `[07-gateway, 09 D76]` **A draining session.** Breakpoint in `ClientSession.finishIfIdle` (`src/main/java/exchangeserver/gateway/ClientSession.java:434`). Paste `NEW …` and `QUIT` together. Watch `readerDone`, `inFlight` and which thread finally passes the `compareAndSet`.
+<details><summary>What you should see</summary>The reader calls it first with <code>inFlight</code> 1 (nothing happens); the writer thread's callback calls it with 0 and closes, after the ORDER line was offered.</details>
+
+c6. `[07-ledger-and-snapshots]` **Replay compares a CHECK.** Debug `ExchangeTest$Checkpoints.aCheckIsWrittenEveryIntervalAndReplayAcceptsIt` with a breakpoint in `Replay.feed` at the CHECK branch (`src/main/java/exchangeserver/core/Replay.java:80-88`). Compare `check.digest()` with `ledger.digest()`.
 
 ---
 
 ## (d) Small hands-on changes
 
-Each on its own branch. "Done" means: the new tests pass, `mvnw.cmd test` is green, no compiler warnings.
+Each on its own branch. "Done": new tests pass, `mvnw.cmd test` green, no compiler warnings.
 
-d1. `[12 Recipe 5, 07-gateway]` **Add `TIME` → `TIME seq=<last seq>`**, answered through the queue (snapshot depth 1, callback variant). Done: `ProtocolTest` parse + format tests, one `TcpGatewayTest` case asserting the seq after two orders is 2.
+d1. `[12 Recipe 5, 07-gateway]` **Add `TIME` → `TIME seq=<last seq>`** through the queue (snapshot depth 1, callback via `tracked`). Done: `ProtocolTest` parse/format and a `TcpGatewayTest` case.
 
-d2. `[12 Recipe 7, 07-client-and-main]` **Add `--queue-capacity <n>` to `Main`.** Done: invalid values print the usage line and exit 1; README/`CLAUDE.md` updated. (No unit test exists for `Main`; verify by hand.)
+d2. `[12 Recipe 8, 07-client-and-main]` **Add `--queue-capacity <n>`** to `Main`. Done: bad values print the usage line and exit 1; README and `CLAUDE.md` updated.
 
-d3. `[12 Recipe 3, 07-domain-and-commands]` **Change the band to 5%.** Bump `Rules.VERSION`, fix the tests that encode 10% (`RulesTest`, `MatchingEngineTest.Risk`, `MatchingEngineTest.Market`). Done: green, and starting on an old journal is refused.
+d3. `[12 Recipe 3]` **Change the band to 5%.** Bump `Rules.VERSION`, fix the tests that encode 10%. Then carry a journal across: compact with the old jar, start the new one. Done: green, and `Recovered … journal moved from rules 2` is printed.
 
-d4. `[11, 08]` **Report replay at startup.** Make `Main` print "replayed N commands, cut M torn bytes". `ExchangeService` does not expose its `Exchange`, so decide where the numbers come from (add accessors? log inside `Exchange.open`?). Done: the line appears; Spec §8's "Startup reporting" thread updated.
+d4. `[07-ledger-and-snapshots]` **See CHECK records.** Start with `--check-interval 2`, place five orders, read the journal. Done: you can say why each CHECK has the sequence number it has.
 
-d5. `[12 Recipe 2]` **New reject: `QUANTITY_ABOVE_BOOK`** for an IOC larger than the whole opposite side. Done: the reject is journalled (an `ExchangeTest` that restarts and sees the same outcome), `Rules.VERSION` bumped, PIT shows no survivor in your new branch of `process`.
+d5. `[12 Recipe 2]` **New reject `QUANTITY_ABOVE_BOOK`** for an IOC larger than the whole opposite side. Done: journalled and replayed (`ExchangeTest`), `Rules.VERSION` bumped, PIT shows no survivor in the new branch.
 
-d6. `[10]` **Write the missing test for "no self-trade prevention".** Assert that a participant's buy matches its own resting sell and both FILL lines go to the same session. Done: test green, and the Spec's open thread links to it.
+d6. `[12 Recipe 2, 09 D67]` **Change STP to "cancel the resting order"** (cancel own resting orders it meets and keep matching). Done: `MatchingEngineTest.SelfTrade` rewritten for the new policy, a D78 written, `Rules.VERSION` bumped.
 
-d7. `[04, 07-journal, 15]` **Run the journal tests on Linux.** Start Docker Desktop, then from the repo root: `docker run --rm -v "$PWD":/w -w /w eclipse-temurin:17 ./mvnw -B test -Dtest=CommandJournalTest` (in PowerShell use `${PWD}`; if `mvnw` is not executable inside the container, prefix it with `sh`). Done: you know whether D65's cross-process test passes on Linux, and guide 15 item 18 can be closed or reopened. The Maven download inside the container takes a while the first time.
+d7. `[04, 12 Recipe 13]` **Run the suite on Linux** with the Docker command in guide 12 Recipe 13. Done: 446-plus tests green in the container.
 
 ---
 
 ## (e) "Break it" experiments
 
-For each: predict what breaks and which test catches it, make the change on a branch, run `mvnw.cmd clean test` (or the named class), compare with the answer, revert.
+Predict what breaks and which test catches it; change it on a branch; run `mvnw.cmd clean test`; revert.
 
-e1. `[07-exchange-and-replay, 09 D40]` In `Exchange.process`, move `journal.appendAll(commands)` (`core/Exchange.java:137`) to after the processing loop.
-<details><summary>Answer</summary>Replies become visible before they are durable. <code>ExchangeTest$LivePath.visibleImpliesDurable</code> is the guard; poison-pill tests also change behaviour because the SKIP would precede its target's record. A crash between processing and appending would leave clients with fills the journal never heard of.</details>
+e1. `[07-exchange-and-replay, 09 D40]` Move `journal.appendAll(commands)` (`src/main/java/exchangeserver/core/Exchange.java:223`) after the processing loop.
+<details><summary>Answer</summary>Replies become visible before they are durable; <code>ExchangeTest$LivePath.visibleImpliesDurable</code> is the guard; poison-pill tests break because the SKIP would precede its target.</details>
 
-e2. `[07-exchange-and-replay, 09 D61]` Delete the `if (p.refused) continue;` (`core/Exchange.java:142-144`).
-<details><summary>Answer</summary>A refused request (e.g. a cancel with order id 0) has <code>p.command == null</code>. It reaches <code>apply(null)</code>, which throws <code>IllegalStateException("Not an engine command: null")</code>; that is caught as a poison pill, and <code>quarantine(null, …)</code> then throws a <code>NullPointerException</code> (it reads <code>poison.sequenceNumber()</code>) out of <code>process</code>. In <code>ExchangeService</code> that halts the writer. <code>ExchangeTest$LivePath.invalidCancelIsRefusedWithoutUsingASequenceNumber</code> fails. Lesson: the writer must decide from its own state (D61).</details>
+e2. `[07-exchange-and-replay, 09 D61]` Delete `if (p.refused) continue;` (`src/main/java/exchangeserver/core/Exchange.java:228-230`).
+<details><summary>Answer</summary>A refused request has <code>p.command == null</code>, is treated as a read, and <code>read(...)</code> throws "Not a read" out of <code>process</code> — the writer halts. <code>ExchangeTest$LivePath.invalidCancelIsRefusedWithoutUsingASequenceNumber</code> fails. <strong>[Inferred]</strong></details>
 
-e3. `[07-engine, 09 D12]` Make `MatchingEngine` stamp trades with `Instant.now()` instead of `order.getTimestamp()` (`engine/MatchingEngine.java:148`).
-<details><summary>Answer</summary><code>MatchingEngineTest$Outputs.tradeTimestampIsTheIncomingCommandsTimestamp</code> fails; <code>Determinism.sameCommandsGiveIdenticalOutputs</code> almost always fails (two runs see different instants). The real damage: replay would produce different trade records than clients saw.</details>
+e3. `[07-engine, 09 D12]` Stamp trades with `Instant.now()` instead of `order.getTimestamp()` (`src/main/java/exchangeserver/engine/MatchingEngine.java:234`).
+<details><summary>Answer</summary><code>MatchingEngineTest$Outputs.tradeTimestampIsTheIncomingCommandsTimestamp</code> fails; determinism tests usually fail. Trade timestamps are not in the digest, so replay would not stop — another reason the rule matters.</details>
 
-e4. `[07-journal, 08]` Delete `channel.force(true)` in `appendAll` (`journal/CommandJournal.java:131`).
-<details><summary>Answer</summary>No test fails. An fsync is not observable without pulling the power; PIT lists it as an expected survivor (Spec §7). Durability is now a lie after an OS crash, but not after a process crash (the OS still has the bytes).</details>
+e4. `[07-journal, 08]` Delete `channel.force(true)` in `appendAll` (`src/main/java/exchangeserver/journal/CommandJournal.java:160`).
+<details><summary>Answer</summary>No test fails: an fsync is not observable without pulling the power (an expected PIT survivor, Spec §7).</details>
 
-e5. `[07-domain-and-commands, 09 D46]` Change `PRICE_BAND_PERCENT` to 5 **without** bumping `VERSION`, and restart on a journal containing an order at +8% of the last trade.
-<details><summary>Answer</summary>Startup succeeds, but the replayed order is now REJECTED instead of RESTED or traded: the rebuilt book silently differs from what clients saw. Tests that hard-code 10% fail; no test detects the missing bump. This is exactly why the version exists.</details>
+e5. `[07-domain-and-commands, 09 D70]` Change `PRICE_BAND_PERCENT` to 5 **without** bumping `VERSION`, and restart on a journal with an order at +8% of the last trade, started with `--check-interval 1`.
+<details><summary>Answer</summary>The replayed order is now rejected instead of resting, so the next CHECK's digest differs: startup fails with <code>Replay diverged before CHECK …</code> and the compaction advice. With the default interval (10,000) a small journal has no CHECK yet, and the change goes unnoticed — the digest only catches what a CHECK covers.</details>
 
-e6. `[07-journal, 11]` Convert a journal to CRLF (open in an editor that saves CRLF, or `(Get-Content j) | Set-Content j2 -Encoding ascii` in Windows PowerShell) and start on it.
-<details><summary>Answer</summary>Startup fails: <code>Bad journal header "HEADER,2,1\r": For input string: "1\r"</code>, exit 1 (observed with version 9). Records are LF-only; nothing strips a trailing <code>\r</code>. Spec §8 lists it as a known limitation.</details>
+e6. `[07-journal, 09 D69]` Convert a journal to CRLF (`(Get-Content j) | Set-Content j2 -Encoding ascii` in Windows PowerShell) and start on it.
+<details><summary>Answer</summary>Startup fails with <code>record ends with '\r': the file was converted to CRLF line endings; convert it back to LF (e.g. dos2unix) and restart</code>, exit 1. <strong>[Verified]</strong> (<code>JournalCodecTest.Corrupt.aCarriageReturnIsReportedAsALineEndingConversion</code>; a test that wrote a journal with <code>Files.write</code> hit exactly this on Windows).</details>
 
-e7. `[07-gateway, 09 D63]` Revert D63: in `ClientSession.handle` send `"BYE"` and return `false` on QUIT, and in `readLoop` call `close()` directly in `finally`. Run `mvnw.cmd clean test -Dtest=TcpGatewayTest`.
-<details><summary>Answer</summary><code>quitAnswersEveryEarlierRequestBeforeBye</code> fails (observed: 1 ORDER line instead of 200) and <code>endOfStreamStillGetsTheReplies</code> fails (0 instead of 50).</details>
+e7. `[07-exchange-and-replay, 09 D76]` In `Exchange.process`, swap the listener call and `p.complete(...)` (`src/main/java/exchangeserver/core/Exchange.java:246-251`).
+<details><summary>Answer</summary><code>ExchangeServiceTest$HandIn.listenerRunsOnTheWriterBeforeTheCallback</code> fails. In the gateway, the last request's callback can close a QUITting session before its ORDER line is offered, so <code>TcpGatewayTest$Session.quitAnswersEveryEarlierRequestBeforeBye</code> and <code>endOfStreamStillGetsTheReplies</code> lose lines. <strong>[Inferred]</strong> for the gateway tests.</details>
 
-e8. `[07-journal, 09 D65]` Remove the `Lock.acquire(file)` call in `CommandJournal.open` (and the matching releases).
-<details><summary>Answer</summary><code>CommandJournalTest$Exclusive.aSecondOpenIsRefusedUntilTheFirstCloses</code>, <code>anotherProcessIsRefusedWhileTheJournalIsOpen</code> (it runs <code>Main --quarantine</code> in a child JVM) and <code>ExchangeTest$PoisonPill.quarantineToolRefusesWhileTheExchangeIsRunning</code> fail.</details>
+e8. `[07-journal, 09 D65]` Remove the `JournalLock.acquire` in `CommandJournal.open`.
+<details><summary>Answer</summary><code>CommandJournalTest$Exclusive</code> (both tests, including the child-JVM one) and <code>ExchangeTest$PoisonPill.quarantineToolRefusesWhileTheExchangeIsRunning</code> fail.</details>
 
-e11. `[07-journal, 09 D65, 15]` **The POSIX trap.** Change `Lock.acquire` to lock the *journal file itself* (open the journal path instead of `<journal>.lock`), keep the `HELD` set, and run `CommandJournalTest` twice: on Windows (`mvnw.cmd test -Dtest=CommandJournalTest`) and on Linux in Docker (`docker run --rm -v "$PWD":/w -w /w eclipse-temurin:17 ./mvnw -B test -Dtest=CommandJournalTest`, from the repo root; Docker Desktop must be running).
-<details><summary>Answer</summary>[Inferred, not yet run] Windows: probably still green, because Windows locks belong to the handle (although a mandatory lock on the records may now block <code>read()</code> and the torn-tail cut, which use their own handles: watch for "another process has locked a portion of the file"). Linux: <code>anotherProcessIsRefusedWhileTheJournalIsOpen</code> should fail. The test calls <code>read()</code> before starting the child, and closing that read's handle drops the process's POSIX lock on the journal, so the child's <code>--quarantine</code> succeeds and appends a SKIP. That is the reason D65 locks a separate file that nothing else ever opens or closes.</details>
+e9. `[07-journal, 09 D65]` **The POSIX trap.** Make `JournalLock` lock the journal file itself and run `CommandJournalTest` on Windows and on Linux.
+<details><summary>Answer</summary><strong>[Inferred, not run]</strong> Windows: likely green (locks belong to the handle) unless the mandatory lock blocks <code>read()</code>. Linux: <code>anotherProcessIsRefusedWhileTheJournalIsOpen</code> should fail, because closing the handle <code>read()</code> used drops the process's POSIX lock. The current design passes on both (Spec §11).</details>
 
-e9. `[07-exchange-service, 08]` Make `ExchangeService.state` non-`volatile` and remove the `synchronized (lock)` in `enqueue`.
-<details><summary>Answer</summary>Usually nothing fails — data races are rarely reproducible on x86 in a short run. <code>racingStopNeverLosesARequest</code> (5 repetitions) is the test most likely to catch a lost request, by luck. The lesson: concurrency correctness comes from the happens-before argument, not from tests.</details>
+e10. `[07-engine, 09 D67]` Remove the STP check in the match loop (`src/main/java/exchangeserver/engine/MatchingEngine.java:224-227`).
+<details><summary>Answer</summary><code>MatchingEngineTest$SelfTrade</code> tests that expect CANCELLED/<code>SELF_TRADE_PREVENTED</code> after matching fail (the order now trades with itself), and <code>TcpGatewayTest$Trading.selfTradeIsPreventedOverTheWire</code> fails. The FOK tests still pass: <code>fillability</code> stops at the own order on its own. <strong>[Inferred]</strong></details>
 
-e10. `[07-book]` In `OrderBook.add`, put the new level into the TreeMap *before* `level.addOrder(order)` (`book/OrderBook.java:62-68`).
-<details><summary>Answer</summary>If <code>addOrder</code> threw, an empty level would be left behind (violating "no empty level"). <strong>[Inferred]</strong> Probably no test fails: <code>add</code> already refuses non-resting types, exhausted orders and duplicate ids before creating the level, and a brand-new level cannot overflow, so <code>addOrder</code> cannot throw on a fresh level today. The ordering is defence in depth (D10/D14: "a failed add must not leave an empty level", <code>OrderBook.java:67</code>), the kind of thing PIT reports as an equivalent mutant (Spec §7).</details>
+e11. `[07-ledger-and-snapshots, 09 D70]` Remove the CHECK comparison in `Replay.feed` (`src/main/java/exchangeserver/core/Replay.java:80-88`; keep the `return`).
+<details><summary>Answer</summary><code>ReplayTest$Check.aDifferentDigestStopsReplayAsDivergence</code>, <code>ExchangeTest$Checkpoints.aChangedHistoryIsCaughtAtTheNextCheck</code> and <code>MainTest.aReplayDivergenceGetsTheCompactionAdvice</code> fail.</details>
+
+e12. `[07-journal, 08]` Remove every call to `Durable.fsyncDirectory`.
+<details><summary>Answer</summary>No test fails. A lost directory entry only shows after a crash on Linux right after a file was created or renamed; on Windows the call is a no-op. PIT lists these as expected survivors (Spec §7).</details>
+
+e13. `[04, 09 D69]` Remove the `*.journal -text` lines from `.gitattributes`, set `core.autocrlf=true`, force-add a journal (`git add -f`, it is git-ignored), commit, delete it and check it out again; start on it.
+<details><summary>Answer</summary><strong>[Inferred]</strong> The checkout converts LF to CRLF; startup fails with the CRLF message of e6. With <code>-text</code> git leaves the bytes alone.</details>
+
+e14. `[07-book]` In `OrderBook.add`, put the new level into the TreeMap *before* `level.addOrder(order)` (`src/main/java/exchangeserver/book/OrderBook.java:66-69`).
+<details><summary>Answer</summary><strong>[Inferred]</strong> Probably no test fails: <code>addOrder</code> cannot throw on a fresh level today; the ordering is defence in depth.</details>
 
 ---
 
 ## Key takeaways
 
-- Predict before you run: every answer here can be derived from the code paths in guide 05.
-- The live server, `ClientMain` and a journal file are the fastest feedback loop for protocol and replay questions.
-- Debugger thread names tell you which side of the queue you are on: `session-N-reader` before, `exchange-writer` after.
-- Some guarantees have no test that can fail (fsync, data races), and some are tested on one OS only (the cross-process journal lock: Windows); know which.
-- Version numbers exist because some mistakes (e5) are silent.
+- Predict before you run: every answer follows from the paths in guide 05.
+- Two sequences to keep apart: `seq` (journal, global) and `oseq` (per participant private stream).
+- Some guarantees have no failing test (fsync, directory fsync, data races); some are covered only partly (CHECK every 10,000 commands).
+- The live server plus `ClientMain` is the fastest feedback loop; `--check-interval` and `--compact` make the recovery features visible.
 
 ## Common confusions
 
-- **"The duplicate's orderId=2 means no id was used."** Id 3 was used; the reply carries the original's id.
-- **"A protocol ERROR is a reject."** It never reaches the queue or the journal; a reject is journalled.
-- **"If the tests pass, the concurrency is right."** See e9.
+- **"The duplicate's orderId=2 means no id was used."** Id 3 was used.
+- **"A protocol ERROR or RATE_LIMITED is a reject."** Neither reaches the journal; a reject does.
+- **"My reply went to the session that sent the order only."** It goes to every session of the participant (D73).
+- **"If tests pass, concurrency is right."** No: happens-before arguments, not tests.
 
 ## Questions to test yourself
 
-1. Which exercise shows a mistake no test catches, and what would catch it in production?
-<details><summary>Answer</summary>e4 (missing fsync) and e5 (rule change without version bump). An OS crash/power loss test rig would catch e4; only discipline or a check comparing replayed outputs with recorded outputs would catch e5.</details>
+1. In b7, why does `WELCOME` say `oseq=4` though alice never saw event 4?
+<details><summary>Answer</summary>The CANCEL_ALL ran after her last session closed; its cancel reply was numbered and retained in her stream. WELCOME reports the latest number; RESEND fetches what she missed.</details>
 
-2. In b2, why is the band reject's orderId 4 and not 3?
-<details><summary>Answer</summary>The duplicate reject was command 3 and consumed order id 3, even though it reported the original id 2.</details>
+2. Which break-it experiments show a mistake no test catches?
+<details><summary>Answer</summary>e4 and e12 (durability), e9 on Windows, e14, and e5 when no CHECK covers the changed command.</details>
 
-3. In c1, why does `appendAll` return before `MatchingEngine.process` is entered, even for a batch of one?
-<details><summary>Answer</summary>Write-ahead: <code>Exchange.process</code> appends and fsyncs the whole batch first, then processes; nothing is visible before it is durable.</details>
+3. In c1, why does `appendAll` return before `MatchingEngine.process` is entered?
+<details><summary>Answer</summary>Write-ahead: the whole batch is appended and fsynced first.</details>

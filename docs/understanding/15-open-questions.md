@@ -1,134 +1,142 @@
 # 15 — Open Questions
 
-> **Project:** ExchangeServer2 | Single-instrument limit order book: price-time matching engine, write-ahead journal with replay, single writer thread, plain TCP gateway | Stack: Java 17, Maven wrapper, JUnit 5 (+ JMH, PIT)
-> **This guide:** what could not be determined from the repository, ambiguous intent, and the questions you should be able to answer after studying | **Prerequisites:** ideally all guides; at least 01, 05, 09, 11 | **Related:** 09, 11, 12, 14
-> **Repo layout summary:** `pom.xml` + Maven wrapper (`mvnw`, `mvnw.cmd`) at the root; production code in `src/main/java/exchangeserver/` (packages `domain`, `book`, `engine`, `command`, `journal`, `core`, `gateway`, `client`, plus `Main`); tests mirror it in `src/test/java/exchangeserver/` (plus `bench/` JMH benchmarks and `testing/MutableClock`); design docs in `docs/` (`ExchangeServer2_Vision.md` = purpose/roadmap, `ExchangeServer2_Spec.md` = decisions D1–D65); these guides in `docs/understanding/`.
+> **Project:** ExchangeServer2 | Single-instrument limit order book: price-time matching engine, write-ahead journal with replay, single writer thread, TCP/TLS gateway with authenticated participants | Stack: Java 17, Maven wrapper, JUnit 5 (+ JMH, PIT)
+> **This guide:** what was open and how it was resolved, what is still open or unverified, and the questions you should be able to answer after studying | **Prerequisites:** ideally all guides; at least 01, 05, 09, 11 | **Related:** 09, 11, 12, 14
+> **Repo layout summary:** `pom.xml` + Maven wrapper (`mvnw`, `mvnw.cmd`) at the root; production code in `src/main/java/exchangeserver/` (packages `domain`, `book`, `engine`, `command`, `journal`, `core`, `gateway`, `client`, plus `Main`); tests mirror it in `src/test/java/exchangeserver/` (plus `bench/` JMH benchmarks and `testing/MutableClock`); design docs in `docs/` (`ExchangeServer2_Vision.md` = purpose/roadmap, `ExchangeServer2_Spec.md` = decisions D1–D77); these guides in `docs/understanding/`.
 
 ## Overview
 
-This project documents its intent unusually well: the Spec records decisions D1–D65 with reasons, and open threads in §8. So most "why" questions have a **[Verified]** answer in the Spec. What remains falls into three groups:
+The first version of this guide listed 24 open questions. On 2026-10-27 the user asked for every risk to be fixed, including the four security findings deferred earlier that day, and chose four policies: credentials + localhost + optional TLS; self-trade prevention by cancelling the incoming remainder; RESEND plus opt-in cancel-on-disconnect; work on a branch with commits and a Linux check in Docker. The result is Spec D66–D77. So this guide now has four parts:
 
-1. **Questions for the user**: choices only the owner can make (scope, policy, priorities). They are not bugs; the code is consistent with either answer.
-2. **Things this survey could not verify**: behaviour on other platforms, numbers not re-measured, documents outside the repo.
-3. **Questions you should be able to answer after studying**: a self-test of understanding, with pointers to the guides but no answers.
-
-Context: the code was written by an AI agent at the user's request on 2026-10-27 (Vision §3). On the same day, the survey for these guides found and fixed four issues (Spec §10, D63–D65 and a flaky test).
-
----
-
-## 1. Questions for the user (policy and scope)
-
-### Security and robustness (deferred on 2026-10-27)
-A security review on 2026-10-27 found four gateway issues, and the user chose to defer all of them. None are recorded in the Spec. **[Verified]** from the project's memory notes, not from the repo.
-1. **Network exposure and identity.** The gateway binds to all interfaces (`new InetSocketAddress(port)`, `src/main/java/exchangeserver/gateway/TcpGateway.java:62-68`) and `LOGIN` has no authentication (`gateway/ClientSession.java:225-243`). Anyone on the LAN can log in as any participant, trade, cancel their orders and read their maker fills. *Do these stay deferred? Should the default bind be `127.0.0.1` with a `--bind` option (the cheapest fix)?* Vision §6 lists "authentication; TLS" as non-goals, but the memory notes say that wording was the AI's addition in Vision v4, not the user's.
-2. **Memory-exhaustion flood.** Participant names are self-chosen, so the per-participant open-order cap (10,000) does not bound the total. The client-order-id map only grows (`engine/MatchingEngine.java:43`; Spec D49 cost). There is no rate limit. An OOM is an `Error`, which halts the writer, and replay rebuilds the same state, so restarts can fail too **[Inferred]**. *Accept for a learning project, or add a global resting-order cap and per-session rate limit?*
-3. **No timeouts.** Sockets have no read, login or idle timeout, so 256 idle pre-login connections exhaust the session slots (`TcpGateway.java:109-115`). *Wanted?*
-4. **No fairness.** One global queue with a capacity of 100,000 means one pipelining client can make everyone get `BUSY` (`core/ExchangeService.java:182-202`). *Per-session in-flight limits?*
-
-### Trading policy
-5. **Cancel-on-disconnect.** Resting orders stay on the book after a session closes (Spec §6, as of D63). Many venues offer cancel-on-disconnect. *Wanted, or keep orders (the current behaviour)?* If wanted, a disconnect becomes a journalled command (determinism), so it needs a design decision.
-6. **Self-trade prevention.** Self-trades are allowed (Spec §8; Vision §7 "next candidates" #3 needs a policy: cancel newest / oldest / both). *Which policy, and when?*
-7. **Open-order cap on a fully fillable LIMIT.** The cap is checked on arrival, so a participant at 10,000 resting orders cannot send a LIMIT that would fill completely and never rest (`MatchingEngine.java:118-121`; Spec §8 "simple and deterministic; real venues differ"). *Intended long term, or a placeholder?*
-8. **Client-order-id lifetime.** Unique per participant *forever* (D49). The Spec's planned fix is a trading day, ended by snapshot + fresh journal. *When does "a trading day" get built (Vision §7 next candidate #1)?*
-
-### Operability
-9. **Snapshots and journal rotation.** Recovery replays the whole journal, O(file size) (Spec §8). Crossing a rule change needs "a snapshot + fresh journal", which the startup error message recommends even though snapshots don't exist (`journal/CommandJournal.java:263-264`). *Priority relative to the other next candidates?*
-10. **Startup reporting.** `Main` prints neither how many commands were replayed nor how many torn bytes were cut. `Exchange.replayedOnOpen()` and `truncatedBytesOnOpen()` exist, but only tests read them **[Verified]** (grep; Spec §8). *Should a silent torn-tail cut be visible to the operator?*
-11. **Writer stats lag replies.** `batches()`, `processed()` and `largestBatch()` are updated after a batch's futures complete (`core/ExchangeService.java:101-106,259-263`). Only tests and the benchmark read them today. *Does anyone need them to be exact at reply time (e.g. a future metrics endpoint)?*
-12. **CRLF tolerance.** Records are LF-only. A journal converted to CRLF (an editor, or git `autocrlf` if a journal were ever committed) fails at startup on its header (observed 2026-10-27; Spec §8). *Tolerate a trailing `\r` (a format decision, `FORMAT_VERSION`?), or keep strict?*
-13. **Double SKIP.** `--quarantine` accepts a command that is already skipped and appends a second, harmless SKIP (observed 2026-10-27; `core/Exchange.java:94-114` checks only that the target exists and is not itself a SKIP). *Refuse it for clarity?*
-14. **Generic startup hint.** Every startup failure prints the poison-pill hint, even a rules-version mismatch (`Main.java:64-69`). *Tailor the message?*
-
-### Documentation and design
-15. **Original-project documents.** Code comments cite "threads guide 4.3 / 4.4 / Lab 6" and "Spec v8" / "v3". These live in the original project (`Exchange Server/New Learnings/03_Threads_Visibility_and_Handoff.md`, `Exchange Server/src/docs/ExchangeServer_Spec_v8.md`), and Spec §1.6 now names them. *Copy them into this repo, or keep pointing outside?*
-16. **D63's barrier.** A session waits for its replies by queueing a depth-1 snapshot read (`gateway/ClientSession.java:143-153`). The trade-off is recorded in Spec D63: it reuses the existing request type, at the cost of one tiny snapshot per disconnect. *Promote it to a dedicated `Request.Barrier` in `core` if more barrier uses appear?*
-17. **Collaboration mode for future work.** `CLAUDE.md` and Vision §3 say to ask, per piece of work, whether the user writes the code (with the LLM reviewing) or the LLM writes it. The fixes in Spec §10 were LLM-written on the user's instruction "Fix first". *Which mode for the next roadmap step?*
+1. **Resolved** — each former question with its answer and where it lives.
+2. **Questions for the user** that remain (policy and scope).
+3. **Not verified** by the sessions that wrote the code and these guides.
+4. **Questions you should be able to answer after studying** (no answers).
 
 ---
 
-## 2. Not verified by this survey
+## 1. Resolved (2026-10-27)
 
-18. **Journal lock on Linux/macOS: design hole resolved in-session; POSIX behaviour still untested.**
-    - *The hole.* D65's first version locked one byte of the journal file itself. The `java.nio.channels.FileLock` Javadoc warns that "on some systems, closing a channel releases all locks held by the Java virtual machine on the underlying file regardless of whether the locks were acquired via that channel or via another channel" (general Java knowledge). POSIX `fcntl` locks behave this way, and `read()`, the header check and the torn-tail cut all open and close their own handles on the journal. So on Linux/macOS that lock would have vanished right after `open()`.
-    - *The fix, made on 2026-10-27 **[Verified]**:* the lock now lives on a separate sibling file, `<journal>.lock`, that nothing else ever opens. Details:
-      - `Files.createFile` (create-new) never opens an existing lock file, so it never closes one.
-      - A whole-file `tryLock` on its own channel.
-      - Key = `lockFile.toRealPath()`.
-      - A static in-JVM `HELD` set refuses a second open in the same JVM before it touches the lock file.
-      - The lock is acquired before the journal channel opens; `close()` closes the journal channel, then releases the lock.
-      - The file is left on disk (git-ignored `*.journal.lock`).
+| # | Former question | Resolution |
+|---|---|---|
+| 1 | Gateway on every interface, unauthenticated LOGIN (deferred security finding 1) | **Fixed at the user's request** (D74): bind 127.0.0.1 by default (`--bind` to widen), `LOGIN <p> <secret>` against salted PBKDF2-HMAC-SHA256 hashes (`--add-user`), one attempt per connection, optional TLS 1.3/1.2 (`--tls-keystore`). `src/main/java/exchangeserver/gateway/Credentials.java`, `src/main/java/exchangeserver/gateway/Tls.java`, `src/main/java/exchangeserver/gateway/TcpGateway.java:52-98`. Authentication and TLS left the Vision's non-goals. **[Verified]** |
+| 2 | Memory-exhaustion flood (finding 2) | **Fixed** (D68, D71, D74, D75): a global cap `MAX_RESTING_ORDERS` (1,000,000, `BOOK_FULL`), only authenticated names, a per-session rate limit, and compaction scoping the client-order-id map to a journal. **[Verified]** |
+| 3 | No timeouts (finding 3) | **Fixed** (D75): login timeout 10 s, idle timeout 300 s. `src/main/java/exchangeserver/gateway/ClientSession.java:152-183`. **[Verified]** |
+| 4 | No fairness (finding 4) | **Fixed** (D75): per-session in-flight cap (`SESSION_BUSY`) and token-bucket rate limit (`RATE_LIMITED`). `ClientSession.java:279-291`. **[Verified]** |
+| 5 | Cancel-on-disconnect | **Opt-in** (D72): `LOGIN … COD`; the last COD session closing submits a journalled `CANCEL_ALL`. `TcpGateway.java:239-263`. **[Verified]** |
+| 6 | Self-trade policy | **Cancel the incoming remainder** (D67), `SELF_TRADE_PREVENTED`. `src/main/java/exchangeserver/engine/MatchingEngine.java:224-227`. **[Verified]** |
+| 7 | Open-order cap on a fully fillable LIMIT | **Fixed** (D68): caps apply only to an order that would rest. `MatchingEngine.java:193-200`. **[Verified]** |
+| 8 | Client-order-id lifetime | **Per journal** (D71 revises D49): after compaction only resting orders keep their ids. **[Verified]** |
+| 9 | Snapshots and rotation | **Offline compaction** (D71): `--compact` writes `<journal>.snapshot-<seq>`, archives the journal, leaves an empty one with that base. `src/main/java/exchangeserver/core/Exchange.java:174-196`. **[Verified]** |
+| 10 | Startup reporting | **Summary line** (D77): `Recovered through sequence N [from snapshot B]: replayed R commands, cut T torn bytes …`. `src/main/java/exchangeserver/Main.java:154-157`. **[Verified]** (live) |
+| 11 | Writer stats lag replies | Documented and kept: tests read them after `stop()` (Spec §10 #1). Nobody needs them exact at reply time yet. |
+| 12 | CRLF tolerance | **Detect, don't tolerate** (D69): a record ending in `\r` is reported as a line-ending conversion; `.gitattributes` marks journals `-text`. **[Verified]** |
+| 13 | Double SKIP | **Refused** (D77): "Command N is already quarantined". `Exchange.java:141-171`. **[Verified]** |
+| 14 | Generic startup hint | **Tailored** (D77): poison-pill advice only for `ReplayException(ENGINE_FAILURE)`, compaction advice for `DIVERGED`, otherwise "The journal was not changed." `Main.java:187-198`. **[Verified]** (`MainTest`) |
+| 16 | D63's snapshot barrier | **Replaced** (D76): an in-flight count per session; the listener runs before the future, so the last callback closes after the lines went out. This also holds during shutdown, where the barrier read was refused. **[Verified]** (`TcpGatewayTest.Session.quitDuringShutdownStillGetsTheRepliesOfAcceptedRequests`) |
+| 18 | Journal lock on Linux/macOS | **Verified in Docker** (`eclipse-temurin:17`, Linux kernel under WSL2): the full suite passed, including the child-JVM test, and `--quarantine` against a running server was refused. Spec §11. **[Verified]** |
+| 19 | Directory fsync | **Done** (D69): `Durable.fsyncDirectory` after creating or renaming files (ignored on Windows, where a directory cannot be opened). `src/main/java/exchangeserver/journal/Durable.java:50-64`. Not observable by any test. |
+| 21 | Clean Ctrl+C shutdown | The hook path ran on Linux (SIGINT and SIGTERM) — see item 24. Windows Ctrl+C itself was not exercised (item N7). |
+| 22 | Mutation results after the fixes | Recorded in Spec §7 by the session that made them. |
+| 24 | Exit code after Ctrl+C | **0, by construction and verified**: the shutdown hook ends the process with `Runtime.halt(status)` (0, or 2 if halted, D77). In Docker with job control on, SIGINT and SIGTERM both gave exit status 0. Note: a non-interactive shell starts background jobs with SIGINT ignored, so test with `set -m`. `Main.java:160-177`. **[Verified]** |
 
-      Code: `journal/CommandJournal.java:52-53,71-103,185-249`. The regression test `CommandJournalTest$Exclusive.anotherProcessIsRefusedWhileTheJournalIsOpen` (`src/test/java/exchangeserver/journal/CommandJournalTest.java:296-312`) appends and calls `read()` (closing a handle on the journal) and only then runs `Main --quarantine` in a child JVM, expecting exit 1 and "already open". It passes on Windows.
-    - *Still open:* nobody has run it on Linux or macOS. Docker Desktop exists on the dev machine but was not started. To check: `docker run --rm -v "$PWD":/w -w /w eclipse-temurin:17 ./mvnw -B test -Dtest=CommandJournalTest` (exercise d7 in guide 14). Smaller open points **[Inferred]**:
-      - A stale lock file is harmless (it is reused), but on a network file system lock semantics may differ.
-      - The lock file sits next to the journal, so the journal's directory must be writable even for `--quarantine`.
-19. **Directory fsync after creating the journal.** Not done; this matters on Linux (Spec §8). Unverified whether a new journal can vanish after a crash on ext4.
-20. **Benchmark numbers.** The Spec §5 tables (engine ~0.65–1.1 µs/command; smart batching 43 orders/ms at 64 clients) were not re-run for these guides. The D52 and D59 decisions rest on them.
-21. **Clean Ctrl+C shutdown.** Only hard kills were exercised live. The clean path (shutdown hook → `gateway.close()` → `service.stop(10 s)`, `Main.java:74-83`) is covered by unit tests of `stop()`, not by a run of `Main`.
-22. **Mutation results after the fixes.** The PIT re-run results for D63–D65 are recorded in Spec §7 by the session that made the fixes. Check there for the current survivor list.
-23. **Linger mode on Linux.** The Spec explains the poor linger numbers by the Windows ~15.6 ms timer resolution. Not measured on another OS.
-24. **Exit code after Ctrl+C.** `Main`'s header comment and the README say exit code 0 after a clean stop (`Main.java:19`). But Ctrl+C makes the JVM run its shutdown hooks *as part of exiting on the signal*. When the JVM exits because of SIGINT, the process exit status is normally 130 (128 + signal 2) on Linux/macOS. On Windows a console Ctrl+C typically gives a non-zero status too (e.g. 130 or `-1073741510` / `0xC000013A`, depending on the shell). `main` returning normally does not set the code, because the exit is already under way. **[Inferred, unverified]**: run the jar, press Ctrl+C, and check `$?` / `$LASTEXITCODE`. If it is not 0, either the documentation is wrong, or `Main` should call `System.exit(0)` itself after a clean stop (which it cannot do from inside a shutdown hook, since `exit` blocks there). Either way, scripts that treat "non-zero = halted" would misread a clean Ctrl+C; only exit code 2 means halted.
+Item 15 (original-project documents cited by comments) and 17 (collaboration mode) remain below; 20 and 23 (benchmarks, linger on Linux) remain unverified.
 
 ---
 
-## 3. Questions you should be able to answer after studying
+## 2. Questions for the user
 
-No answers here; each points to where the answer lives. If you can answer all of them without looking, you understand the project the way its author does.
+N1. **Online or automatic compaction.** Compaction runs only with the exchange stopped (D71). *Should it run on a schedule, at a size threshold, or online (the writer swapping journals between batches)?* Online needs a design for the swap and for clients' RESEND across it.
+
+N2. **Retention size.** RESEND keeps 1,000 events per participant (`--resend-window`) and never reaches past a compaction (D73). *Is that enough for your clients' reconnect gaps? Should retention be per time instead of per count?*
+
+N3. **Market-data resend.** Private events can be resent; TRADE/LEVEL cannot (re-SUBSCRIBE gives a fresh snapshot). *Wanted?*
+
+N4. **Per-participant vs per-session limits.** Rate and in-flight limits are per session (D75); a participant can open several sessions (bounded by 256 total). *Limit per participant instead, or as well?*
+
+N5. **Reloading users without restart.** The users file is read at startup only. *Add a reload (an admin command, or watching the file)? And what happens to sessions of a removed participant?*
+
+N6. **PBKDF2 cost vs login latency.** 210,000 iterations make each LOGIN cost tens to hundreds of milliseconds on the reader thread **[Inferred]** — fine for a few logins, but a login storm costs CPU. *Lower, keep, or add a per-address login rate limit?*
+
+N7. **Secrets rotation and policy.** `--add-user` replaces an entry; there is no expiry, no lockout after failures beyond "one attempt per connection". *Needed for a learning project?*
+
+N8. **Self-trade policy variants.** "Cancel incoming" was chosen; "cancel resting" and "cancel both" are not available. *Ever make it a per-order or per-participant choice?*
+
+N9. **Old journals.** Format v2 / rules v1 journals from before D69 cannot be opened, and there is no migration tool (they predate snapshots). *Write one, or treat them as disposable?*
+
+N10. **Original-project documents** (former 15). Comments cite "threads guide" and "Spec v8" in the original project; Spec §1.6 names them. *Copy them in?*
+
+N11. **Collaboration mode** (former 17). D63–D77 were LLM-written on the user's instruction. *Which mode for the next piece of work?* (`CLAUDE.md`, Vision §3.)
+
+N12. **Digest strength.** The output digest is FNV-1a 64 (D70): good at catching accidental divergence, useless against deliberate tampering, and only checked every 10,000 commands. *Is a cryptographic hash or a shorter interval worth the cost?*
+
+---
+
+## 3. Not verified
+
+V1. **macOS.** Nothing has run on macOS; Linux ran in Docker (Spec §11).
+V2. **Windows Ctrl+C.** The exit-code fix was verified with SIGINT/SIGTERM on Linux; a console Ctrl+C on Windows was not exercised from the tooling **[Inferred]** to behave the same, since the same hook runs.
+V3. **Benchmarks** (former 20, 23). Spec §5 numbers were not re-run after D66–D77. The new per-command work (digest update, output-log entry, private-event lines) adds allocation the benchmarks do not yet measure **[Inferred]**.
+V4. **Network file systems.** Lock semantics there may differ (D65) **[Inferred]**.
+V5. **Login cost.** The PBKDF2 time per login was not measured.
+V6. **TLS performance and client interop.** Tested with the JDK's own client in `TcpGatewayTest.Security.tlsRoundTrip`; no other TLS client was tried.
+
+---
+
+## 4. Questions you should be able to answer after studying
+
+No answers here; each points to where the answer lives.
 
 **Architecture and flow**
-1. Trace a crossing NEW from the socket to the maker's FILL line, naming every thread and every class it touches. *(guide 05 flow 1)*
-2. Why does sequence order equal processing order without any lock around the `Sequencer`? *(07 exchange-service; Spec D55)*
-3. Why must the reply callback run before the `OutputListener` for the same command, and what guarantees it? *(07 exchange-service; 07 gateway; D53)*
-4. What exactly does the caller's future protect against that the writer's own future did not? *(07 exchange-service; D61)*
+1. Trace a crossing NEW from the socket to the maker's FILL line, naming every thread and class. *(05 flow 1)*
+2. Why does sequence order equal processing order without a lock around the `Sequencer`? *(07 exchange-service; D55)*
+3. Why does the listener run before the request's future completes, and what would break if it did not? *(07 exchange-and-replay; D76)*
+4. Why do a participant's replies go to all its sessions? *(07 gateway; D73)*
 
-**Correctness and invariants**
-5. List the book invariants and the single method responsible for each. *(07 book)*
-6. Why is `fillBest` in `OrderBook`, not in the engine? What would break if the engine could unlink nodes? *(07 book; D44)*
-7. Why is a market order's collar fixed at arrival, and how do floor and ceil make it agree with `withinBand`? *(07 engine; D50)*
-8. Why can't a FOK use the normal matching loop and "undo" on failure? *(07 engine)*
+**Correctness**
+5. Where exactly does self-trade prevention stop matching, and why does the FOK pre-check have to stop at the same place? *(07 engine; D67)*
+6. Why do the caps ignore an order that fully trades on arrival? *(07 engine; D68)*
+7. How is the market collar anchored before the first trade? *(07 engine; D66)*
 
 **Durability and recovery**
-9. State "visible ⇒ durable" and "durable ⇒ visible". Which one holds, why, and what is the client's remedy for the other? *(07 journal; Spec §4; D49)*
-10. Why is a torn last record cut but a complete corrupt record never dropped? *(07 journal; D38)*
-11. Why is a poison pill skipped automatically when it happens live, but never at startup? *(07 exchange-and-replay; D51)*
-12. After a live poison pill in the middle of a batch, why do the later commands in that batch run on a *rebuilt* engine, and why is that consistent with replay? *(05 flow 5)*
-13. Why does `open` lock, then check the header, then cut — and what went wrong when it cut first? *(07 journal; D64, D65)*
+8. What does a CHECK record prove, and what can it miss? *(07 ledger-and-snapshots; D70)*
+9. Walk through a crash at each step of compaction: which journal and snapshot does the next startup use? *(07 ledger-and-snapshots; D71)*
+10. How do you move a journal across a `Rules.VERSION` change? *(12; D71)*
+11. Why does a CRC catch what the parser cannot? *(07 journal; D69)*
+12. Why is oseq rebuilt identically by replay, and what does a snapshot keep of it? *(07 ledger-and-snapshots; D73)*
 
-**Concurrency**
-14. Why does no field of `Pending` need `volatile`? *(07 exchange-and-replay; happens-before)*
-15. How do `stop()` and `enqueue()` together guarantee "refused or processed, never lost"? *(07 exchange-service; D56)*
-16. Why may a test read `processed()` only after `stop()`? *(10; Spec §10 #1)*
-17. How does the subscription number prevent two BOOK lines after SUBSCRIBE, UNSUBSCRIBE, SUBSCRIBE? *(07 gateway; Spec §9 #3)*
+**Concurrency and the gateway**
+13. How does `ClientSession` decide when a QUITting session may close, and why is it safe whichever thread gets there last? *(07 gateway; D76)*
+14. Why is the rate limit outside the engine? *(08; D75)*
+15. Why must `JournalLock` lock a separate file? *(07 journal; D65)*
 
 **Design judgement**
-18. Why was the cached best-level pointer rejected? What measurement decided it? *(09; D59; Spec §5)*
-19. Why smart batching instead of linger, and why did linger measure so badly on Windows? *(09; D52)*
-20. Which changes need `Rules.VERSION` bumped, and which need `FORMAT_VERSION`? *(12)*
-21. Name three risks in guide 11 that tests cannot catch, and say how you would detect each in production. *(11; 14 (e))*
+16. Which changes need `Rules.VERSION`, which `FORMAT_VERSION`, and which are caught only by a CHECK? *(12)*
+17. Name three guarantees no test can verify, and how you would check them in production. *(11; 14 (e))*
 
 ---
 
 ## Key takeaways
 
-- Most "why" questions are answered by a D-number in the Spec. The open questions are about policy and scope, not mystery code.
-- The four deferred security findings are the biggest open decisions. They are recorded only in the project's memory notes, not in the Spec.
-- Cross-platform behaviour (the journal lock, the directory fsync, linger timing) is verified on Windows only.
-- Benchmarks were not re-run; decisions D52 and D59 rest on the Spec §5 numbers.
-- If you can answer section 3 without the guides, you are ready to change the code with confidence.
+- Every risk from the review, including the deferred security findings, was addressed on 2026-10-27 (D66–D77), with the four policy choices made by the user.
+- What remains open is mostly *scope*: online compaction, retention, market-data resend, limits per participant, users reload, digest strength.
+- Linux is verified (Docker); macOS, Windows Ctrl+C and the benchmarks are not.
+- If you can answer section 4 without the guides, you understand the project the way its author does.
 
 ## Common confusions
 
-- **"An open question means a bug."** Mostly not. Items 5–8 are deliberate simplifications that the Spec documents.
-- **"Non-goals in the Vision were the user's decisions."** The memory notes say the "authentication; TLS" non-goal wording was added by the AI in Vision v4. Confirm with the user.
-- **"D63–D65 were part of the original design."** They were added on 2026-10-27, during the survey for these guides (Spec §10).
+- **"Deferred means still open."** The four security findings were deferred, then fixed at the user's later request.
+- **"Compaction runs by itself."** It is an offline operator tool.
+- **"RESEND recovers everything."** It reaches back 1,000 events per participant and never past the last compaction; market data is not resent.
+- **"Exit code 0 after Ctrl+C is just documentation."** It is enforced by the shutdown hook and was observed on Linux.
 
 ## Questions to test yourself
 
-1. Which open question would change the journal format if answered "yes"?
-<details><summary>Answer</summary>CRLF tolerance (12) arguably needs a format decision. So do cancel-on-disconnect (5), which needs a new journalled command type, and trading-day scoping (8), which needs snapshots and rotation. A new command type means a new record word in <code>JournalCodec</code>.</details>
+1. Which resolved item needed a new journalled command type, and why could it not be done in the gateway alone?
+<details><summary>Answer</summary>Cancel-on-disconnect: a disconnect changes the book, so it must be a stamped, journalled command (<code>CANCEL_ALL</code>) processed by the writer thread; the gateway may not touch the book and replay must see the change.</details>
 
-2. Why can't cancel-on-disconnect simply be done by the gateway calling `book.cancel` when a socket closes?
-<details><summary>Answer</summary>Two reasons. Only the writer thread may touch the book (single writer). And every state change must be a journalled command, or replay would rebuild a different book. The gateway would have to submit cancel requests through <code>ExchangeService</code>, or a new "disconnect" command, stamped and journalled.</details>
+2. Why does the Linux run matter for the journal lock but not much for the matching engine?
+<details><summary>Answer</summary>File-lock semantics differ by OS (POSIX locks per process, dropped on any close; Windows per handle), while the engine is pure deterministic Java that behaves the same everywhere.</details>
 
-3. What could go wrong with the journal lock on Linux that cannot happen on Windows?
-<details><summary>Answer</summary>POSIX record locks belong to the process, and closing <em>any</em> descriptor for the file releases them (the <code>FileLock</code> Javadoc warns about this); on Windows, locks belong to the handle. A lock on the journal itself would therefore vanish on Linux as soon as <code>read()</code>, the header check or the torn-tail cut closed its handle. That is why D65 now locks a separate <code>&lt;journal&gt;.lock</code> file that nothing else opens or closes, plus an in-JVM <code>HELD</code> set. Whether the fix holds on Linux has not been run yet (item 18).</details>
+3. A client misses fills while disconnected for a week with heavy trading. What can it recover?
+<details><summary>Answer</summary>Only the last 1,000 of its private events (by default), and nothing from before the last compaction: RESEND answers with <code>RESEND_GAP first=…</code> for the rest.</details>
