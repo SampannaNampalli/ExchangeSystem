@@ -98,7 +98,9 @@ public final class ExchangeService {
     private volatile State state = State.RUNNING;
     private volatile Throwable haltCause;
 
-    // Written only by the writer thread; volatile so other threads can read a recent value.
+    // Written only by the writer thread; volatile so other threads can read a recent value. Updated after the
+    // batch's futures complete, so a caller holding a result may still see the previous values; after stop()
+    // returns true (the writer's join) they are final.
     private volatile long batches;
     private volatile long processed;
     private volatile int largestBatch;

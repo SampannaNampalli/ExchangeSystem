@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -97,6 +99,44 @@ class TcpGatewayTest {
             c.send("QUIT");
             assertEquals("BYE", c.awaitPrefix("BYE", WAIT));
             assertTrue(c.isClosedByServer(WAIT));
+        }
+
+        // D63: QUIT used to say BYE and close at once, dropping replies the writer had not produced yet.
+        @Test
+        void quitAnswersEveryEarlierRequestBeforeBye() throws Exception {
+            ExchangeClient c = login("alice");
+            int orders = 200;
+            List<String> burst = new ArrayList<>();
+            for (int i = 0; i < orders; i++) {
+                burst.add("NEW q" + i + " BUY LIMIT 1 " + (100 + i % 10));
+            }
+            burst.add("QUIT");
+            c.send(String.join("\n", burst));       // one write: the reader sees QUIT long before the writer is done
+
+            List<String> lines = c.linesUntil(line -> line.equals("BYE"), WAIT);
+            assertEquals(orders, lines.stream().filter(l -> l.startsWith("ORDER")).count(), lines.toString());
+            assertEquals("BYE", lines.get(lines.size() - 1));
+            assertTrue(c.isClosedByServer(WAIT));
+        }
+
+        @Test
+        void endOfStreamStillGetsTheReplies() throws Exception {
+            int orders = 50;
+            StringBuilder burst = new StringBuilder("LOGIN bob\n");
+            for (int i = 0; i < orders; i++) {
+                burst.append("NEW e").append(i).append(" SELL LIMIT 1 200\n");
+            }
+            try (Socket raw = new Socket("localhost", gateway.port())) {
+                raw.getOutputStream().write(burst.toString().getBytes(US_ASCII));
+                raw.shutdownOutput();               // end of stream right after the last request
+                raw.setSoTimeout((int) WAIT.toMillis());
+                BufferedReader in = new BufferedReader(new InputStreamReader(raw.getInputStream(), US_ASCII));
+                List<String> lines = new ArrayList<>();
+                for (String line; (line = in.readLine()) != null; ) {
+                    lines.add(line);
+                }
+                assertEquals(orders, lines.stream().filter(l -> l.startsWith("ORDER")).count(), lines.toString());
+            }
         }
 
         @Test

@@ -35,6 +35,7 @@ Server -> client (key=value after the message type, so fields can be added witho
     ERROR <text>
 
 For a NEW, the submitter gets its FILL lines, then ORDER; market data for the same command follows.
+QUIT: every request sent before it is answered first, then BYE, then the server closes the connection.
 
  */
 final class Protocol {

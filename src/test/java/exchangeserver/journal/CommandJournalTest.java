@@ -17,6 +17,7 @@ import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -74,6 +75,7 @@ class CommandJournalTest {
             IllegalStateException e = assertThrows(IllegalStateException.class, () -> CommandJournal.open(file(), RULES + 1));
             assertTrue(e.getMessage().contains("rules version"), e.getMessage());
             assertEquals(open, CommandJournal.openJournals(), "the refused journal's channel was closed");
+            CommandJournal.open(file(), RULES).close();     // the refused open released its lock (D65)
         }
 
         @Test
@@ -82,6 +84,35 @@ class CommandJournalTest {
             int open = CommandJournal.openJournals();
             assertThrows(IllegalStateException.class, () -> CommandJournal.open(file(), RULES));
             assertEquals(open, CommandJournal.openJournals());
+        }
+
+        // D64: open() used to cut the "torn tail" of any file before checking its header.
+        @Test
+        void fileThatIsNotAJournalIsRefusedUnchanged() throws IOException {
+            Files.writeString(file(), "hello\nworld", UTF_8);
+            int open = CommandJournal.openJournals();
+            assertThrows(IllegalStateException.class, () -> CommandJournal.open(file(), RULES));
+            assertEquals("hello\nworld", text(), "a refused file is never cut");
+            assertEquals(open, CommandJournal.openJournals());
+        }
+
+        @Test
+        void textWithoutAnyRecordIsRefusedUnlessItStartsAHeader() throws IOException {
+            Files.writeString(file(), "hello", UTF_8);
+            IllegalStateException e = assertThrows(IllegalStateException.class, () -> CommandJournal.open(file(), RULES));
+            assertTrue(e.getMessage().contains("does not start with a journal header"), e.getMessage());
+            assertEquals("hello", text());
+        }
+
+        @Test
+        void otherRulesVersionWithATornTailIsRefusedUnchanged() throws IOException {
+            try (CommandJournal j = CommandJournal.open(file(), RULES + 1)) {
+                j.append(order(1, 1));
+            }
+            Files.writeString(file(), "NEW,2,2026", UTF_8, StandardOpenOption.APPEND);
+            String before = text();
+            assertThrows(IllegalStateException.class, () -> CommandJournal.open(file(), RULES));
+            assertEquals(before, text());
         }
 
         @Test
@@ -236,6 +267,47 @@ class CommandJournalTest {
                 assertEquals(10_000, j.getTruncatedBytesOnOpen());
                 assertEquals(1, readAll(j).size());
             }
+        }
+    }
+
+    // D65: nothing stopped a second writer (e.g. --quarantine against a running exchange) from appending.
+    @Nested
+    class Exclusive {
+
+        @Test
+        void aSecondOpenIsRefusedUntilTheFirstCloses() throws IOException {
+            try (CommandJournal first = CommandJournal.open(file(), RULES)) {
+                int open = CommandJournal.openJournals();
+                IllegalStateException e = assertThrows(IllegalStateException.class, () -> CommandJournal.open(file(), RULES));
+                assertTrue(e.getMessage().contains("already open"), e.getMessage());
+                assertEquals(open, CommandJournal.openJournals(), "the refused channel was closed");
+
+                first.append(order(1, 1));          // the refusal did not disturb the owner
+                assertEquals(List.of(order(1, 1)), readAll(first));
+            }
+            try (CommandJournal again = CommandJournal.open(file(), RULES)) {
+                assertEquals(1, readAll(again).size());
+            }
+        }
+
+        // The lock must hold against another process even after this one has opened and closed other handles on
+        // the journal (read() does): on Linux and macOS that closing drops POSIX locks on the journal file itself.
+        @Test
+        void anotherProcessIsRefusedWhileTheJournalIsOpen() throws Exception {
+            try (CommandJournal held = CommandJournal.open(file(), RULES)) {
+                held.append(order(1, 1));
+                readAll(held);
+                String java = ProcessHandle.current().info().command().orElse("java");
+                Process child = new ProcessBuilder(java, "-cp", System.getProperty("java.class.path"),
+                        "exchangeserver.Main", "--journal", file().toString(), "--quarantine", "1")
+                        .redirectErrorStream(true)
+                        .start();
+                assertTrue(child.waitFor(60, TimeUnit.SECONDS), "the child JVM did not finish");
+                String output = new String(child.getInputStream().readAllBytes(), UTF_8);
+                assertEquals(1, child.exitValue(), output);
+                assertTrue(output.contains("already open"), output);
+            }
+            assertEquals(2, Files.readAllLines(file(), UTF_8).size(), "header and one order: no SKIP was appended");
         }
     }
 

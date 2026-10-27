@@ -45,7 +45,14 @@ public final class Main {
         }
 
         if (quarantine != null) {
-            Exchange.quarantine(journal, quarantine, Clock.systemUTC());
+            try {
+                Exchange.quarantine(journal, quarantine, Clock.systemUTC());
+            } catch (IOException | RuntimeException e) {
+                // e.g. no such command, or the journal is open in a running exchange (D65)
+                System.err.println("Quarantine failed: " + e.getMessage());
+                System.exit(1);
+                return;
+            }
             System.out.println("Quarantined command " + quarantine + " in " + journal.toAbsolutePath());
             return;
         }

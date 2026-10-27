@@ -11,8 +11,13 @@ understanding and justified design matter more than features. It is a rewrite of
 
 The two design documents are the source of truth and must be kept current when behaviour changes:
 - `docs/ExchangeServer2_Vision.md`: purpose, working style, principles, and **the roadmap (it lives only there)**.
-- `docs/ExchangeServer2_Spec.md`: exact code state, numbered decisions (D1–D60), journal format, benchmark and
+- `docs/ExchangeServer2_Spec.md`: exact code state, numbered decisions (D1–D65), journal format, benchmark and
   mutation results, open threads. New design decisions get the next D-number there, with their real reason.
+  Comments that cite a "threads guide" or "Spec v8" point to files in the original project (Spec §1.6).
+
+`docs/understanding/` holds study guides written for the user (start at `00-START-HERE.md`); they cite
+`path:LINE`, so update them when behaviour or line numbers change, then regenerate `FULL-CONTEXT.md` with
+`java docs/understanding/build-full-context.java`.
 
 **Working style:** this rewrite was written by Claude at the user's explicit request. The original project's rule
 was "the user writes production code; Claude reviews, quizzes, and writes the tests". For new work, ask which
@@ -23,7 +28,7 @@ mode applies instead of assuming (Vision §3).
 No local Maven: use the wrapper (`mvnw.cmd` on Windows, `./mvnw` elsewhere). JDK 17.
 
 ```
-mvnw.cmd test                                   all tests (326)
+mvnw.cmd test                                   all tests (334)
 mvnw.cmd test -Dtest=MatchingEngineTest         one test class, including its @Nested groups
 mvnw.cmd test -Dtest=RulesTest#oppositeSide     one test method
 mvnw.cmd package                                jar: target/exchange-server2-2.0.0-SNAPSHOT.jar
@@ -68,7 +73,8 @@ decides what to process from its own state, never from a future's (D61).
 - `domain.Rules` holds every rule replay depends on. Changing any of them means bumping `Rules.VERSION`; the
   journal header records it and `CommandJournal.open` refuses a journal written under another version.
 - Journal format (`journal.JournalCodec`): `HEADER`, then `NEW` / `CANCEL` / `SKIP` text records ending in `\n`.
-  `open` cuts a torn last record; a complete unparsable record is never dropped (startup fails).
+  `open` locks `<journal>.lock` (one process at a time, D65), verifies the header before changing anything (D64), then
+  cuts a torn last record; a complete unparsable record is never dropped (startup fails).
 - Poison pill: if the engine throws a `RuntimeException` on a command live, `Exchange` appends `SKIP <seq>`,
   rebuilds the engine by replaying everything before it, and continues. An `Error` or journal failure halts the
   writer (`Main` exits 2). At startup a failing record is never auto-skipped; the operator runs `--quarantine <seq>`.
@@ -94,4 +100,6 @@ Windows 11, default charset windows-1252: always pass an explicit charset (the b
 source files with Windows PowerShell's `Set-Content -Encoding utf8`: it adds a byte-order mark, which javac
 rejects; use the Edit tool or `[IO.File]::WriteAllText(path, text, New-Object Text.UTF8Encoding($false))`. fsync costs
 ~1.5 ms on the dev disk, and timed waits round up to the ~15.6 ms Windows timer (why the linger batching mode
-measured badly). The project is not a git repository yet.
+measured badly). Git repository, branch `main`. Maven compiles incrementally by timestamp: a source restored with
+an older modification time (e.g. `Copy-Item` from a backup) is not recompiled and the jar keeps stale classes; use
+`mvnw.cmd clean ...` after swapping files.

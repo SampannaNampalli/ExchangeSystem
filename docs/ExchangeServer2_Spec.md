@@ -3,7 +3,7 @@
 **Supersedes:** `ExchangeServer_Spec_v8.md` (original project). Self-contained: nothing needs to be read from earlier specs.
 **Companion:** `ExchangeServer2_Vision.md` (purpose, working style, principles, **roadmap**).
 **Verified on 2026-10-27 against the working tree:** `mvnw test` compiles with `-Xlint:all` and no warnings,
-**326 tests, all green** (three consecutive full runs after the code-review fixes, §9).
+**334 tests, all green** (after the survey fixes, §10; the earlier "326 green, three runs" hid a flaky test, §10 #1).
 **Status:** roadmap steps 1–7 complete (Vision §7).
 
 ---
@@ -21,6 +21,11 @@
    the code always passes a charset); one fsync ~1.5 ms; timed waits round up to the ~15.6 ms Windows timer.
    **Java opens files on Windows with delete sharing, so deleting a file does not prove its handle was closed**
    (an early version of the tests assumed it did; PIT exposed it). Tests use `CommandJournal.openJournals()`.
+6. **References in code comments** that point outside this repo: "threads guide 4.3 / 4.4 / Lab 6" =
+   `Exchange Server/New Learnings/03_Threads_Visibility_and_Handoff.md` (sections 4.3 shutdown state machine,
+   4.4 timeouts in tests, Lab 6 one future per request); "Spec v8", "v3" = `Exchange Server/src/docs/
+   ExchangeServer_Spec_v8.md`, `ExchangeServer_Vision_v3.md` (both in the original project). "Step N" / "step 4A"
+   = the roadmap in Vision §7.
 
 ---
 
@@ -47,7 +52,7 @@ Packages under `src/main/java/exchangeserver/`. Single instrument.
 | `command.Command` | Sealed: `NewOrderCommand(seq, ts, orderId, request)`, `CancelOrderCommand(seq, ts, participant, orderId)`, `SkipCommand(seq, ts, skippedSeq)`. Records, validated in their constructors. |
 | `command.Sequencer` | Takes a `java.time.Clock`. `stampNewOrder`, `stampCancel`, `stampSkip`; `resume(clock, lastSeq, lastOrderId, lastTs)`. Backwards clock reuses the previous timestamp. |
 | `journal.JournalCodec` | The text format (§4). |
-| `journal.CommandJournal` | `open(path, rulesVersion)` (cut torn tail, write or verify header), `append`, `appendAll` (one write + one fsync), `read(consumer)` (streaming), fail-stop, `getTruncatedBytesOnOpen`. |
+| `journal.CommandJournal` | `open(path, rulesVersion)` (lock the file, verify the header, then cut a torn tail or write a new header), `append`, `appendAll` (one write + one fsync), `read(consumer)` (streaming), fail-stop, `getTruncatedBytesOnOpen`. |
 | `core.Replay` | Two passes: verify (contiguous seq, non-decreasing ts, collect SKIPs and counters), then feed. `stopBefore` for the poison rebuild. |
 | `core.Exchange` | Single-threaded live path. `open(path, clock)` replays; `process(batch, listener)`; poison-pill quarantine + rebuild; static `quarantine(path, seq, clock)` operator tool; convenience `submit`/`cancel`/`snapshot`. |
 | `core.ExchangeService` | The writer thread. `start(path, listener[, settings])`; `submit`/`cancel`/`snapshot` returning futures, and callback variants; `stop(timeout)`; `awaitTermination()`; states `RUNNING`, `STOPPING`, `STOPPED`, `HALTED`; stats `batches()`, `processed()`, `largestBatch()`. `Settings(queueCapacity, maxBatchSize, lingerNanos, clock)`. |
@@ -95,6 +100,10 @@ restart: CommandJournal.open (cut torn tail, check header) -> Replay (verify, fe
 - Visible ⇒ durable: no reply, fill or market data exists for a command that is not fsynced.
 - Restart rebuilds the identical book (snapshot equality, time priority, partial fills, client order ids).
 - Replay never writes to the journal; the poison rebuild appends exactly one SKIP.
+- At most one open `CommandJournal` per file, across processes (D65); `open` never modifies a file it refuses
+  (D64).
+- A session that stops reading (QUIT, end of stream, overlong line) closes only after every request it handed in
+  has been answered (D63).
 - No accepted request is lost: every future completes with a result or a refusal, including when `stop()` races
   producers (tested 5 x 1,000 requests) and when the writer halts.
 
@@ -164,6 +173,9 @@ New in ExchangeServer2:
 | D60 | **Replay streams the file twice** (verify, then feed) instead of loading a `List`. | Constant memory, and nothing is fed if the history is invalid anywhere. The poison-pill rebuild uses the feed pass alone with the skip set `Exchange` already holds (the journal was verified at open and only the writer has appended since). |
 | D61 | **Callers never get the writer's own future.** `submit`/`cancel`/`snapshot` return a separate future, completed from the common pool; the writer decides what to process from its own state (`Pending.refused`), never from a future's state. The callback variants (gateway only) still run on the writer and must not block. | Found in review: with the shared future, a caller's `cancel()`/`orTimeout()` on a queued request made the writer skip a command it had already journalled (live book ≠ replayed book), and any continuation a caller attached ran on, and could block, the writer thread. |
 | D62 | **SUBSCRIBE snapshots at most `Protocol.SNAPSHOT_DEPTH` (100) levels per side.** | Bounds the writer-thread cost and the line length of a SUBSCRIBE whatever the book depth (a client could loop SUBSCRIBE/UNSUBSCRIBE). LEVEL updates carry absolute quantities, so a deeper level appears in a subscriber's view when it first changes. |
+| D63 | **A session closes only after its requests are answered.** When the reader stops (QUIT, end of stream, overlong line) it queues a depth-1 snapshot read; the read's callback sends BYE (for QUIT) and closes. A broken connection (I/O error) still closes at once. | The queue is FIFO, so that read completes after every request the session handed in, and their reply callbacks have already offered their lines. Before, QUIT sent BYE and closed at once: a client sending NEW then QUIT lost the ORDER reply (199 of 200 in the regression test) for an order that executed and may rest. A read reuses the existing request type instead of a new "barrier" request in `core`; it costs the writer one tiny snapshot per disconnect. During shutdown the read is refused at once and the session closes without waiting (shutdown drops connections anyway). |
+| D64 | **`CommandJournal.open` checks the header before it changes anything.** A complete first record must be a header of this rules version; a file with no complete record must be a prefix of the expected header (a crash while creating the journal). Otherwise `open` refuses and the file is untouched. | Before, the torn-tail cut ran first: pointing `--journal` at any other file cut its unterminated last line, and a one-line file without a newline was emptied and turned into a journal. A journal written under other rules was also cut before being refused. |
+| D65 | **A journal is locked while open, through a separate `<journal>.lock` file.** `open` first adds the lock file's real path to an in-JVM set (`HELD`), then takes an exclusive `FileLock` on the lock file through a channel nothing else opens; a second open (same JVM or another process) is refused with "already open". `close` closes the journal channel, then the lock channel, then leaves `HELD`. The lock file stays (empty; gitignored). | Nothing stopped `--quarantine` from appending next to a running exchange, interleaving sequence numbers (the next startup fails on the gap/repeat). **Why a separate file:** the first implementation locked one byte at `Long.MAX_VALUE - 1` of the journal itself (past the data, because Windows locks are mandatory). On Linux/macOS Java's locks are POSIX locks and closing *any* handle a process has on a file drops all its locks on it; `open`, `read()` and the torn-tail cut open and close handles on the journal, so that lock would vanish at once (found while writing the study guides; it passed on Windows, where locks are per handle). The in-JVM set refuses a second open before it touches the lock file for the same reason. Tested across processes on Windows (`CommandJournalTest.anotherProcessIsRefusedWhileTheJournalIsOpen`, a child JVM); **not yet run on Linux/macOS**. |
 
 ---
 
@@ -184,7 +196,9 @@ skipped record stays in the file (history is annotated, never edited).
 - *Durable ⇒ visible* does not: a crash or halt after the fsync and before the reply leaves journalled commands
   whose clients heard nothing (for a halt, every command in the failing batch). They are replayed on restart.
   Clients reconcile by resending with the same client order id (D49).
-- A torn last record is cut on open; a complete corrupt record stops startup with its record number.
+- A torn last record is cut on open; a complete corrupt record stops startup with its record number. The header is
+  verified first, so a file that is not a journal of these rules is refused untouched (D64).
+- One process at a time: `open` locks `<journal>.lock` (D65); `--quarantine` against a running exchange is refused.
 - A journal I/O failure fail-stops the journal; the writer halts; the process exits 2.
 
 ---
@@ -241,7 +255,8 @@ Plain TCP, `TcpGateway(port)`; protocol documented in `Protocol.java` and the RE
 reader (parse, stateless checks, hand-in) and one sender (bounded queue -> socket) per session, plus one acceptor.
 Max 256 sessions, 10,000 queued lines per session, 256-byte lines (longer => ERROR + disconnect). Routing: reply ->
 requesting session; passive fill -> every session of the owner; TRADE/LEVEL -> subscribers. LOGIN has no
-authentication (non-goal).
+authentication (non-goal). QUIT and end of stream close the session only after its earlier requests are answered
+(D63); resting orders stay on the book after a disconnect (no cancel-on-disconnect).
 
 ---
 
@@ -254,16 +269,23 @@ is covered by end-to-end tests, not mutated).
 |---|---|---|---|---|
 | first | 476 | 432 (91%) | 94% | 94% |
 | after fixes | 478 | 444 (93%) | 95% | 95% |
+| after survey fixes (§10) | 496 | 454 (92%) | 94% | 94% |
 
 The first run found real gaps, now closed by tests: journal close on failed open / service stop / `Exchange.close`
 (the delete-based checks proved nothing, see §1.5); `stop()` returning false on timeout; a halt refusing
 requests still in the queue (not just in the batch); extra fields in CANCEL/SKIP records; quarantining a SKIP;
 the record number in the "no end of record" error; `hasFailed()` false case.
 
-The 34 left, by kind:
-- **Not observable by a unit test (by design):** removed `force()` (fsync) after the header and after the
-  torn-tail cut, as in Spec v8; removed log calls; removed `addSuppressed`; removed `channel.close()` on the
-  failed-open error path (the counter counts only successful opens); `awaitTermination()` (used by `Main`).
+The 42 left after the survey fixes (27 survived, 15 without coverage), by kind:
+- **Not observable by a unit test (by design):** removed `force()` (fsync) after the header, after the
+  torn-tail cut and in `appendAll`, as in Spec v8; removed log calls; removed `addSuppressed`;
+  `awaitTermination()` (used by `Main`); removed `channel.close()` of the journal channel on the failed-open path
+  and its `channel != null` guard (the lock is released separately, so a leaked journal channel blocks nothing;
+  the counter counts only successful opens). Removing the lock *release* on that path is killed
+  (`CommandJournalTest.otherRulesVersionIsRefusedAndTheFileIsReleased` reopens).
+- **Covered only in a child JVM (D65):** the branch of `Lock.acquire` where another process holds the lock
+  (`tryLock()` returns null) and its cleanup run only in `anotherProcessIsRefusedWhileTheJournalIsOpen`'s child
+  process, which PIT does not instrument: 3 mutants without coverage.
 - **Equivalent:** `setDaemon(false)` on a thread that is already non-daemon; `<=` vs `<` where a second layer
   throws anyway (`OrderBook.add`, `PriceLevel.fillHead`, overflow guard); linger and scan-loop boundaries that
   only change an extra iteration; `StringBuilder` capacity; header-length cap.
@@ -287,8 +309,11 @@ The 34 left, by kind:
 - **Open-order cap is checked on arrival**, so a LIMIT that would fully fill is rejected when the participant is
   at the cap (simple and deterministic; real venues differ).
 - **Self-trades are allowed** (no self-trade prevention).
-- **Journal:** directory not fsynced after creating the file (matters on Linux); no lock against a second process;
-  no per-record checksum.
+- **Journal:** directory not fsynced after creating the file (matters on Linux); no per-record checksum. Records
+  end in LF only: a tool that converts the file to CRLF (an editor, git `autocrlf`) makes it unreadable (startup
+  fails on the header). `--quarantine` accepts a command that is already skipped (a harmless second SKIP).
+- **Startup reporting:** `Main` prints neither how many commands were replayed nor how many torn bytes were cut
+  (`Exchange.replayedOnOpen()` / `truncatedBytesOnOpen()` exist but only tests read them).
 - **Gateway:** two platform threads per connection; no authentication or TLS; market data uses the command
   sequence number, so gaps are normal (commands without public effects).
 - `ExchangeService.stop()` called from the writer thread itself (e.g. inside a listener) would wait for its own
@@ -322,3 +347,19 @@ has a regression test, and each of those tests was checked by putting the old co
 | 8 | Caller continuations ran on, and could block, the writer thread | D61 | `ExchangeServiceTest.callerContinuationsRunOffTheWriterAndCannotStallIt` |
 | 9 | Poison rebuild read the journal twice | `Replay.feed` with the known skip set (D60) | `ReplayTest.feedAloneUsesTheGivenSkipSetAndDoesNotVerify` |
 | 10 | The `\r` of `\r\n` counted toward the 256-byte line limit | Limit applies to the content | `ClientSessionTest.ReadLine` |
+
+---
+
+## 10. Fixes from the study-guide survey (2026-10-27)
+
+Found while surveying the code to write `docs/understanding/`. Each regression test was run against the old code
+(restored from git): all seven fail there and pass now.
+
+| # | Finding | Fix | Regression test |
+|---|---|---|---|
+| 1 | Flaky: `waitingRequestsShareOneBatch` failed once in a full run (`expected 50 but was 1`). The writer updates `batches`/`processed`/`largestBatch` after `process()` has completed the batch's futures, so a test woken by the last future can read the previous values. Five assertions had the race. | Tests read the stats after `stop()` (the writer's `join` is the happens-before edge); the field comment says the stats lag the replies. Production behaviour unchanged. | the five `ExchangeServiceTest` assertions themselves |
+| 2 | QUIT (or end of stream) right after NEW dropped the reply of an order that executed | D63 | `TcpGatewayTest.quitAnswersEveryEarlierRequestBeforeBye`, `endOfStreamStillGetsTheReplies` |
+| 3 | `open` cut the last line of any file before checking its header; a one-line file was overwritten | D64 | `CommandJournalTest.fileThatIsNotAJournalIsRefusedUnchanged`, `textWithoutAnyRecordIsRefusedUnlessItStartsAHeader`, `otherRulesVersionWithATornTailIsRefusedUnchanged` |
+| 4 | `--quarantine` could append to a journal a running exchange was writing | D65 (lock file; the first version, a byte lock on the journal itself, would not hold on Linux/macOS); `Main --quarantine` reports a refusal in one line (exit 1) instead of a stack trace | `CommandJournalTest.aSecondOpenIsRefusedUntilTheFirstCloses`, `anotherProcessIsRefusedWhileTheJournalIsOpen` (child JVM), `ExchangeTest.quarantineToolRefusesWhileTheExchangeIsRunning`; also checked by hand against a running server |
+| 5 | Comments cite a "threads guide" and "Spec v8" that are not in this repo | §1.6 names the files | — |
+| 6 | `CLAUDE.md` said decisions run D1–D60, the test count was stale, and it said the project is not a git repository | Updated | — |

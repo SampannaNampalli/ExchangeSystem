@@ -336,6 +336,20 @@ class ExchangeTest {
             assertEquals(3, journalLines().size());
         }
 
+        // D65: the tool used to append with its own sequence numbers next to the running exchange's.
+        @Test
+        void quarantineToolRefusesWhileTheExchangeIsRunning() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "ok", Side.SELL, 100, 5));
+                assertThrows(IllegalStateException.class, () -> Exchange.quarantine(journal(), 1, clock));
+                ex.submit(limit("a", "ok2", Side.SELL, 100, 5));
+            }
+            assertEquals(3, journalLines().size(), "header and two orders, no SKIP");
+            try (Exchange ex = open()) {
+                assertEquals(2, ex.lastSequenceNumber());
+            }
+        }
+
         @Test
         void errorsAreNotQuarantinedTheyPropagate() throws IOException {
             CommandInterceptor fatal = c -> {

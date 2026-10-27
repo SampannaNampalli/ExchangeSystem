@@ -29,6 +29,9 @@ reader  parses lines, applies the stateless checks (syntax, then OrderRequest), 
         exchange. Malformed or invalid requests are answered here and never reach the queue (D19, D30).
 sender  writes the outbound queue to the socket.
 
+When the reader stops (QUIT, end of stream, an overlong line), the session closes only after the exchange has
+answered every request it already handed in (D63): a client that sends NEW then QUIT gets its ORDER, then BYE.
+
 send() is called from the exchange's writer thread (replies, fills, market data) and must never block it, so
 it only offers to a bounded queue. A client that cannot keep up is disconnected, never waited for (D54).
 
@@ -110,22 +113,43 @@ final class ClientSession {
 
     private void readLoop() {
         // Not try-with-resources: closing a socket's input stream closes the whole socket, and the sender must
-        // still flush what is queued (BYE, a final ERROR). The sender closes the socket.
+        // still flush what is queued (replies, BYE, a final ERROR). The sender closes the socket.
+        boolean answerFirst = false;
+        String farewell = null;
         try {
             InputStream in = new BufferedInputStream(socket.getInputStream());
             String line;
             while ((line = readLine(in)) != null) {
                 if (!handle(line)) {
+                    farewell = "BYE";
                     break;
                 }
             }
+            answerFirst = true;                     // QUIT or end of stream
         } catch (ProtocolException e) {
             send(Protocol.error(e.getMessage()));
+            answerFirst = true;
         } catch (IOException e) {
-            // connection gone
+            // connection gone: nobody left to answer
         } finally {
-            close();
+            if (answerFirst) {
+                closeAfterReplies(farewell);
+            } else {
+                close();
+            }
         }
+    }
+
+    // Closes once every request this session handed in has been answered (D63). The exchange processes its queue
+    // in order, so a read queued now completes after all of them, and their reply callbacks have already offered
+    // their lines. A refused read (exchange stopping) completes at once: shutdown drops connections anyway.
+    private void closeAfterReplies(String farewell) {
+        gateway.service().snapshot(1, (snapshot, failure) -> {
+            if (farewell != null) {
+                send(farewell);
+            }
+            close();
+        });
     }
 
     // A line without its terminator, or null at end of stream. Bounded: a client cannot make us buffer more than
@@ -173,8 +197,7 @@ final class ClientSession {
             return true;
         }
         if (message instanceof ClientMessage.Quit) {
-            send("BYE");
-            return false;
+            return false;                           // BYE follows the replies still owed (readLoop)
         }
         String p = participant;
         if (p == null) {

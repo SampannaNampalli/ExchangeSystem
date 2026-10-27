@@ -37,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // Every wait has a timeout (threads guide 4.4): a bug must fail the test, not hang it.
+// The writer's stats (batches, processed, largestBatch) are read only after stop(): the writer updates them after
+// a batch's futures complete, so a completed future does not make them current; the writer's join() does.
 class ExchangeServiceTest {
 
     private static final Duration WAIT = Duration.ofSeconds(30);
@@ -152,10 +154,10 @@ class ExchangeServiceTest {
                     assertTrue(orderIds.add(r.orderId()), "order id issued twice");
                 }
             }
-            assertEquals(threads * each, service.processed());
             BookSnapshot before = await(service.snapshot(Integer.MAX_VALUE));
 
             assertTrue(service.stop(WAIT));
+            assertEquals(threads * each + 1, service.processed(), "every order, plus the snapshot read");
             try (Exchange replayed = Exchange.open(journal(), clock)) {
                 assertEquals(threads * each, replayed.lastSequenceNumber());
                 assertEquals(before, replayed.snapshot(Integer.MAX_VALUE), "the journal alone rebuilds the book");
@@ -392,6 +394,7 @@ class ExchangeServiceTest {
             for (CompletableFuture<Response> f : accepted) {
                 await(f);
             }
+            assertTrue(service.stop(WAIT));
             assertEquals(4, service.processed());
         }
     }
@@ -490,6 +493,7 @@ class ExchangeServiceTest {
             for (CompletableFuture<Response> f : waiting) {
                 await(f);
             }
+            assertTrue(service.stop(WAIT));
             assertEquals(50, service.largestBatch());
             assertEquals(2, service.batches());
         }
@@ -508,6 +512,7 @@ class ExchangeServiceTest {
             for (CompletableFuture<Response> f : waiting) {
                 await(f);
             }
+            assertTrue(service.stop(WAIT));
             assertEquals(1, service.largestBatch());
             assertEquals(11, service.batches());
         }
@@ -521,6 +526,7 @@ class ExchangeServiceTest {
             CompletableFuture<Response> second = service.submit(order("a", "2", Side.BUY, 100));
             await(first);
             await(second);
+            assertTrue(service.stop(WAIT));
             assertEquals(1, service.batches());
             assertEquals(2, service.largestBatch());
         }
