@@ -11,7 +11,7 @@ Everything one command produced. The private part goes to the participants invol
 fills); the public part is market data (trades, level updates).
 
  */
-public sealed interface EngineOutput permits OrderOutput, CancelOutput {
+public sealed interface EngineOutput permits OrderOutput, CancelOutput, CancelAllOutput {
 
     long sequenceNumber();
 

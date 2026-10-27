@@ -56,7 +56,7 @@ class CommandJournalTest {
         @Test
         void newJournalStartsWithAHeader() throws IOException {
             try (CommandJournal j = CommandJournal.open(file(), RULES)) {
-                assertEquals(JournalCodec.encodeHeader(RULES), text());
+                assertEquals(JournalCodec.encodeHeader(RULES, 0), text());
                 assertTrue(readAll(j).isEmpty());
             }
         }
@@ -65,17 +65,33 @@ class CommandJournalTest {
         void reopeningDoesNotWriteASecondHeader() throws IOException {
             CommandJournal.open(file(), RULES).close();
             CommandJournal.open(file(), RULES).close();
-            assertEquals(JournalCodec.encodeHeader(RULES), text());
+            assertEquals(JournalCodec.encodeHeader(RULES, 0), text());
         }
 
         @Test
         void otherRulesVersionIsRefusedAndTheFileIsReleased() throws IOException {
-            CommandJournal.open(file(), RULES).close();
+            try (CommandJournal j = CommandJournal.open(file(), RULES)) {
+                j.append(order(1, 1));
+            }
             int open = CommandJournal.openJournals();
             IllegalStateException e = assertThrows(IllegalStateException.class, () -> CommandJournal.open(file(), RULES + 1));
             assertTrue(e.getMessage().contains("rules version"), e.getMessage());
             assertEquals(open, CommandJournal.openJournals(), "the refused journal's channel was closed");
             CommandJournal.open(file(), RULES).close();     // the refused open released its lock (D65)
+        }
+
+        // D71: the way across a rules change is a compacted, empty journal; it takes the new version.
+        @Test
+        void anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase() throws IOException {
+            CommandJournal.writeFresh(file(), RULES, 9);
+            try (CommandJournal j = CommandJournal.open(file(), RULES + 1)) {
+                assertEquals(RULES, j.adoptedRulesFrom());
+                assertEquals(9, j.baseSequence());
+            }
+            assertEquals(JournalCodec.encodeHeader(RULES + 1, 9), text());
+            try (CommandJournal j = CommandJournal.open(file(), RULES + 1)) {
+                assertEquals(0, j.adoptedRulesFrom(), "adopted once, then it is simply this build's journal");
+            }
         }
 
         @Test
@@ -154,7 +170,7 @@ class CommandJournalTest {
             try (CommandJournal j = CommandJournal.open(file(), RULES)) {
                 j.appendAll(List.of());
             }
-            assertEquals(JournalCodec.encodeHeader(RULES), text());
+            assertEquals(JournalCodec.encodeHeader(RULES, 0), text());
         }
 
         @Test
@@ -196,7 +212,7 @@ class CommandJournalTest {
                 withNull.add(null);
                 assertThrows(NullPointerException.class, () -> j.appendAll(withNull));
             }
-            assertEquals(JournalCodec.encodeHeader(RULES), text());
+            assertEquals(JournalCodec.encodeHeader(RULES, 0), text());
         }
     }
 
@@ -223,7 +239,7 @@ class CommandJournalTest {
             try (CommandJournal j = CommandJournal.open(file(), RULES)) {
                 assertEquals(4, j.getTruncatedBytesOnOpen());
             }
-            assertEquals(JournalCodec.encodeHeader(RULES), text());
+            assertEquals(JournalCodec.encodeHeader(RULES, 0), text());
         }
 
         @Test

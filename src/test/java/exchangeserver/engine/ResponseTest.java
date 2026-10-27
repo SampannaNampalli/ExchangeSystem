@@ -21,7 +21,7 @@ class ResponseTest {
         new Response(1, "c", OrderStatus.FILLED, null, 5, 0, List.of(T5));
         new Response(1, "c", OrderStatus.RESTED, null, 5, 3, List.of(T5));
         new Response(1, "c", OrderStatus.CANCELLED, null, 0, 3, List.of());
-        new Response(1, "c", OrderStatus.REJECTED, RejectReason.POST_ONLY_WOULD_CROSS, 0, 3, List.of());
+        new Response(1, "c", OrderStatus.REJECTED, Reason.POST_ONLY_WOULD_CROSS, 0, 3, List.of());
     }
 
     @Test
@@ -44,13 +44,25 @@ class ResponseTest {
     void reasonGoesWithRejectedOnly() {
         assertThrows(IllegalStateException.class, () -> new Response(1, "c", OrderStatus.REJECTED, null, 0, 3, List.of()));
         assertThrows(IllegalStateException.class,
-                () -> new Response(1, "c", OrderStatus.RESTED, RejectReason.MAX_OPEN_ORDERS, 0, 3, List.of()));
+                () -> new Response(1, "c", OrderStatus.RESTED, Reason.MAX_OPEN_ORDERS, 0, 3, List.of()));
+    }
+
+    // D67: SELF_TRADE_PREVENTED goes with CANCELLED (possibly after trades), and never with REJECTED.
+    @Test
+    void selfTradePreventedGoesWithCancelledOnly() {
+        new Response(1, "c", OrderStatus.CANCELLED, Reason.SELF_TRADE_PREVENTED, 5, 2, List.of(T5));
+        assertThrows(IllegalStateException.class,
+                () -> new Response(1, "c", OrderStatus.REJECTED, Reason.SELF_TRADE_PREVENTED, 0, 3, List.of()));
+        assertThrows(IllegalStateException.class,
+                () -> new Response(1, "c", OrderStatus.RESTED, Reason.SELF_TRADE_PREVENTED, 0, 3, List.of()));
+        assertThrows(IllegalStateException.class,
+                () -> new Response(1, "c", OrderStatus.CANCELLED, Reason.MAX_OPEN_ORDERS, 0, 3, List.of()));
     }
 
     @Test
     void rejectedCannotHaveTraded() {
         assertThrows(IllegalStateException.class,
-                () -> new Response(1, "c", OrderStatus.REJECTED, RejectReason.MAX_OPEN_ORDERS, 5, 0, List.of(T5)));
+                () -> new Response(1, "c", OrderStatus.REJECTED, Reason.MAX_OPEN_ORDERS, 5, 0, List.of(T5)));
     }
 
     @Test

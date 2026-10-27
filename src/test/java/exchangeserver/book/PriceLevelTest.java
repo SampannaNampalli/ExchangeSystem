@@ -240,6 +240,16 @@ class PriceLevelTest {
     }
 
     @Test
+    void nextNodeWalksInTimePriorityAndRefusesForeignNodes() {
+        OrderNode first = level.addOrder(sell(1, 100, 1));
+        OrderNode second = level.addOrder(sell(2, 100, 1));
+        assertSame(second, level.nextNode(first));
+        assertNull(level.nextNode(second));
+        level.unlink(first);
+        assertThrows(IllegalStateException.class, () -> level.nextNode(first));
+    }
+
+    @Test
     void realNodeNeedsAnOrder() {
         assertThrows(NullPointerException.class, () -> new OrderNode(null));
     }

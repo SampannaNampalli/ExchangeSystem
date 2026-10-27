@@ -1,5 +1,6 @@
 package exchangeserver.client;
 
+import javax.net.SocketFactory;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -37,7 +38,12 @@ public final class ExchangeClient implements AutoCloseable {
     private final List<String> skipped = new ArrayList<>();
 
     public ExchangeClient(String host, int port) throws IOException {
-        socket = new Socket(host, port);
+        this(host, port, SocketFactory.getDefault());
+    }
+
+    // With an SSLSocketFactory for a TLS gateway (D74).
+    public ExchangeClient(String host, int port, SocketFactory factory) throws IOException {
+        socket = factory.createSocket(host, port);
         socket.setTcpNoDelay(true);
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), US_ASCII));
         Thread reader = new Thread(this::readLoop, "client-reader");
@@ -82,18 +88,35 @@ public final class ExchangeClient implements AutoCloseable {
         return await(line -> line.startsWith(prefix), timeout);
     }
 
-    // Every line, in arrival order (skipped ones first), up to and including the first that matches.
+    // Every line, in arrival order (skipped ones first), up to and including the first that matches. Consumes
+    // exactly those lines: a later line equal to one of them stays available (L4).
     public List<String> linesUntil(Predicate<String> match, Duration timeout) throws InterruptedException {
         List<String> lines = new ArrayList<>();
-        String[] last = {null};
-        await(line -> {
+        while (!skipped.isEmpty()) {
+            String line = skipped.remove(0);
             lines.add(line);
-            last[0] = line;
-            return match.test(line);
-        }, timeout);
-        // await() moved the non-matching lines it read into `skipped`; they are reported here, so drop them.
-        skipped.removeAll(lines);
-        return lines;
+            if (match.test(line)) {
+                return lines;
+            }
+        }
+        long deadline = System.nanoTime() + timeout.toNanos();
+        while (true) {
+            long left = deadline - System.nanoTime();
+            String line = left <= 0 ? null : incoming.poll(left, TimeUnit.NANOSECONDS);
+            if (line == null) {
+                skipped.addAll(0, lines);
+                throw new IllegalStateException("No matching line within " + timeout + "; read so far: " + lines);
+            }
+            if (line == EOF) {
+                incoming.add(EOF);
+                skipped.addAll(0, lines);
+                throw new IllegalStateException("Connection closed; read so far: " + lines);
+            }
+            lines.add(line);
+            if (match.test(line)) {
+                return lines;
+            }
+        }
     }
 
     // Blocks for the next raw line, or null at end of stream. For the interactive client.

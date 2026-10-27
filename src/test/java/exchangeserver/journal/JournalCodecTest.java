@@ -1,6 +1,8 @@
 package exchangeserver.journal;
 
+import exchangeserver.command.CancelAllCommand;
 import exchangeserver.command.CancelOrderCommand;
+import exchangeserver.command.CheckCommand;
 import exchangeserver.command.Command;
 import exchangeserver.command.NewOrderCommand;
 import exchangeserver.command.SkipCommand;
@@ -28,20 +30,31 @@ class JournalCodecTest {
         return JournalCodec.decode(record.substring(0, record.length() - 1), 1);
     }
 
+    // The record as written: text, ",", CRC-32C of the text, "\n" (D69).
+    private static String sealed(String text) {
+        return text + "," + Checksums.crcHex(text) + "\n";
+    }
+
+    // A sealed record without its "\n", as decode() receives it.
+    private static String record(String text) {
+        String s = sealed(text);
+        return s.substring(0, s.length() - 1);
+    }
+
     @Nested
     class RoundTrip {
 
         @Test
         void newLimitOrder() {
             Command c = new NewOrderCommand(1, T, 7, OrderRequest.limit("alice", "a-1.x", Side.BUY, 100, 10));
-            assertEquals("NEW,1,2026-01-01T10:00:00.123456789Z,7,alice,a-1.x,BUY,LIMIT,10,100\n", JournalCodec.encode(c));
+            assertEquals(sealed("NEW,1,2026-01-01T10:00:00.123456789Z,7,alice,a-1.x,BUY,LIMIT,10,100"), JournalCodec.encode(c));
             assertEquals(c, roundTrip(c));
         }
 
         @Test
         void marketOrderPriceIsADash() {
             Command c = new NewOrderCommand(2, T, 8, OrderRequest.market("bob", "m1", Side.SELL, 5));
-            assertEquals("NEW,2,2026-01-01T10:00:00.123456789Z,8,bob,m1,SELL,MARKET,5,-\n", JournalCodec.encode(c));
+            assertEquals(sealed("NEW,2,2026-01-01T10:00:00.123456789Z,8,bob,m1,SELL,MARKET,5,-"), JournalCodec.encode(c));
             assertEquals(c, roundTrip(c));
         }
 
@@ -57,14 +70,28 @@ class JournalCodecTest {
         @Test
         void cancel() {
             Command c = new CancelOrderCommand(3, T, "alice", 7);
-            assertEquals("CANCEL,3,2026-01-01T10:00:00.123456789Z,alice,7\n", JournalCodec.encode(c));
+            assertEquals(sealed("CANCEL,3,2026-01-01T10:00:00.123456789Z,alice,7"), JournalCodec.encode(c));
+            assertEquals(c, roundTrip(c));
+        }
+
+        @Test
+        void cancelAll() {
+            Command c = new CancelAllCommand(5, T, "alice");
+            assertEquals(sealed("CANCEL_ALL,5,2026-01-01T10:00:00.123456789Z,alice"), JournalCodec.encode(c));
             assertEquals(c, roundTrip(c));
         }
 
         @Test
         void skip() {
             Command c = new SkipCommand(9, T, 4);
-            assertEquals("SKIP,9,2026-01-01T10:00:00.123456789Z,4\n", JournalCodec.encode(c));
+            assertEquals(sealed("SKIP,9,2026-01-01T10:00:00.123456789Z,4"), JournalCodec.encode(c));
+            assertEquals(c, roundTrip(c));
+        }
+
+        @Test
+        void check() {
+            Command c = new CheckCommand(10, T, "00ff00ff00ff00ff");
+            assertEquals(sealed("CHECK,10,2026-01-01T10:00:00.123456789Z,00ff00ff00ff00ff"), JournalCodec.encode(c));
             assertEquals(c, roundTrip(c));
         }
     }
@@ -73,21 +100,28 @@ class JournalCodecTest {
     class Header {
 
         @Test
-        void roundTrip() {
-            String h = JournalCodec.encodeHeader(5);
-            assertEquals("HEADER," + JournalCodec.FORMAT_VERSION + ",5\n", h);
-            assertEquals(5, JournalCodec.decodeHeader(h.strip()));
+        void roundTripWithTheBaseSequence() {
+            String h = JournalCodec.encodeHeader(5, 42);
+            assertEquals(sealed("HEADER," + JournalCodec.FORMAT_VERSION + ",5,42"), h);
+            assertEquals(new JournalCodec.Header(5, 42), JournalCodec.decodeHeader(h.strip()));
         }
 
         @Test
         void otherFormatVersionIsRefused() {
-            assertThrows(IllegalStateException.class, () -> JournalCodec.decodeHeader("HEADER,1,1"));
+            IllegalStateException e = assertThrows(IllegalStateException.class,
+                    () -> JournalCodec.decodeHeader(record("HEADER,2,1")));
+            assertTrue(e.getMessage().contains("format version 2"), e.getMessage());
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"", "NEW,1", "HEADER,2", "HEADER,x,1", "HEADER,2,1,extra"})
-        void malformedHeaderIsRefused(String record) {
-            assertThrows(IllegalStateException.class, () -> JournalCodec.decodeHeader(record));
+        @ValueSource(strings = {"", "NEW,1", "HEADER,3", "HEADER,x,1,0", "HEADER,3,1,0,extra", "HEADER,3,1,-1", "HEADER,3,1"})
+        void malformedHeaderIsRefused(String text) {
+            assertThrows(IllegalStateException.class, () -> JournalCodec.decodeHeader(record(text)));
+        }
+
+        @Test
+        void unsealedHeaderIsRefused() {
+            assertThrows(IllegalStateException.class, () -> JournalCodec.decodeHeader("HEADER,3,1,0"));
         }
     }
 
@@ -111,14 +145,46 @@ class JournalCodecTest {
                 "NEW,1,2026-01-01T10:00:00Z,0,alice,c,BUY,LIMIT,10,100",          // id 0
                 "CANCEL,1,2026-01-01T10:00:00Z,alice",
                 "CANCEL,1,2026-01-01T10:00:00Z,alice,7,extra",
+                "CANCEL_ALL,1,2026-01-01T10:00:00Z",
+                "CANCEL_ALL,1,2026-01-01T10:00:00Z,alice,extra",
+                "CHECK,3,2026-01-01T10:00:00Z,0123456789abcdef,extra",
+                "CHECK,3,2026-01-01T10:00:00Z",
+                "CANCEL_ALL,1,2026-01-01T10:00:00Z,a b",                          // invalid participant
                 "SKIP,4,2026-01-01T10:00:00Z,3,extra",
                 "SKIP,4,2026-01-01T10:00:00Z",
                 "CANCEL,1,2026-01-01T10:00:00Z,,7",                               // empty participant
                 "SKIP,3,2026-01-01T10:00:00Z,3",                                  // skips itself
+                "CHECK,3,2026-01-01T10:00:00Z,XYZ",                               // not a digest
         })
-        void isAnIllegalStateWithTheRecordNumber(String record) {
-            IllegalStateException e = assertThrows(IllegalStateException.class, () -> JournalCodec.decode(record, 42));
+        void isAnIllegalStateWithTheRecordNumber(String text) {
+            IllegalStateException e = assertThrows(IllegalStateException.class, () -> JournalCodec.decode(record(text), 42));
             assertTrue(e.getMessage().contains("record 42"), e.getMessage());
+        }
+
+        // D69: a bit flip that still parses changes history; the checksum catches it.
+        @Test
+        void aChangedCharacterFailsTheChecksum() {
+            String good = record("NEW,1,2026-01-01T10:00:00Z,7,alice,c,BUY,LIMIT,10,100");
+            String flipped = good.replace(",100,", ",900,");
+            IllegalStateException e = assertThrows(IllegalStateException.class, () -> JournalCodec.decode(flipped, 3));
+            assertTrue(e.getCause().getMessage().contains("checksum mismatch"), e.getCause().getMessage());
+        }
+
+        @Test
+        void aRecordWithoutChecksumIsCorrupt() {
+            assertThrows(IllegalStateException.class,
+                    () -> JournalCodec.decode("NEW,1,2026-01-01T10:00:00Z,7,alice,c,BUY,LIMIT,10,100", 3));
+        }
+
+        // D69 (M7): a CRLF conversion gets a message that says what happened.
+        @Test
+        void aCarriageReturnIsReportedAsALineEndingConversion() {
+            IllegalStateException e = assertThrows(IllegalStateException.class,
+                    () -> JournalCodec.decode(record("CANCEL,1,2026-01-01T10:00:00Z,alice,7") + "\r", 3));
+            assertTrue(e.getCause().getMessage().contains("CRLF"), e.getCause().getMessage());
+            IllegalStateException h = assertThrows(IllegalStateException.class,
+                    () -> JournalCodec.decodeHeader(record("HEADER,3,1,0") + "\r"));
+            assertTrue(h.getMessage().contains("CRLF"), h.getMessage());
         }
     }
 

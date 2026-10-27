@@ -37,7 +37,10 @@ A single-instrument limit order book with a price-time-priority matching engine,
 
 **Status (2026-10-27): roadmap steps 1–7 are implemented** in ExchangeServer2, a rewrite of ExchangeServer into a
 Maven project with real packages. Steps 1–3 were rebuilt with the open threads of Spec v8 closed; steps 4–7 are
-new. The rewrite was written by the LLM at the user's request (see §3).
+new. The rewrite was written by the LLM at the user's request (see §3). The same day, at the user's request, the
+LLM also fixed every risk found by the study-guide review, including the deferred security findings: next
+candidates 1–3 below (snapshots and rotation, output sequence numbers and resend, self-trade prevention) are done,
+as are authentication, TLS and per-session limits (Spec D66–D77).
 
 ---
 
@@ -102,7 +105,10 @@ new. The rewrite was written by the LLM at the user's request (see §3).
   queue and get a `CompletableFuture` each. No internal thread-safety in the book.
 - **Batching:** smart batching (take whatever is waiting, one fsync, then process), chosen by measurement.
 - **Poison pills:** quarantine + rebuild live; stop + operator quarantine at startup.
-- **Gateway:** plain TCP, line protocol, thread-per-connection, slow consumers disconnected.
+- **Recovery:** snapshots + offline compaction bound recovery; CHECK records prove replay rebuilt the same outputs.
+- **Gateway:** TCP or TLS, line protocol, thread-per-connection, slow consumers disconnected; authenticated
+  participants, loopback by default, per-session timeouts and limits; a numbered private stream per participant
+  with RESEND; opt-in cancel-on-disconnect; self-trade prevention in the engine.
 
 ---
 
@@ -110,8 +116,8 @@ new. The rewrite was written by the LLM at the user's request (see §3).
 
 - Multi-instrument support, multi-threaded matching, distributed replication/consensus.
 - Price-indexed array books (needs a bounded price range; benchmarks did not ask for it).
-- Full FIX/ITCH compliance; authentication; TLS.
-- Production hardening beyond the learning goals.
+- Full FIX/ITCH compliance. (Authentication and TLS were listed here until 2026-10-27; they are now built, D74.)
+- Production hardening beyond the learning goals (accounts and permissions, online rotation, market-data resend).
 
 ---
 
@@ -127,13 +133,13 @@ new. The rewrite was written by the LLM at the user's request (see §3).
 | 6 | Benchmarking | **done (ES2)**: JMH; cached pointer rejected; smart batching kept |
 | 7 | Crash recovery via replay, including poison-pill policy | **done (ES2)** |
 | — | Cleanup: one test file per production class with `@Nested` groups | **done (ES2)** |
+| — | Risk fixes from the study-guide review: snapshots + compaction, output digest, journal checksums, private stream + RESEND, cancel-on-disconnect, self-trade prevention (cancel incoming), authentication + TLS + session limits, operability | **done (ES2, 2026-10-27, Spec D63–D77)** |
 
 **Next candidates (not scheduled; pick with the user):**
-1. Snapshots + journal rotation (bounded recovery time; scopes the client-order-id map to a trading day).
-2. Output sequence numbers and resend requests (a reconnecting client recovers missed fills).
-3. Self-trade prevention (needs a policy choice: cancel newest / oldest / both).
-4. NIO or virtual-thread gateway (Java 21) instead of two platform threads per connection.
-5. Distributed systems concepts (replication of the journal, failover), observability (metrics, structured logs).
+1. NIO or virtual-thread gateway (Java 21) instead of two platform threads per connection.
+2. Online rotation (compaction while running) and market-data resend.
+3. Distributed systems concepts (replication of the journal, failover), observability (metrics, structured logs).
+4. Accounts and permissions beyond participant + secret.
 
 ---
 

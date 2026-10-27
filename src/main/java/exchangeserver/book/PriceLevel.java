@@ -91,6 +91,14 @@ public final class PriceLevel {
         return head.next == tail ? null : head.next;
     }
 
+    // The node after `node` in time priority, or null at the end. `node` must be linked here.
+    OrderNode nextNode(OrderNode node) {
+        if (node.level != this) {
+            throw new IllegalStateException("Order " + node.order.getOrderId() + " is not linked in level " + side + " " + price);
+        }
+        return node.next == tail ? null : node.next;
+    }
+
     // Fills the head order by up to maxQuantity and returns how much was filled. Never removes the head:
     // that is OrderBook's job, so the id map and the list change together (D3).
     long fillHead(long maxQuantity) {

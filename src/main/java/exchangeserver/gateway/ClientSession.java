@@ -1,9 +1,11 @@
 package exchangeserver.gateway;
 
 import exchangeserver.core.ExchangeException;
+import exchangeserver.core.ExchangeService;
+import exchangeserver.core.PrivateEvent;
+import exchangeserver.core.ResendResult;
 import exchangeserver.domain.OrderRequest;
 import exchangeserver.domain.Rules;
-import exchangeserver.engine.Response;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
@@ -13,11 +15,13 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
@@ -25,12 +29,22 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 
 One TCP connection, with two threads:
 
-reader  parses lines, applies the stateless checks (syntax, then OrderRequest), and hands valid requests to the
-        exchange. Malformed or invalid requests are answered here and never reach the queue (D19, D30).
+reader  parses lines, applies the stateless checks (syntax, then OrderRequest), the session's limits (D75) and
+        hands valid requests to the exchange. Malformed, invalid or over-limit requests are answered here and never
+        reach the queue (D19, D30).
 sender  writes the outbound queue to the socket.
 
-When the reader stops (QUIT, end of stream, an overlong line), the session closes only after the exchange has
-answered every request it already handed in (D63): a client that sends NEW then QUIT gets its ORDER, then BYE.
+Login (D74): LOGIN <participant> <secret> [COD]. The secret is checked on the reader thread (one attempt per
+connection); then an Attach read joins the participant's private stream on the writer thread, so the WELCOME's
+oseq and the first event the session receives leave no gap (D73).
+
+Limits (D75): a login timeout and an idle timeout (socket read timeouts); at most maxInFlight requests handed in
+and not yet answered; a token-bucket rate limit on requests. A refusal is an ERROR line, never queued.
+
+Closing (D76): when the reader stops (QUIT, end of stream, overlong line, timeout), the session closes only once
+every request it handed in has completed: a request's callback runs after its lines were offered, so the last
+callback to finish sends BYE (for QUIT) and closes. This holds during shutdown too, since every accepted request
+completes (processed, or refused). A broken connection closes at once: nobody is left to answer.
 
 send() is called from the exchange's writer thread (replies, fills, market data) and must never block it, so
 it only offers to a bounded queue. A client that cannot keep up is disconnected, never waited for (D54).
@@ -44,6 +58,7 @@ final class ClientSession {
     final long id;
     private final Socket socket;
     private final TcpGateway gateway;
+    private final TcpGateway.Settings settings;
     private final BlockingQueue<String> outbound;
     private final AtomicBoolean closed = new AtomicBoolean();
     private final Object subscriptionLock = new Object();
@@ -51,14 +66,28 @@ final class ClientSession {
     private long subscriptionNumber;        // guarded by subscriptionLock
     private final Thread reader;
     private final Thread sender;
-    // Written by the reader thread at LOGIN, read by the writer thread when routing fills.
+    // Written by the reader thread at LOGIN, read by the writer thread when routing and by removed().
     private volatile String participant;
+    private volatile boolean cancelOnDisconnect;
 
-    ClientSession(long id, Socket socket, TcpGateway gateway, int outboundCapacity) {
+    // D76: requests handed in and not yet completed; the reader's end; the farewell line; closed once.
+    private final AtomicInteger inFlight = new AtomicInteger();
+    private volatile boolean readerDone;
+    private volatile String farewell;
+    private final AtomicBoolean finished = new AtomicBoolean();
+
+    // Rate limit (D75), reader thread only.
+    private double tokens;
+    private long lastRefillNanos = System.nanoTime();
+    private boolean loginAttempted;
+
+    ClientSession(long id, Socket socket, TcpGateway gateway) {
         this.id = id;
         this.socket = socket;
         this.gateway = gateway;
-        this.outbound = new ArrayBlockingQueue<>(outboundCapacity);
+        this.settings = gateway.settings();
+        this.outbound = new ArrayBlockingQueue<>(settings.outboundCapacity());
+        this.tokens = settings.burst();
         this.reader = new Thread(this::readLoop, "session-" + id + "-reader");
         this.sender = new Thread(this::sendLoop, "session-" + id + "-sender");
         reader.setDaemon(true);
@@ -72,6 +101,15 @@ final class ClientSession {
 
     String participant() {
         return participant;
+    }
+
+    boolean cancelOnDisconnect() {
+        return cancelOnDisconnect;
+    }
+
+    // For tests: the reader stopped, and the session waits for requests still in flight (D76).
+    boolean draining() {
+        return readerDone && !finished.get();
     }
 
     // Any thread; never blocks.
@@ -115,17 +153,19 @@ final class ClientSession {
         // Not try-with-resources: closing a socket's input stream closes the whole socket, and the sender must
         // still flush what is queued (replies, BYE, a final ERROR). The sender closes the socket.
         boolean answerFirst = false;
-        String farewell = null;
         try {
+            socket.setSoTimeout((int) settings.loginTimeout().toMillis());
             InputStream in = new BufferedInputStream(socket.getInputStream());
             String line;
             while ((line = readLine(in)) != null) {
                 if (!handle(line)) {
-                    farewell = "BYE";
                     break;
                 }
             }
-            answerFirst = true;                     // QUIT or end of stream
+            answerFirst = true;                     // QUIT, a failed login, or end of stream
+        } catch (SocketTimeoutException e) {
+            send(Protocol.error(participant == null ? "login timeout; disconnecting" : "idle timeout; disconnecting"));
+            answerFirst = true;
         } catch (ProtocolException e) {
             send(Protocol.error(e.getMessage()));
             answerFirst = true;
@@ -133,23 +173,12 @@ final class ClientSession {
             // connection gone: nobody left to answer
         } finally {
             if (answerFirst) {
-                closeAfterReplies(farewell);
+                readerDone = true;
+                finishIfIdle();
             } else {
                 close();
             }
         }
-    }
-
-    // Closes once every request this session handed in has been answered (D63). The exchange processes its queue
-    // in order, so a read queued now completes after all of them, and their reply callbacks have already offered
-    // their lines. A refused read (exchange stopping) completes at once: shutdown drops connections anyway.
-    private void closeAfterReplies(String farewell) {
-        gateway.service().snapshot(1, (snapshot, failure) -> {
-            if (farewell != null) {
-                send(farewell);
-            }
-            close();
-        });
     }
 
     // A line without its terminator, or null at end of stream. Bounded: a client cannot make us buffer more than
@@ -179,7 +208,7 @@ final class ClientSession {
     }
 
     // Returns false to stop reading.
-    private boolean handle(String line) {
+    private boolean handle(String line) throws IOException {
         ClientMessage message;
         try {
             message = Protocol.parse(line);
@@ -188,79 +217,147 @@ final class ClientSession {
             return true;
         }
 
-        if (message instanceof ClientMessage.Login login) {
-            login(login.participant());
-            return true;
-        }
         if (message instanceof ClientMessage.Ping) {
             send("PONG");
             return true;
         }
         if (message instanceof ClientMessage.Quit) {
-            return false;                           // BYE follows the replies still owed (readLoop)
+            farewell = "BYE";                       // sent after the replies still owed (D76)
+            return false;
+        }
+        ExchangeService service = gateway.service();
+        if (service == null) {
+            send(Protocol.error("exchange is starting; retry shortly"));        // L6
+            return false;
+        }
+        if (message instanceof ClientMessage.Login login) {
+            return login(service, login);
         }
         String p = participant;
         if (p == null) {
             send(Protocol.error("LOGIN first"));
             return true;
         }
+        if (message instanceof ClientMessage.Unsubscribe) {
+            unsubscribe();
+            return true;
+        }
 
+        String context = context(message);
+        String refusal = admit();
+        if (refusal != null) {
+            send(Protocol.error(context + " " + refusal));
+            return true;
+        }
         if (message instanceof ClientMessage.NewOrder n) {
-            newOrder(p, n);
+            newOrder(service, p, n, context);
         } else if (message instanceof ClientMessage.Cancel c) {
             if (c.orderId() <= 0) {
                 send(Protocol.error("order id must be positive"));
             } else {
-                gateway.service().cancel(p, c.orderId(), (result, failure) ->
-                        send(failure == null ? Protocol.cancel(result) : failureLine("orderId=" + c.orderId(), failure)));
+                service.cancel(p, c.orderId(), tracked((result, failure) -> replyFailure(context, failure)));
             }
+        } else if (message instanceof ClientMessage.Resend r) {
+            resend(service, p, r.fromOseq());
         } else if (message instanceof ClientMessage.Subscribe) {
-            subscribe();
-        } else if (message instanceof ClientMessage.Unsubscribe) {
-            unsubscribe();
+            subscribe(service);
         }
         return true;
     }
 
-    private void login(String requested) {
-        if (participant != null) {
-            send(Protocol.error("already logged in as " + participant));
-            return;
+    private static String context(ClientMessage message) {
+        if (message instanceof ClientMessage.NewOrder n) {
+            return "clOrdId=" + n.clientOrderId();
         }
-        if (!Rules.PARTICIPANT.matcher(requested).matches()) {
-            send(Protocol.error("invalid participant " + requested));
-            return;
+        if (message instanceof ClientMessage.Cancel c) {
+            return "orderId=" + c.orderId();
         }
-        participant = requested;
-        gateway.loggedIn(this);
-        // close() sets `closed` and then unregisters. If it ran before loggedIn(), its unregistering missed us:
-        // undo it here. (Add-then-check against set-then-remove: at least one side sees the other.)
-        if (closed.get()) {
-            gateway.removed(this);
-            return;
-        }
-        send(Protocol.welcome(requested));
+        return message instanceof ClientMessage.Resend ? "RESEND" : "SUBSCRIBE";
     }
 
-    private void newOrder(String p, ClientMessage.NewOrder n) {
+    // D75: null if the request may go to the exchange, else why not.
+    private String admit() {
+        if (inFlight.get() >= settings.maxInFlight()) {
+            return "SESSION_BUSY";
+        }
+        long now = System.nanoTime();
+        tokens = Math.min(settings.burst(), tokens + (now - lastRefillNanos) * settings.ratePerSecond() / 1e9);
+        lastRefillNanos = now;
+        if (tokens < 1) {
+            return "RATE_LIMITED";
+        }
+        tokens -= 1;
+        return null;
+    }
+
+    private boolean login(ExchangeService service, ClientMessage.Login login) throws IOException {
+        if (participant != null) {
+            send(Protocol.error("already logged in as " + participant));
+            return true;
+        }
+        if (loginAttempted) {
+            send(Protocol.error("one login attempt per connection"));
+            return false;
+        }
+        loginAttempted = true;
+        String requested = login.participant();
+        if (!Rules.PARTICIPANT.matcher(requested).matches() || !gateway.authenticate(requested, login.secret())) {
+            send(Protocol.error("login failed"));       // the same answer whatever was wrong (D74)
+            return false;
+        }
+        socket.setSoTimeout((int) settings.idleTimeout().toMillis());
+        cancelOnDisconnect = login.cancelOnDisconnect();
+        participant = requested;
+        // On the writer thread, before any later output: register for routing, then report the latest oseq (D73).
+        service.attach(requested, tracked((lastOseq, failure) -> {
+            if (failure != null) {
+                replyFailure("LOGIN", failure);
+                return;
+            }
+            gateway.loggedIn(this);
+            // close() sets `closed` and then unregisters. If it ran before loggedIn(), its unregistering missed us:
+            // undo it here. (Add-then-check against set-then-remove: at least one side sees the other.)
+            if (closed.get()) {
+                gateway.removed(this);
+                return;
+            }
+            send(Protocol.welcome(requested, lastOseq));
+        }));
+        return true;
+    }
+
+    private void newOrder(ExchangeService service, String p, ClientMessage.NewOrder n, String context) {
         OrderRequest request;
         try {
             request = OrderRequest.of(p, n.clientOrderId(), n.side(), n.type(), n.quantity(), n.price());
         } catch (IllegalArgumentException invalid) {
-            send(Protocol.error("clOrdId=" + n.clientOrderId() + " " + invalid.getMessage()));
+            send(Protocol.error(context + " " + invalid.getMessage()));
             return;
         }
-        // Runs on the writer thread (or here, if refused): FILLs then ORDER, before this command's market data.
-        gateway.service().submit(request, (Response response, Throwable failure) -> {
+        // The FILL and ORDER lines come through the participant's private stream (D73); this callback only
+        // reports a refusal.
+        service.submit(request, tracked((response, failure) -> replyFailure(context, failure)));
+    }
+
+    private void resend(ExchangeService service, String p, long from) {
+        if (from <= 0) {
+            send(Protocol.error("oseq must be positive"));
+            return;
+        }
+        // On the writer thread: the events go out before any later live event.
+        service.resend(p, from, tracked((ResendResult result, Throwable failure) -> {
             if (failure != null) {
-                send(failureLine("clOrdId=" + n.clientOrderId(), failure));
+                replyFailure("RESEND", failure);
                 return;
             }
-            List<String> lines = new ArrayList<>(response.trades().size() + 1);
-            Protocol.takerFills(response, n.side(), n.quantity(), lines);
-            lines.add(Protocol.order(response));
-            sendAll(lines);
-        });
+            if (from < result.firstAvailable() && from <= result.lastOseq()) {
+                send(Protocol.error("RESEND_GAP first=" + result.firstAvailable()));
+            }
+            for (PrivateEvent e : result.events()) {
+                sendAll(Protocol.lines(e, true));
+            }
+            send("RESENT last=" + result.lastOseq());
+        }));
     }
 
     /*
@@ -273,7 +370,7 @@ final class ClientSession {
         number acts, so one BOOK goes out, not two.
     The lock is held only while offering lines to the outbound queue (never blocks), so the writer is not delayed.
     */
-    private void subscribe() {
+    private void subscribe(ExchangeService service) {
         long mine;
         synchronized (subscriptionLock) {
             if (subscriptionActive) {
@@ -285,14 +382,14 @@ final class ClientSession {
         }
         // The snapshot is taken on the writer thread and the session joins the subscribers in the same step,
         // so the first update it gets is the first command after the snapshot: no gap, no duplicate.
-        gateway.service().snapshot(Protocol.SNAPSHOT_DEPTH, (snapshot, failure) -> {
+        service.snapshot(Protocol.SNAPSHOT_DEPTH, tracked((snapshot, failure) -> {
             synchronized (subscriptionLock) {
                 if (mine != subscriptionNumber || !subscriptionActive) {
                     return;                         // withdrawn by an UNSUBSCRIBE that got here first
                 }
                 if (failure != null) {
                     subscriptionActive = false;
-                    send(failureLine("SUBSCRIBE", failure));
+                    replyFailure("SUBSCRIBE", failure);
                     return;
                 }
                 send("SUBSCRIBED");
@@ -302,7 +399,7 @@ final class ClientSession {
             if (closed.get()) {
                 gateway.unsubscribe(this);          // closed meanwhile: removed() may already have run
             }
-        });
+        }));
     }
 
     private void unsubscribe() {
@@ -313,9 +410,35 @@ final class ClientSession {
         }
     }
 
-    private static String failureLine(String context, Throwable failure) {
-        String reason = failure instanceof ExchangeException e ? e.getReason().name() : failure.getClass().getSimpleName();
-        return Protocol.error(context + " " + reason);
+    private void replyFailure(String context, Throwable failure) {
+        if (failure != null) {
+            String reason = failure instanceof ExchangeException e ? e.getReason().name() : failure.getClass().getSimpleName();
+            send(Protocol.error(context + " " + reason));
+        }
+    }
+
+    // D76: counts the request in flight until its callback has run (after the request's own lines went out).
+    private <T> BiConsumer<T, Throwable> tracked(BiConsumer<T, Throwable> callback) {
+        inFlight.incrementAndGet();
+        return (value, failure) -> {
+            try {
+                callback.accept(value, failure);
+            } finally {
+                inFlight.decrementAndGet();
+                finishIfIdle();
+            }
+        };
+    }
+
+    // Closes after the reader stopped and nothing is in flight; whichever of the two happens last does it.
+    private void finishIfIdle() {
+        if (readerDone && inFlight.get() == 0 && finished.compareAndSet(false, true)) {
+            String last = farewell;
+            if (last != null) {
+                send(last);
+            }
+            close();
+        }
     }
 
     // ---------- Sender thread ----------

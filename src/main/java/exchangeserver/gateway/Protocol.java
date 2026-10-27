@@ -3,6 +3,7 @@ package exchangeserver.gateway;
 import exchangeserver.book.CancelResult;
 import exchangeserver.book.CancelStatus;
 import exchangeserver.book.LevelUpdate;
+import exchangeserver.core.PrivateEvent;
 import exchangeserver.domain.OrderType;
 import exchangeserver.domain.Side;
 import exchangeserver.engine.BookSnapshot;
@@ -10,6 +11,7 @@ import exchangeserver.engine.Execution;
 import exchangeserver.engine.Response;
 import exchangeserver.engine.Trade;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalLong;
 
@@ -18,24 +20,28 @@ import java.util.OptionalLong;
 The wire protocol: ASCII lines ending in '\n' ("\r\n" accepted), tokens separated by single spaces (D53).
 
 Client -> server
-    LOGIN <participant>
+    LOGIN <participant> <secret> [COD]          COD: cancel my resting orders when my last session closes (D72)
     NEW <clOrdId> <BUY|SELL> <LIMIT|IOC|FOK|POST_ONLY> <quantity> <price>
     NEW <clOrdId> <BUY|SELL> MARKET <quantity>
     CANCEL <orderId>
+    RESEND <oseq>                               private events from oseq on, as far as still retained (D73)
     SUBSCRIBE | UNSUBSCRIBE | PING | QUIT
 
 Server -> client (key=value after the message type, so fields can be added without breaking parsers)
-    WELCOME participant=<p>
-    FILL orderId= clOrdId= side= price= qty= leaves= liquidity=TAKER|MAKER     (one per trade, both sides)
-    ORDER orderId= clOrdId= status= filled= remaining= [reason=]               (the outcome of a NEW)
-    CANCELLED orderId= qty=          CANCEL_REJECT orderId= reason=UNKNOWN_ORDER
+  Private stream, numbered per participant (oseq), sent to every session of that participant (D73):
+    FILL oseq= orderId= clOrdId= side= price= qty= leaves= liquidity=TAKER|MAKER   (one per trade, both sides)
+    ORDER oseq= orderId= clOrdId= status= filled= remaining= [reason=]           (the outcome of a NEW)
+    CANCELLED oseq= orderId= qty= [reason=CANCEL_ALL]   CANCEL_REJECT oseq= orderId= reason=UNKNOWN_ORDER
+    (a line repeated by RESEND ends with resend=1)
+  Session:
+    WELCOME participant=<p> oseq=<latest>       RESENT last=<latest>      ERROR RESEND_GAP first=<oldest retained>
     BOOK seq= last= bids=<price>x<qty>,... asks=...      (best SNAPSHOT_DEPTH levels; "-" for an empty side)
     TRADE seq= price= qty= aggressor=          LEVEL seq= side= price= qty= orders=   (qty=0: level gone)
     SUBSCRIBED  UNSUBSCRIBED  PONG  BYE
     ERROR <text>
 
-For a NEW, the submitter gets its FILL lines, then ORDER; market data for the same command follows.
-QUIT: every request sent before it is answered first, then BYE, then the server closes the connection.
+For a NEW, the submitter gets its FILL lines, then ORDER; makers' fills and market data for the same command
+follow. QUIT: every request sent before it is answered first, then BYE, then the server closes the connection.
 
  */
 final class Protocol {
@@ -46,6 +52,7 @@ final class Protocol {
     // work however deep the book is (D62). LEVEL updates carry absolute quantities, so a deeper level appears in a
     // subscriber's view the first time it changes.
     static final int SNAPSHOT_DEPTH = 100;
+    static final String CANCEL_ON_DISCONNECT = "COD";
 
     private Protocol() {
     }
@@ -57,13 +64,20 @@ final class Protocol {
         String[] t = line.split(" ", -1);
         return switch (t[0]) {
             case "LOGIN" -> {
-                arity(t, 2);
-                yield new ClientMessage.Login(t[1]);
+                if (t.length == 4 && t[3].equals(CANCEL_ON_DISCONNECT)) {
+                    yield new ClientMessage.Login(t[1], t[2], true);
+                }
+                arity(t, 3);
+                yield new ClientMessage.Login(t[1], t[2], false);
             }
             case "NEW" -> parseNew(t);
             case "CANCEL" -> {
                 arity(t, 2);
                 yield new ClientMessage.Cancel(number(t[1], "order id"));
+            }
+            case "RESEND" -> {
+                arity(t, 2);
+                yield new ClientMessage.Resend(number(t[1], "oseq"));
             }
             case "SUBSCRIBE" -> {
                 arity(t, 1);
@@ -123,38 +137,50 @@ final class Protocol {
 
     // ---------- Formatting ----------
 
-    static String welcome(String participant) {
-        return "WELCOME participant=" + participant;
+    static String welcome(String participant, long lastOseq) {
+        return "WELCOME participant=" + participant + " oseq=" + lastOseq;
     }
 
-    // The submitter's own fills, from its Response; leaves counts down trade by trade.
-    static void takerFills(Response r, Side side, long quantity, List<String> out) {
-        long leaves = quantity;
-        for (Trade t : r.trades()) {
-            leaves -= t.quantity();
-            out.add(fill(r.orderId(), r.clientOrderId(), side, t.price(), t.quantity(), leaves, "TAKER"));
+    // The lines of one private event; resent ones are marked.
+    static List<String> lines(PrivateEvent event, boolean resent) {
+        List<String> lines = new ArrayList<>(2);
+        String o = "oseq=" + event.oseq() + " ";
+        if (event instanceof PrivateEvent.OrderReply r) {
+            Response response = r.response();
+            long leaves = r.quantity();
+            for (Trade t : response.trades()) {
+                leaves -= t.quantity();
+                lines.add(fill(o, response.orderId(), response.clientOrderId(), r.side(), t.price(), t.quantity(), leaves, "TAKER"));
+            }
+            lines.add(order(o, response));
+        } else if (event instanceof PrivateEvent.CancelReply c) {
+            lines.add(cancel(o, c.result(), c.byCancelAll()));
+        } else if (event instanceof PrivateEvent.MakerFill m) {
+            Execution e = m.execution();
+            lines.add(fill(o, e.orderId(), e.clientOrderId(), e.side(), e.price(), e.quantity(), e.leavesQuantity(), "MAKER"));
         }
+        if (resent) {
+            lines.replaceAll(line -> line + " resend=1");
+        }
+        return lines;
     }
 
-    static String makerFill(Execution e) {
-        return fill(e.orderId(), e.clientOrderId(), e.side(), e.price(), e.quantity(), e.leavesQuantity(), "MAKER");
-    }
-
-    private static String fill(long orderId, String clientOrderId, Side side, long price, long qty, long leaves, String liquidity) {
-        return "FILL orderId=" + orderId + " clOrdId=" + clientOrderId + " side=" + side + " price=" + price
+    private static String fill(String o, long orderId, String clientOrderId, Side side, long price, long qty, long leaves,
+                               String liquidity) {
+        return "FILL " + o + "orderId=" + orderId + " clOrdId=" + clientOrderId + " side=" + side + " price=" + price
                 + " qty=" + qty + " leaves=" + leaves + " liquidity=" + liquidity;
     }
 
-    static String order(Response r) {
-        return "ORDER orderId=" + r.orderId() + " clOrdId=" + r.clientOrderId() + " status=" + r.status()
+    private static String order(String o, Response r) {
+        return "ORDER " + o + "orderId=" + r.orderId() + " clOrdId=" + r.clientOrderId() + " status=" + r.status()
                 + " filled=" + r.filledQuantity() + " remaining=" + r.remainingQuantity()
-                + (r.rejectReason() == null ? "" : " reason=" + r.rejectReason());
+                + (r.reason() == null ? "" : " reason=" + r.reason());
     }
 
-    static String cancel(CancelResult r) {
+    private static String cancel(String o, CancelResult r, boolean byCancelAll) {
         return r.status() == CancelStatus.CANCELLED
-                ? "CANCELLED orderId=" + r.orderId() + " qty=" + r.cancelledQuantity()
-                : "CANCEL_REJECT orderId=" + r.orderId() + " reason=" + r.status();
+                ? "CANCELLED " + o + "orderId=" + r.orderId() + " qty=" + r.cancelledQuantity() + (byCancelAll ? " reason=CANCEL_ALL" : "")
+                : "CANCEL_REJECT " + o + "orderId=" + r.orderId() + " reason=" + r.status();
     }
 
     static String book(BookSnapshot s) {

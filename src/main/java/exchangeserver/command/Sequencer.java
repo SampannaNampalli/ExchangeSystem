@@ -57,6 +57,18 @@ public final class Sequencer {
         return command;
     }
 
+    public CancelAllCommand stampCancelAll(String participant) {
+        CancelAllCommand command = new CancelAllCommand(nextSequenceNumber, nextTimestamp(), participant);
+        nextSequenceNumber++;
+        return command;
+    }
+
+    public CheckCommand stampCheck(String digest) {
+        CheckCommand command = new CheckCommand(nextSequenceNumber, nextTimestamp(), digest);
+        nextSequenceNumber++;
+        return command;
+    }
+
     public SkipCommand stampSkip(long skippedSequenceNumber) {
         SkipCommand command = new SkipCommand(nextSequenceNumber, nextTimestamp(), skippedSequenceNumber);
         nextSequenceNumber++;

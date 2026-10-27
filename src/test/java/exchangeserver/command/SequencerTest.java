@@ -161,6 +161,31 @@ class SequencerTest {
         }
 
         @Test
+        void cancelAllCommand() {
+            assertThrows(IllegalArgumentException.class, () -> new CancelAllCommand(0, t, "a"));
+            assertThrows(IllegalArgumentException.class, () -> new CancelAllCommand(1, t, "a b"));
+            assertThrows(NullPointerException.class, () -> new CancelAllCommand(1, null, "a"));
+        }
+
+        @Test
+        void checkCommandNeedsSixteenHexDigits() {
+            new CheckCommand(1, t, "0123456789abcdef");
+            assertThrows(IllegalArgumentException.class, () -> new CheckCommand(1, t, "0123456789ABCDEF"));
+            assertThrows(IllegalArgumentException.class, () -> new CheckCommand(1, t, "0123"));
+            assertThrows(IllegalArgumentException.class, () -> new CheckCommand(0, t, "0123456789abcdef"));
+        }
+
+        @Test
+        void cancelAllAndCheckUseSequenceNumbersButNoOrderIds() {
+            Sequencer s = new Sequencer(java.time.Clock.fixed(t, java.time.ZoneOffset.UTC));
+            assertEquals(1, s.stampCancelAll("a").sequenceNumber());
+            assertEquals(2, s.stampCheck("0123456789abcdef").sequenceNumber());
+            assertEquals(1, s.nextOrderId());
+            assertThrows(IllegalArgumentException.class, () -> s.stampCancelAll("bad name"));
+            assertEquals(3, s.nextSequenceNumber(), "an invalid command uses up no number");
+        }
+
+        @Test
         void skipCommandOnlySkipsEarlierCommands() {
             new SkipCommand(5, t, 4);
             assertThrows(IllegalArgumentException.class, () -> new SkipCommand(5, t, 5));
