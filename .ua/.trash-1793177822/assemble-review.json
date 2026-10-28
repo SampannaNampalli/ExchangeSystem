@@ -1,0 +1,15 @@
+{
+  "fixedSectionOk": true,
+  "nodesRecovered": 1,
+  "edgesRestored": 1,
+  "crossBatchEdgesAdded": 0,
+  "typesRemapped": 0,
+  "complexityRemapped": 0,
+  "notes": [
+    "Fixed section is minimal (3 tested_by direction flips); no ID-prefix or complexity normalization was needed, so batch output was clean.",
+    "Recovered function:src/main/java/exchangeserver/core/ExchangeService.java:recovery (public accessor, lines 139-141) that batch-6-part-1 referenced but never emitted; added file contains/exports edges mirroring sibling methods and restored the Main.serve -> recovery calls edge.",
+    "All 278 internal importMap edges already present as imports edges; no cross-batch gaps.",
+    "All node types (function, file, class, document, config) and complexity values valid; no dangling edges or duplicate (source,target,type) keys remain.",
+    "Final: 391 nodes, 1116 edges."
+  ]
+}

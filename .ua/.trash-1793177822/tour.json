@@ -1,0 +1,167 @@
+[
+  {
+    "order": 1,
+    "title": "Project Overview",
+    "description": "Start with the README: ExchangeServer2 is a crash-safe, deterministic, single-instrument exchange in Java 17, with price-time matching, a checksummed write-ahead journal with replay and snapshots, a single-writer thread model and an authenticated TCP/TLS gateway. Its diagram shows the path you will follow in this tour: client, gateway, queue, writer thread (stamp, journal, match), and replay on restart. The Vision describes the purpose and the roadmap, and the Spec is the source of truth for the code state and the numbered design decisions D1-D77 that later steps cite.",
+    "nodeIds": [
+      "document:README.md",
+      "document:docs/ExchangeServer2_Vision.md",
+      "document:docs/ExchangeServer2_Spec.md"
+    ]
+  },
+  {
+    "order": 2,
+    "title": "Entry Point and Build",
+    "description": "Main.java is the command-line launcher. It either runs an operator tool (--add-user, --quarantine, --compact) or loads credentials, binds the TCP/TLS gateway and starts the ExchangeService writer, and it maps failures to exit codes 0/1/2 so a halted writer stops the whole process. The Maven pom builds the runnable jar around exchangeserver.Main with no runtime dependencies, and adds the 'bench' (JMH) and 'mutation' (PIT) profiles you will meet at the end of the tour.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/Main.java",
+      "config:pom.xml"
+    ],
+    "languageLesson": "Maven profiles (<profile> blocks activated with -P) let one pom define optional build modes. Here -Pbench and -Pmutation add JMH and PIT runs without slowing the default 'test' lifecycle."
+  },
+  {
+    "order": 3,
+    "title": "Domain Vocabulary and Rules",
+    "description": "Before the engine makes sense you need its vocabulary. Side and OrderType (LIMIT, IOC, FOK, MARKET, POST_ONLY) are the most widely used types in the codebase, OrderRequest is the immutable client order and the only layer of stateless field validation, and Order is an accepted request plus a sequencer-issued id and timestamp. Rules collects every rule that replay depends on, behind a VERSION number that the journal header records, so changing a rule cannot silently change how old history replays.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/domain/Side.java",
+      "file:src/main/java/exchangeserver/domain/OrderType.java",
+      "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+      "file:src/main/java/exchangeserver/domain/Order.java",
+      "file:src/main/java/exchangeserver/domain/Rules.java"
+    ],
+    "languageLesson": "Java 17 records (record OrderRequest(...)) give immutable value types with a compact constructor where validation runs, so an invalid instance can never exist."
+  },
+  {
+    "order": 4,
+    "title": "The Order Book",
+    "description": "OrderBook owns every resting order: bid and ask TreeMaps of PriceLevels, an order-id map and per-participant open counts. Each PriceLevel is a time-priority queue built as a sentinel-bounded doubly linked list of OrderNodes, which gives O(1) cancel. All PriceLevel mutators are package-private, so code in other packages (including the engine) can only change the book through add, fillBest and cancel, and those methods keep the invariants in one place. Fill and RestingOrderView report results and expose read-only views without handing out the mutable Order.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/book/OrderBook.java",
+      "file:src/main/java/exchangeserver/book/PriceLevel.java",
+      "file:src/main/java/exchangeserver/book/OrderNode.java",
+      "file:src/main/java/exchangeserver/book/Fill.java",
+      "file:src/main/java/exchangeserver/book/RestingOrderView.java"
+    ],
+    "languageLesson": "Java has no 'friend' classes. Package-private visibility (no modifier) is how this project gets the compiler to enforce ownership: only classes in exchangeserver.book can call PriceLevel's mutators."
+  },
+  {
+    "order": 5,
+    "title": "Price-Time Matching Engine",
+    "description": "Building on the book from Step 4, MatchingEngine runs side-effect-free pre-checks (duplicate client order id, price band, caps, FOK fillability, post-only), then a shared matching loop with self-trade prevention and per-OrderType outcomes. It is deterministic: it reads no clock, counter or randomness, so feeding it the same commands always produces the same outputs, and replay depends on that. Results come out as sealed EngineOutput records: a Response for the submitter, Trades that carry the incoming command's timestamp, and Reason codes for state-dependent rejects.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+      "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+      "file:src/main/java/exchangeserver/engine/Response.java",
+      "file:src/main/java/exchangeserver/engine/Trade.java",
+      "file:src/main/java/exchangeserver/engine/Reason.java"
+    ],
+    "languageLesson": "A sealed interface (sealed interface EngineOutput permits ...) restricts its implementations to a known set, so the compiler knows every case that code over EngineOutput has to handle."
+  },
+  {
+    "order": 6,
+    "title": "Commands and the Sequencer",
+    "description": "The engine never sees raw requests. It sees stamped Commands: NEW, CANCEL, CANCEL_ALL, SKIP and CHECK records with a sequence number and a timestamp. The Sequencer is the only component that reads the clock and counts, issuing sequence numbers, order ids and non-decreasing timestamps, which is how the determinism from Step 5 is kept. CheckCommand carries an output digest that replay must reproduce, and SkipCommand quarantines a poison-pill command by adding a note to history instead of editing it.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/command/Command.java",
+      "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+      "file:src/main/java/exchangeserver/command/Sequencer.java",
+      "file:src/main/java/exchangeserver/command/CheckCommand.java",
+      "file:src/main/java/exchangeserver/command/SkipCommand.java"
+    ]
+  },
+  {
+    "order": 7,
+    "title": "The Write-Ahead Journal",
+    "description": "Every stamped command is made durable before it is processed. CommandJournal locks the file (JournalLock: one owner at a time), checks the header and Rules.VERSION before changing anything, cuts a torn last record, and appends each batch with one write and one fsync. JournalCodec defines format v3, text records each sealed with a CRC-32C from Checksums, and .gitattributes marks journal files as binary so that git never converts their LF line endings to CRLF.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+      "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+      "file:src/main/java/exchangeserver/journal/Checksums.java",
+      "file:src/main/java/exchangeserver/journal/JournalLock.java",
+      "file:.gitattributes"
+    ],
+    "languageLesson": "A write-ahead log only protects you once the data is on disk: forcing the file (fsync) is the step that lets an append survive a power loss. It costs about 1.5 ms on the dev disk, which is why the project batches many commands per fsync."
+  },
+  {
+    "order": 8,
+    "title": "The Exchange Pipeline",
+    "description": "Exchange.process connects the previous steps: it stamps a batch with the Sequencer, appends it to the CommandJournal with one fsync, feeds each command to the Ledger, calls the OutputListener and only then completes the futures. The Ledger bundles everything derived from commands (the MatchingEngine, the OutputDigest and the per-participant OutputLog) so it can be rebuilt as one unit. OutputDigest is a running FNV-1a hash of every engine output, written into CHECK records, and OutputLog numbers each participant's private events so RESEND works after a restart.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/core/Exchange.java",
+      "file:src/main/java/exchangeserver/core/Ledger.java",
+      "file:src/main/java/exchangeserver/core/OutputDigest.java",
+      "file:src/main/java/exchangeserver/core/OutputLog.java",
+      "file:src/main/java/exchangeserver/core/OutputListener.java"
+    ]
+  },
+  {
+    "order": 9,
+    "title": "Single-Writer Thread Model",
+    "description": "ExchangeService is how other threads reach the Exchange from Step 8. A caller hands in a Request (Submit, Cancel, CancelAll, or a read such as Snapshot), gets its own CompletableFuture back, and a dedicated 'exchange-writer' thread drains the queue in batches and calls Exchange.process. The state check, the enqueue and stop() share one lock, so no accepted request is ever lost, and ExchangeException tells callers whether to retry (BUSY) or give up (STOPPED, HALTED). Only the writer thread ever touches the book, the engine or the journal.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/core/ExchangeService.java",
+      "file:src/main/java/exchangeserver/core/Request.java",
+      "file:src/main/java/exchangeserver/core/Pending.java",
+      "file:src/main/java/exchangeserver/core/ExchangeException.java"
+    ],
+    "languageLesson": "Completing a CompletableFuture creates a happens-before edge: everything the writer did before completing it is visible to a thread that later reads the result. That is why the tests inspect state only through a future."
+  },
+  {
+    "order": 10,
+    "title": "Recovery: Snapshots and Replay",
+    "description": "On restart, Replay rebuilds the Ledger in two passes. The first checks sequence and timestamp continuity and collects SKIPs; the second feeds the remaining commands to the same engine and checks every CHECK digest, so a behaviour change in the code shows up as a DIVERGED replay. Snapshot lets recovery start part-way through history from a checksummed '<journal>.snapshot-<seq>' file holding an EngineState, and Durable provides the atomic write-and-rename and directory fsync that make those files crash-safe. ReplayException tells the operator whether a record is a poison pill or a divergence.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/core/Replay.java",
+      "file:src/main/java/exchangeserver/core/Snapshot.java",
+      "file:src/main/java/exchangeserver/engine/EngineState.java",
+      "file:src/main/java/exchangeserver/journal/Durable.java",
+      "file:src/main/java/exchangeserver/core/ReplayException.java"
+    ]
+  },
+  {
+    "order": 11,
+    "title": "The TCP/TLS Gateway",
+    "description": "The gateway is the network edge of the live path. TcpGateway accepts connections (optionally over TLS) and, as the exchange's OutputListener, sends private events to their owners and market data to subscribers. Each ClientSession has a reader thread that authenticates LOGIN against salted PBKDF2 hashes in Credentials, parses lines with Protocol, builds the OrderRequest and applies the in-flight cap and rate limit, so invalid requests are answered with ERROR and never reach the queue. Protocol's header comment is the reference for the wire format.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+      "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+      "file:src/main/java/exchangeserver/gateway/Protocol.java",
+      "file:src/main/java/exchangeserver/gateway/Credentials.java",
+      "file:src/main/java/exchangeserver/gateway/Tls.java"
+    ]
+  },
+  {
+    "order": 12,
+    "title": "The Client Side",
+    "description": "To use the gateway from Step 11, ClientMain is an interactive console client: it connects (optionally with a TLS truststore), forwards the protocol lines you type and prints every server line as it arrives. ExchangeClient is the minimal blocking client underneath, with a background reader thread and an await() that finds matching lines. The gateway tests use it too, so it shows how a client is expected to use the protocol.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/client/ClientMain.java",
+      "file:src/main/java/exchangeserver/client/ExchangeClient.java"
+    ]
+  },
+  {
+    "order": 13,
+    "title": "Tests, Seams and Benchmarks",
+    "description": "There is one test class per production class, with @Nested groups per behaviour. ExchangeServiceTest blocks the writer deterministically with a Gate CommandInterceptor instead of using sleeps, OrderBookTest re-checks the book invariants under randomized traffic, and MutableClock lets tests control the Sequencer's timestamps. MatchingBenchmark measures engine cost from 10 to 100,000 price levels with JMH, and the testing guide explains the seams and the PIT mutation-testing results.",
+    "nodeIds": [
+      "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+      "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+      "file:src/test/java/exchangeserver/testing/MutableClock.java",
+      "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+      "document:docs/understanding/10-testing.md"
+    ],
+    "languageLesson": "JUnit 5 @Nested inner classes group related tests under one outer class, so test reports show the behaviour group above each test. Mutation testing (PIT) checks how strong the tests are by changing the code and confirming that some test fails."
+  },
+  {
+    "order": 14,
+    "title": "Study Guides and Next Steps",
+    "description": "With the architecture covered, the study guides take you deeper. 00-START-HERE gives the reading order, 05-core-flows traces each request flow through the code with path:LINE citations, and 09-design-decisions maps the guide's records to the Spec's D-numbered decisions. CLAUDE.md summarises the cross-file rules (determinism, single writer, package ownership, Rules.VERSION) that any change has to respect.",
+    "nodeIds": [
+      "document:docs/understanding/00-START-HERE.md",
+      "document:docs/understanding/05-core-flows.md",
+      "document:docs/understanding/09-design-decisions.md",
+      "document:CLAUDE.md"
+    ]
+  }
+]

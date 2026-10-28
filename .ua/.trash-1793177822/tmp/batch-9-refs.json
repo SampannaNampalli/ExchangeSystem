@@ -1,0 +1,113 @@
+{
+ "docs/understanding/07-modules/book.md": [
+  "src/main/java/exchangeserver/book/CancelResult.java",
+  "src/main/java/exchangeserver/book/Fill.java",
+  "src/main/java/exchangeserver/book/LevelUpdate.java",
+  "src/main/java/exchangeserver/book/OrderBook.java",
+  "src/main/java/exchangeserver/book/OrderNode.java",
+  "src/main/java/exchangeserver/book/PriceLevel.java",
+  "src/main/java/exchangeserver/book/RestingOrderView.java",
+  "src/test/java/exchangeserver/book/OrderBookTest.java"
+ ],
+ "docs/understanding/07-modules/client-and-main.md": [
+  "src/main/java/exchangeserver/Main.java",
+  "src/main/java/exchangeserver/client/ClientMain.java",
+  "src/main/java/exchangeserver/client/ExchangeClient.java",
+  "src/main/java/exchangeserver/gateway/Credentials.java",
+  "src/test/java/exchangeserver/MainTest.java",
+  "src/test/java/exchangeserver/client/ExchangeClientTest.java"
+ ],
+ "docs/understanding/07-modules/domain-and-commands.md": [
+  "src/main/java/exchangeserver/command/CancelAllCommand.java",
+  "src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "src/main/java/exchangeserver/command/CheckCommand.java",
+  "src/main/java/exchangeserver/command/Command.java",
+  "src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "src/main/java/exchangeserver/command/Sequencer.java",
+  "src/main/java/exchangeserver/command/SkipCommand.java",
+  "src/main/java/exchangeserver/core/Exchange.java",
+  "src/main/java/exchangeserver/core/Replay.java",
+  "src/main/java/exchangeserver/domain/Order.java",
+  "src/main/java/exchangeserver/domain/OrderRequest.java",
+  "src/main/java/exchangeserver/domain/OrderType.java",
+  "src/main/java/exchangeserver/domain/Rules.java",
+  "src/main/java/exchangeserver/domain/Side.java",
+  "src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "src/main/java/exchangeserver/gateway/ClientSession.java",
+  "src/main/java/exchangeserver/journal/JournalCodec.java",
+  "src/test/java/exchangeserver/testing/MutableClock.java"
+ ],
+ "docs/understanding/07-modules/engine.md": [
+  "src/main/java/exchangeserver/core/Exchange.java",
+  "src/main/java/exchangeserver/core/Ledger.java",
+  "src/main/java/exchangeserver/engine/BookSnapshot.java",
+  "src/main/java/exchangeserver/engine/CancelAllOutput.java",
+  "src/main/java/exchangeserver/engine/CancelOutput.java",
+  "src/main/java/exchangeserver/engine/EngineOutput.java",
+  "src/main/java/exchangeserver/engine/EngineState.java",
+  "src/main/java/exchangeserver/engine/Execution.java",
+  "src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "src/main/java/exchangeserver/engine/OrderOutput.java",
+  "src/main/java/exchangeserver/engine/Reason.java",
+  "src/main/java/exchangeserver/engine/Response.java",
+  "src/main/java/exchangeserver/engine/Trade.java",
+  "src/test/java/exchangeserver/engine/MatchingEngineTest.java"
+ ],
+ "docs/understanding/07-modules/exchange-and-replay.md": [
+  "src/main/java/exchangeserver/core/Exchange.java",
+  "src/main/java/exchangeserver/core/OutputListener.java",
+  "src/main/java/exchangeserver/core/Pending.java",
+  "src/main/java/exchangeserver/core/Replay.java",
+  "src/main/java/exchangeserver/core/ReplayException.java",
+  "src/main/java/exchangeserver/core/Request.java",
+  "src/test/java/exchangeserver/MainTest.java",
+  "src/test/java/exchangeserver/core/ExchangeTest.java",
+  "src/test/java/exchangeserver/core/ReplayTest.java"
+ ],
+ "docs/understanding/07-modules/exchange-service.md": [
+  "src/main/java/exchangeserver/Main.java",
+  "src/main/java/exchangeserver/core/ExchangeService.java",
+  "src/test/java/exchangeserver/core/ExchangeServiceTest.java"
+ ],
+ "docs/understanding/07-modules/gateway.md": [
+  "src/main/java/exchangeserver/Main.java",
+  "src/main/java/exchangeserver/core/Request.java",
+  "src/main/java/exchangeserver/gateway/ClientMessage.java",
+  "src/main/java/exchangeserver/gateway/ClientSession.java",
+  "src/main/java/exchangeserver/gateway/Credentials.java",
+  "src/main/java/exchangeserver/gateway/Protocol.java",
+  "src/main/java/exchangeserver/gateway/TcpGateway.java",
+  "src/main/java/exchangeserver/gateway/Tls.java",
+  "src/test/java/exchangeserver/gateway/CredentialsTest.java",
+  "src/test/java/exchangeserver/gateway/TcpGatewayTest.java"
+ ],
+ "docs/understanding/07-modules/journal.md": [
+  "src/main/java/exchangeserver/core/Exchange.java",
+  "src/main/java/exchangeserver/core/Replay.java",
+  "src/main/java/exchangeserver/core/Snapshot.java",
+  "src/main/java/exchangeserver/gateway/Credentials.java",
+  "src/main/java/exchangeserver/journal/Checksums.java",
+  "src/main/java/exchangeserver/journal/CommandJournal.java",
+  "src/main/java/exchangeserver/journal/Durable.java",
+  "src/main/java/exchangeserver/journal/JournalCodec.java",
+  "src/main/java/exchangeserver/journal/JournalLock.java",
+  "src/test/java/exchangeserver/journal/CommandJournalTest.java"
+ ],
+ "docs/understanding/07-modules/ledger-and-snapshots.md": [
+  "src/main/java/exchangeserver/core/Exchange.java",
+  "src/main/java/exchangeserver/core/Ledger.java",
+  "src/main/java/exchangeserver/core/OutputDigest.java",
+  "src/main/java/exchangeserver/core/OutputLog.java",
+  "src/main/java/exchangeserver/core/PrivateEvent.java",
+  "src/main/java/exchangeserver/core/Replay.java",
+  "src/main/java/exchangeserver/core/Snapshot.java",
+  "src/main/java/exchangeserver/gateway/ClientSession.java",
+  "src/main/java/exchangeserver/gateway/Protocol.java",
+  "src/test/java/exchangeserver/core/ExchangeTest.java",
+  "src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "src/test/java/exchangeserver/core/OutputLogTest.java",
+  "src/test/java/exchangeserver/core/ReplayTest.java",
+  "src/test/java/exchangeserver/core/SnapshotTest.java",
+  "src/test/java/exchangeserver/gateway/TcpGatewayTest.java"
+ ]
+}

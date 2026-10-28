@@ -1,7 +1,8 @@
-# ExchangeServer2 — Vision (v5)
+# ExchangeServer2 — Vision (v6)
 
-**Supersedes:** v4 (in git history; v5 extends the roadmap to multiple symbols, DevOps, distributed systems and a
-public demo) and `ExchangeServer_Vision_v3.md` (in the original `Exchange Server` project). Self-contained.
+**Supersedes:** v5 and v4 (in git history; v5 extended the roadmap to multiple symbols, DevOps, distributed systems
+and a public demo; v6 makes zero cost a constraint on every step) and `ExchangeServer_Vision_v3.md` (in the original
+`Exchange Server` project). Self-contained.
 **Companion:** `ExchangeServer2_Spec.md` (exact code state, decisions, open threads).
 **Rule:** the roadmap lives only here. The spec points to it and does not duplicate it.
 
@@ -127,8 +128,9 @@ limits (Spec D63–D77). Steps 8–31 (v5, same day) are planned and not started
 - Full FIX/ITCH compliance. A binary protocol is step 31; certification-grade compliance is not a goal.
 - Real money. The system is a play-money simulation: no deposits, payouts or real securities, and the public demo
   uses made-up symbols, not real tickers or real market data.
-- An always-on, paid multi-node cloud cluster. The full cluster runs locally (kind or k3d); the public demo is a
-  small single-host deployment.
+- Paid infrastructure. Every step is built and run on free tooling and free tiers (§7, open decision 7): the full
+  cluster runs locally (kind or k3d) and the public demo is one free-tier host. The one accepted cost is an optional
+  domain name (about $10 a year).
 
 Removed from this list in v5, now on the roadmap: multiple instruments, distributed replication and consensus,
 accounts and permissions, online rotation, market-data resend. (Authentication and TLS left it on 2026-10-27, D74.)
@@ -158,8 +160,8 @@ one. Each phase leaves a working system; within a phase, steps are in dependency
 
 | # | Step | Scope | Teaches |
 |---|---|---|---|
-| 8 | Continuous integration | GitHub Actions: build and test on a Windows and Linux matrix, warning-free check, nightly PIT, JMH runs that fail on a latency regression; CodeQL, dependency and secret scanning | CI/CD, performance regression gates, DevSecOps |
-| 9 | Containers | Multi-stage Dockerfile, minimal JRE from `jlink`, non-root user, volumes for the journal and users file; `docker compose` for the whole stack; SBOM and signed images published to GHCR | Reproducible builds, image hygiene, supply-chain security |
+| 8 | Continuous integration | GitHub Actions: build and test on a Windows and Linux matrix, warning-free check, nightly PIT, JMH runs that fail on a latency regression; CodeQL, dependency and secret scanning. All free on a public repository (a private one has a monthly minute quota, Windows minutes counting double). Shared runners give noisy timings, so the JMH gate compares against a baseline run in the same job and fails only on a large slowdown | CI/CD, performance regression gates, DevSecOps |
+| 9 | Containers | Multi-stage Dockerfile, minimal JRE from `jlink`, non-root user, volumes for the journal and users file; `docker compose` for the whole stack; amd64 and arm64 images (the free demo host is ARM, step 19); SBOM (Syft) and keyless-signed (cosign) images published to GHCR | Reproducible builds, image hygiene, supply-chain security |
 | 10 | Metrics and structured logs | Queue depth, batch size, fsync latency histogram, rejects by reason, sessions; JSON logs; Prometheus and Grafana in the compose file | Observability basics; measuring what Spec §5 measured once, continuously |
 
 ### Phase 2 — Multiple symbols, one process (planned)
@@ -174,7 +176,7 @@ one. Each phase leaves a working system; within a phase, steps are in dependency
 | # | Step | Scope | Teaches |
 |---|---|---|---|
 | 13 | Scalable gateway | NIO selectors, or virtual threads (needs Java 21), instead of two platform threads per connection; measure both | I/O models, measuring a concurrency change |
-| 14 | Online compaction, backups, restore | Compaction and journal rotation while running; snapshots and journals copied to object storage; a rehearsed restore | Operating stateful systems without downtime; disaster recovery |
+| 14 | Online compaction, backups, restore | Compaction and journal rotation while running; snapshots and journals copied to object storage (a local S3-compatible store such as Garage or SeaweedFS; off-site, a free tier such as Cloudflare R2 or Backblaze B2); a rehearsed restore | Operating stateful systems without downtime; disaster recovery |
 | 15 | Accounts and permissions | Users managed while running (no restart), roles (trader, viewer, admin), limits per participant across sessions | Authorization, multi-tenant fairness |
 
 ### Phase 4 — Public demo, play money (planned)
@@ -184,7 +186,7 @@ one. Each phase leaves a working system; within a phase, steps are in dependency
 | 16 | Web gateway | WebSocket (and HTTP) gateway in front of the same `OrderRequest` validation as the TCP gateway; the JDK has no WebSocket server, so hand-rolled RFC 6455 framing or a library (decision below) | Protocol adapters; one validation layer for several front doors |
 | 17 | Web front end | Order entry, live L2 book, trade tape, own orders and fills; a read-only public Grafana | Real-time UIs over a streaming API |
 | 18 | Bots | A market maker quoting both sides and random traders, as ordinary authenticated participants | Load that looks like a market; a self-test that never stops |
-| 19 | Hosting | Docker Compose on one VPS; Caddy or nginx with Let's Encrypt; firewall, per-IP limits, a CDN or DDoS shield in front; scheduled backups; demo accounts; a visible "simulation, play money" notice. Moves to primary-backup after step 20 | Deploying and running a public service; abuse protection |
+| 19 | Hosting | Docker Compose on one Oracle Cloud Always Free ARM VM (a real disk for the journal's fsync; fallback: Google Cloud's e2-micro with a small heap, or a home PC); Cloudflare Tunnel in front for TLS and DDoS protection with no inbound ports (or Caddy with Let's Encrypt on a free DuckDNS subdomain); the web front end on GitHub Pages or Cloudflare Pages; firewall, per-IP limits; scheduled backups; demo accounts; a visible "simulation, play money" notice. Not hosts that sleep when idle or have no persistent disk (Render's free tier), nor time-limited credits. Moves to primary-backup after step 20 | Deploying and running a public service; abuse protection |
 
 ### Phase 5 — Replication, one group (planned)
 
@@ -224,7 +226,10 @@ one. Each phase leaves a working system; within a phase, steps are in dependency
    participant.
 6. **Phase order.** Phase 4 can come before phase 3 for an earlier public demo, provided the journal is kept small
    (step 14, or a scheduled restart that compacts).
-7. **Cloud spend.** Default: one small VPS for the demo; the cluster stays local.
+7. **Cloud spend. Decided 2026-10-28: zero cost.** Build and run every step on free tooling and free tiers: local
+   Docker, kind or k3d for phases 5–7; GitHub Actions and GHCR on a public repository; Oracle Cloud Always Free for
+   the demo (step 19). The only accepted cost is an optional domain. Free-tier terms change (Oracle reclaims idle
+   instances; capacity is sometimes unavailable), so check the provider's current terms when the step starts.
 
 ---
 
@@ -235,6 +240,8 @@ one. Each phase leaves a working system; within a phase, steps are in dependency
 - **Scope expansion (2026-10-27, v5):** at the user's request the roadmap now covers multiple symbols, DevOps,
   distributed systems and a public play-money demo (§7 steps 8–31). The multi-symbol design in step 11 is a
   recommendation, to be confirmed when the step starts.
+- **Zero cost (2026-10-28, v6):** the user wants the project built and run for free; open decision 7 is settled
+  and steps 8, 9, 14 and 19 name free options (§6, §7).
 
 ---
 

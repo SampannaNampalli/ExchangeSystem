@@ -1,0 +1,112 @@
+{
+ "projectRoot": "S:/Codes and Programs/Programs/Dev/Exchange Server Misc/ExchangeServer2",
+ "batchFiles": [
+  {
+   "path": "src/main/java/exchangeserver/book/Fill.java",
+   "language": "java",
+   "sizeLines": 13,
+   "fileCategory": "code"
+  },
+  {
+   "path": "src/main/java/exchangeserver/book/RestingOrderView.java",
+   "language": "java",
+   "sizeLines": 20,
+   "fileCategory": "code"
+  },
+  {
+   "path": "src/main/java/exchangeserver/core/Snapshot.java",
+   "language": "java",
+   "sizeLines": 137,
+   "fileCategory": "code"
+  },
+  {
+   "path": "src/main/java/exchangeserver/domain/OrderType.java",
+   "language": "java",
+   "sizeLines": 23,
+   "fileCategory": "code"
+  },
+  {
+   "path": "src/main/java/exchangeserver/domain/Side.java",
+   "language": "java",
+   "sizeLines": 10,
+   "fileCategory": "code"
+  },
+  {
+   "path": "src/main/java/exchangeserver/engine/EngineState.java",
+   "language": "java",
+   "sizeLines": 22,
+   "fileCategory": "code"
+  },
+  {
+   "path": "src/main/java/exchangeserver/gateway/ClientMessage.java",
+   "language": "java",
+   "sizeLines": 40,
+   "fileCategory": "code"
+  },
+  {
+   "path": "src/main/java/exchangeserver/journal/Checksums.java",
+   "language": "java",
+   "sizeLines": 18,
+   "fileCategory": "code"
+  },
+  {
+   "path": "src/test/java/exchangeserver/book/PriceLevelTest.java",
+   "language": "java",
+   "sizeLines": 256,
+   "fileCategory": "code"
+  },
+  {
+   "path": "src/test/java/exchangeserver/core/SnapshotTest.java",
+   "language": "java",
+   "sizeLines": 88,
+   "fileCategory": "code"
+  },
+  {
+   "path": "src/test/java/exchangeserver/engine/ResponseTest.java",
+   "language": "java",
+   "sizeLines": 87,
+   "fileCategory": "code"
+  }
+ ],
+ "batchImportData": {
+  "src/main/java/exchangeserver/book/Fill.java": [
+   "src/main/java/exchangeserver/domain/Side.java"
+  ],
+  "src/main/java/exchangeserver/book/RestingOrderView.java": [
+   "src/main/java/exchangeserver/domain/OrderType.java",
+   "src/main/java/exchangeserver/domain/Side.java"
+  ],
+  "src/main/java/exchangeserver/core/Snapshot.java": [
+   "src/main/java/exchangeserver/book/RestingOrderView.java",
+   "src/main/java/exchangeserver/domain/OrderType.java",
+   "src/main/java/exchangeserver/domain/Side.java",
+   "src/main/java/exchangeserver/engine/EngineState.java",
+   "src/main/java/exchangeserver/journal/Checksums.java",
+   "src/main/java/exchangeserver/journal/Durable.java"
+  ],
+  "src/main/java/exchangeserver/domain/OrderType.java": [],
+  "src/main/java/exchangeserver/domain/Side.java": [],
+  "src/main/java/exchangeserver/engine/EngineState.java": [
+   "src/main/java/exchangeserver/book/RestingOrderView.java"
+  ],
+  "src/main/java/exchangeserver/gateway/ClientMessage.java": [
+   "src/main/java/exchangeserver/domain/OrderType.java",
+   "src/main/java/exchangeserver/domain/Side.java"
+  ],
+  "src/main/java/exchangeserver/journal/Checksums.java": [],
+  "src/test/java/exchangeserver/book/PriceLevelTest.java": [
+   "src/main/java/exchangeserver/domain/Order.java",
+   "src/main/java/exchangeserver/domain/OrderRequest.java",
+   "src/main/java/exchangeserver/domain/Side.java"
+  ],
+  "src/test/java/exchangeserver/core/SnapshotTest.java": [
+   "src/main/java/exchangeserver/book/RestingOrderView.java",
+   "src/main/java/exchangeserver/domain/OrderType.java",
+   "src/main/java/exchangeserver/domain/Side.java",
+   "src/main/java/exchangeserver/journal/Checksums.java"
+  ],
+  "src/test/java/exchangeserver/engine/ResponseTest.java": [
+   "src/main/java/exchangeserver/domain/Side.java"
+  ]
+ }
+}

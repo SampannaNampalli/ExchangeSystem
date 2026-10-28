@@ -1,0 +1,192 @@
+[
+  {
+    "id": "layer:gateway",
+    "name": "Gateway & Entry Points",
+    "description": "TCP/TLS gateway with authenticated client sessions and the line-based wire protocol, plus the Main launcher (server, add-user, compact, quarantine modes) and the interactive CLI client.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/gateway/Protocol.java",
+      "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+      "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+      "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+      "file:src/main/java/exchangeserver/gateway/Credentials.java",
+      "file:src/main/java/exchangeserver/gateway/Tls.java",
+      "file:src/main/java/exchangeserver/gateway/ProtocolException.java",
+      "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+      "file:src/main/java/exchangeserver/client/ClientMain.java",
+      "file:src/main/java/exchangeserver/Main.java"
+    ]
+  },
+  {
+    "id": "layer:core",
+    "name": "Exchange Core",
+    "description": "Single-writer ExchangeService queue and Exchange.process pipeline that stamps, journals, feeds the Ledger and notifies listeners, plus replay, snapshots, output digest and poison-pill recovery.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/core/OutputDigest.java",
+      "file:src/main/java/exchangeserver/core/OutputListener.java",
+      "file:src/main/java/exchangeserver/core/OutputLog.java",
+      "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+      "file:src/main/java/exchangeserver/core/ExchangeException.java",
+      "file:src/main/java/exchangeserver/core/ExchangeService.java",
+      "file:src/main/java/exchangeserver/core/Request.java",
+      "file:src/main/java/exchangeserver/core/ResendResult.java",
+      "file:src/main/java/exchangeserver/core/Ledger.java",
+      "file:src/main/java/exchangeserver/core/CommandInterceptor.java",
+      "file:src/main/java/exchangeserver/core/Pending.java",
+      "file:src/main/java/exchangeserver/core/Replay.java",
+      "file:src/main/java/exchangeserver/core/Snapshot.java",
+      "file:src/main/java/exchangeserver/core/Exchange.java",
+      "file:src/main/java/exchangeserver/core/ReplayException.java"
+    ]
+  },
+  {
+    "id": "layer:command-journal",
+    "name": "Commands & Journal",
+    "description": "Sequencer-stamped command records (NEW, CANCEL, CANCEL_ALL, SKIP, CHECK) and the checksummed, fsynced, file-locked write-ahead CommandJournal with its v3 text codec.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+      "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+      "file:src/main/java/exchangeserver/command/CheckCommand.java",
+      "file:src/main/java/exchangeserver/command/Command.java",
+      "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+      "file:src/main/java/exchangeserver/command/SkipCommand.java",
+      "file:src/main/java/exchangeserver/command/Sequencer.java",
+      "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+      "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+      "file:src/main/java/exchangeserver/journal/Checksums.java",
+      "file:src/main/java/exchangeserver/journal/Durable.java",
+      "file:src/main/java/exchangeserver/journal/JournalLock.java"
+    ]
+  },
+  {
+    "id": "layer:engine",
+    "name": "Matching Engine",
+    "description": "Deterministic price-time MatchingEngine and its output records (responses, executions, trades, cancel results, book snapshots, reject reasons).",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+      "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+      "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+      "file:src/main/java/exchangeserver/engine/Execution.java",
+      "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+      "file:src/main/java/exchangeserver/engine/Reason.java",
+      "file:src/main/java/exchangeserver/engine/Trade.java",
+      "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+      "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+      "file:src/main/java/exchangeserver/engine/Response.java",
+      "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+      "file:src/main/java/exchangeserver/engine/EngineState.java"
+    ]
+  },
+  {
+    "id": "layer:book",
+    "name": "Order Book",
+    "description": "Limit order book with price levels and order nodes whose package-private mutators enforce the book invariants, exposing fills, level updates and read-only resting-order views.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/book/CancelResult.java",
+      "file:src/main/java/exchangeserver/book/CancelStatus.java",
+      "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+      "file:src/main/java/exchangeserver/book/OrderBook.java",
+      "file:src/main/java/exchangeserver/book/OrderNode.java",
+      "file:src/main/java/exchangeserver/book/PriceLevel.java",
+      "file:src/main/java/exchangeserver/book/Fill.java",
+      "file:src/main/java/exchangeserver/book/RestingOrderView.java"
+    ]
+  },
+  {
+    "id": "layer:domain",
+    "name": "Domain Model",
+    "description": "Foundational order types, sides, validated OrderRequest and the versioned Rules that every replayed behaviour depends on.",
+    "nodeIds": [
+      "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+      "file:src/main/java/exchangeserver/domain/Order.java",
+      "file:src/main/java/exchangeserver/domain/Rules.java",
+      "file:src/main/java/exchangeserver/domain/OrderType.java",
+      "file:src/main/java/exchangeserver/domain/Side.java"
+    ]
+  },
+  {
+    "id": "layer:test",
+    "name": "Tests & Benchmarks",
+    "description": "JUnit test classes mirroring each main package with @Nested behaviour groups, the MutableClock test seam, and JMH matching and batching benchmarks.",
+    "nodeIds": [
+      "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+      "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+      "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+      "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+      "file:src/test/java/exchangeserver/core/ReplayTest.java",
+      "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+      "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+      "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+      "file:src/test/java/exchangeserver/gateway/ClientSessionTest.java",
+      "file:src/test/java/exchangeserver/gateway/CredentialsTest.java",
+      "file:src/test/java/exchangeserver/MainTest.java",
+      "file:src/test/java/exchangeserver/bench/BatchingBenchmark.java",
+      "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+      "file:src/test/java/exchangeserver/command/SequencerTest.java",
+      "file:src/test/java/exchangeserver/testing/MutableClock.java",
+      "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+      "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+      "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+      "file:src/test/java/exchangeserver/engine/ResponseTest.java",
+      "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+      "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+      "file:src/test/java/exchangeserver/journal/DurableTest.java",
+      "file:src/test/java/exchangeserver/client/ExchangeClientTest.java",
+      "file:src/test/java/exchangeserver/domain/OrderRequestTest.java",
+      "file:src/test/java/exchangeserver/domain/OrderTest.java",
+      "file:src/test/java/exchangeserver/domain/RulesTest.java"
+    ]
+  },
+  {
+    "id": "layer:documentation",
+    "name": "Documentation & Study Guides",
+    "description": "Vision and Spec design documents (roadmap, numbered decisions D1-D77), README and CLAUDE.md, and the understanding/ study guides with the generator that assembles FULL-CONTEXT.md.",
+    "nodeIds": [
+      "document:CLAUDE.md",
+      "document:README.md",
+      "document:docs/ExchangeServer2_Spec.md",
+      "document:docs/ExchangeServer2_Vision.md",
+      "document:docs/understanding/00-START-HERE.md",
+      "document:docs/understanding/01-big-picture.md",
+      "document:docs/understanding/02-tech-stack.md",
+      "document:docs/understanding/03-codebase-map.md",
+      "document:docs/understanding/04-running-and-tooling.md",
+      "document:docs/understanding/05-core-flows.md",
+      "document:docs/understanding/05a-core-flows-trading.md",
+      "document:docs/understanding/05b-core-flows-lifecycle.md",
+      "document:docs/understanding/06-data-and-state.md",
+      "document:docs/understanding/08-cross-cutting.md",
+      "document:docs/understanding/09-design-decisions.md",
+      "document:docs/understanding/09a-design-decisions-foundations.md",
+      "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+      "document:docs/understanding/10-testing.md",
+      "document:docs/understanding/11-risks-and-smells.md",
+      "document:docs/understanding/12-change-recipes.md",
+      "document:docs/understanding/13-glossary.md",
+      "document:docs/understanding/14-exercises.md",
+      "document:docs/understanding/15-open-questions.md",
+      "document:docs/understanding/AI-TUTOR-PROMPT.md",
+      "document:docs/understanding/07-modules/book.md",
+      "document:docs/understanding/07-modules/client-and-main.md",
+      "document:docs/understanding/07-modules/domain-and-commands.md",
+      "document:docs/understanding/07-modules/engine.md",
+      "document:docs/understanding/07-modules/exchange-and-replay.md",
+      "document:docs/understanding/07-modules/exchange-service.md",
+      "document:docs/understanding/07-modules/gateway.md",
+      "document:docs/understanding/07-modules/journal.md",
+      "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+      "file:docs/understanding/build-full-context.java"
+    ]
+  },
+  {
+    "id": "layer:config",
+    "name": "Build & Tooling",
+    "description": "Maven pom with test, mutation (PIT) and bench (JMH) profiles, the Maven wrapper scripts and properties, and git attributes that keep the journal LF-only.",
+    "nodeIds": [
+      "file:mvnw.cmd",
+      "config:pom.xml",
+      "file:.gitattributes",
+      "file:mvnw",
+      "config:.mvn/wrapper/maven-wrapper.properties"
+    ]
+  }
+]

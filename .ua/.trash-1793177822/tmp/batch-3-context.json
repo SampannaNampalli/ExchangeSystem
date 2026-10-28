@@ -1,0 +1,621 @@
+{
+  "batchIndex": 3,
+  "files": [
+    {
+      "path": "src/main/java/exchangeserver/book/OrderBook.java",
+      "language": "java",
+      "sizeLines": 272,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/main/java/exchangeserver/book/OrderNode.java",
+      "language": "java",
+      "sizeLines": 35,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/main/java/exchangeserver/book/PriceLevel.java",
+      "language": "java",
+      "sizeLines": 165,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/main/java/exchangeserver/command/CancelAllCommand.java",
+      "language": "java",
+      "sizeLines": 21,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/main/java/exchangeserver/command/CancelOrderCommand.java",
+      "language": "java",
+      "sizeLines": 24,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/main/java/exchangeserver/core/Ledger.java",
+      "language": "java",
+      "sizeLines": 74,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/main/java/exchangeserver/domain/Order.java",
+      "language": "java",
+      "sizeLines": 110,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/main/java/exchangeserver/domain/Rules.java",
+      "language": "java",
+      "sizeLines": 48,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+      "language": "java",
+      "sizeLines": 333,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+      "language": "java",
+      "sizeLines": 100,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/test/java/exchangeserver/book/OrderBookTest.java",
+      "language": "java",
+      "sizeLines": 337,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+      "language": "java",
+      "sizeLines": 865,
+      "fileCategory": "code"
+    }
+  ],
+  "batchImportData": {
+    "src/main/java/exchangeserver/book/OrderBook.java": [
+      "src/main/java/exchangeserver/domain/Order.java",
+      "src/main/java/exchangeserver/domain/Side.java"
+    ],
+    "src/main/java/exchangeserver/book/OrderNode.java": [
+      "src/main/java/exchangeserver/domain/Order.java"
+    ],
+    "src/main/java/exchangeserver/book/PriceLevel.java": [
+      "src/main/java/exchangeserver/domain/Order.java",
+      "src/main/java/exchangeserver/domain/Side.java"
+    ],
+    "src/main/java/exchangeserver/command/CancelAllCommand.java": [
+      "src/main/java/exchangeserver/domain/Rules.java"
+    ],
+    "src/main/java/exchangeserver/command/CancelOrderCommand.java": [
+      "src/main/java/exchangeserver/domain/Rules.java"
+    ],
+    "src/main/java/exchangeserver/core/Ledger.java": [
+      "src/main/java/exchangeserver/command/CancelAllCommand.java",
+      "src/main/java/exchangeserver/command/CancelOrderCommand.java",
+      "src/main/java/exchangeserver/command/Command.java",
+      "src/main/java/exchangeserver/command/NewOrderCommand.java",
+      "src/main/java/exchangeserver/engine/EngineOutput.java",
+      "src/main/java/exchangeserver/engine/MatchingEngine.java"
+    ],
+    "src/main/java/exchangeserver/domain/Order.java": [],
+    "src/main/java/exchangeserver/domain/Rules.java": [],
+    "src/main/java/exchangeserver/engine/MatchingEngine.java": [
+      "src/main/java/exchangeserver/book/CancelResult.java",
+      "src/main/java/exchangeserver/book/Fill.java",
+      "src/main/java/exchangeserver/book/LevelUpdate.java",
+      "src/main/java/exchangeserver/book/OrderBook.java",
+      "src/main/java/exchangeserver/book/PriceLevel.java",
+      "src/main/java/exchangeserver/book/RestingOrderView.java",
+      "src/main/java/exchangeserver/command/CancelAllCommand.java",
+      "src/main/java/exchangeserver/command/CancelOrderCommand.java",
+      "src/main/java/exchangeserver/command/NewOrderCommand.java",
+      "src/main/java/exchangeserver/domain/Order.java",
+      "src/main/java/exchangeserver/domain/OrderRequest.java",
+      "src/main/java/exchangeserver/domain/OrderType.java",
+      "src/main/java/exchangeserver/domain/Rules.java",
+      "src/main/java/exchangeserver/domain/Side.java"
+    ],
+    "src/test/java/exchangeserver/bench/MatchingBenchmark.java": [
+      "src/main/java/exchangeserver/book/OrderBook.java",
+      "src/main/java/exchangeserver/book/PriceLevel.java",
+      "src/main/java/exchangeserver/command/CancelOrderCommand.java",
+      "src/main/java/exchangeserver/command/NewOrderCommand.java",
+      "src/main/java/exchangeserver/domain/OrderRequest.java",
+      "src/main/java/exchangeserver/domain/Side.java",
+      "src/main/java/exchangeserver/engine/CancelOutput.java",
+      "src/main/java/exchangeserver/engine/MatchingEngine.java",
+      "src/main/java/exchangeserver/engine/OrderOutput.java"
+    ],
+    "src/test/java/exchangeserver/book/OrderBookTest.java": [
+      "src/main/java/exchangeserver/command/CancelOrderCommand.java",
+      "src/main/java/exchangeserver/command/NewOrderCommand.java",
+      "src/main/java/exchangeserver/domain/Order.java",
+      "src/main/java/exchangeserver/domain/OrderRequest.java",
+      "src/main/java/exchangeserver/domain/OrderType.java",
+      "src/main/java/exchangeserver/domain/Side.java",
+      "src/main/java/exchangeserver/engine/MatchingEngine.java",
+      "src/main/java/exchangeserver/engine/OrderOutput.java"
+    ],
+    "src/test/java/exchangeserver/engine/MatchingEngineTest.java": [
+      "src/main/java/exchangeserver/book/CancelResult.java",
+      "src/main/java/exchangeserver/book/LevelUpdate.java",
+      "src/main/java/exchangeserver/book/OrderBook.java",
+      "src/main/java/exchangeserver/command/CancelOrderCommand.java",
+      "src/main/java/exchangeserver/command/Command.java",
+      "src/main/java/exchangeserver/command/NewOrderCommand.java",
+      "src/main/java/exchangeserver/domain/OrderRequest.java",
+      "src/main/java/exchangeserver/domain/Rules.java",
+      "src/main/java/exchangeserver/domain/Side.java"
+    ]
+  },
+  "neighborMap": {
+    "src/main/java/exchangeserver/book/OrderBook.java": [
+      {
+        "path": "src/main/java/exchangeserver/domain/Side.java",
+        "batchIndex": 5,
+        "symbols": [
+          "opposite",
+          "Side"
+        ]
+      }
+    ],
+    "src/main/java/exchangeserver/book/PriceLevel.java": [
+      {
+        "path": "src/main/java/exchangeserver/domain/Side.java",
+        "batchIndex": 5,
+        "symbols": [
+          "opposite",
+          "Side"
+        ]
+      }
+    ],
+    "src/main/java/exchangeserver/command/CancelAllCommand.java": [
+      {
+        "path": "src/main/java/exchangeserver/core/Exchange.java",
+        "batchIndex": 6,
+        "symbols": [
+          "open",
+          "quarantine",
+          "compact",
+          "submit",
+          "cancel",
+          "cancelAll",
+          "snapshot",
+          "resend",
+          "lastSequenceNumber",
+          "recovery",
+          "replayedOnOpen",
+          "truncatedBytesOnOpen",
+          "quarantined",
+          "close",
+          "Exchange"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/core/OutputLog.java",
+        "batchIndex": 1,
+        "symbols": []
+      },
+      {
+        "path": "src/main/java/exchangeserver/journal/JournalCodec.java",
+        "batchIndex": 4,
+        "symbols": []
+      },
+      {
+        "path": "src/test/java/exchangeserver/core/OutputLogTest.java",
+        "batchIndex": 1,
+        "symbols": []
+      },
+      {
+        "path": "src/test/java/exchangeserver/journal/JournalCodecTest.java",
+        "batchIndex": 4,
+        "symbols": []
+      }
+    ],
+    "src/main/java/exchangeserver/command/CancelOrderCommand.java": [
+      {
+        "path": "src/main/java/exchangeserver/core/Exchange.java",
+        "batchIndex": 6,
+        "symbols": [
+          "open",
+          "quarantine",
+          "compact",
+          "submit",
+          "cancel",
+          "cancelAll",
+          "snapshot",
+          "resend",
+          "lastSequenceNumber",
+          "recovery",
+          "replayedOnOpen",
+          "truncatedBytesOnOpen",
+          "quarantined",
+          "close",
+          "Exchange"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/core/OutputLog.java",
+        "batchIndex": 1,
+        "symbols": []
+      },
+      {
+        "path": "src/main/java/exchangeserver/journal/JournalCodec.java",
+        "batchIndex": 4,
+        "symbols": []
+      },
+      {
+        "path": "src/test/java/exchangeserver/core/OutputLogTest.java",
+        "batchIndex": 1,
+        "symbols": []
+      },
+      {
+        "path": "src/test/java/exchangeserver/core/ReplayTest.java",
+        "batchIndex": 4,
+        "symbols": []
+      },
+      {
+        "path": "src/test/java/exchangeserver/journal/CommandJournalTest.java",
+        "batchIndex": 4,
+        "symbols": []
+      },
+      {
+        "path": "src/test/java/exchangeserver/journal/JournalCodecTest.java",
+        "batchIndex": 4,
+        "symbols": []
+      }
+    ],
+    "src/main/java/exchangeserver/core/Ledger.java": [
+      {
+        "path": "src/main/java/exchangeserver/command/Command.java",
+        "batchIndex": 4,
+        "symbols": [
+          "Command"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/command/NewOrderCommand.java",
+        "batchIndex": 4,
+        "symbols": [
+          "NewOrderCommand"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/engine/EngineOutput.java",
+        "batchIndex": 1,
+        "symbols": [
+          "EngineOutput"
+        ]
+      }
+    ],
+    "src/main/java/exchangeserver/domain/Order.java": [
+      {
+        "path": "src/test/java/exchangeserver/book/PriceLevelTest.java",
+        "batchIndex": 5,
+        "symbols": []
+      }
+    ],
+    "src/main/java/exchangeserver/domain/Rules.java": [
+      {
+        "path": "src/main/java/exchangeserver/core/Exchange.java",
+        "batchIndex": 6,
+        "symbols": [
+          "open",
+          "quarantine",
+          "compact",
+          "submit",
+          "cancel",
+          "cancelAll",
+          "snapshot",
+          "resend",
+          "lastSequenceNumber",
+          "recovery",
+          "replayedOnOpen",
+          "truncatedBytesOnOpen",
+          "quarantined",
+          "close",
+          "Exchange"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/gateway/ClientSession.java",
+        "batchIndex": 2,
+        "symbols": []
+      },
+      {
+        "path": "src/main/java/exchangeserver/gateway/Credentials.java",
+        "batchIndex": 6,
+        "symbols": [
+          "DEFAULT_ITERATIONS",
+          "SECRET",
+          "load",
+          "of",
+          "addUser",
+          "verify",
+          "size",
+          "Credentials"
+        ]
+      },
+      {
+        "path": "src/test/java/exchangeserver/core/ReplayTest.java",
+        "batchIndex": 4,
+        "symbols": []
+      }
+    ],
+    "src/main/java/exchangeserver/engine/MatchingEngine.java": [
+      {
+        "path": "src/main/java/exchangeserver/book/CancelResult.java",
+        "batchIndex": 1,
+        "symbols": [
+          "cancelled",
+          "unknown",
+          "CancelResult"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/book/Fill.java",
+        "batchIndex": 5,
+        "symbols": [
+          "Fill"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/book/LevelUpdate.java",
+        "batchIndex": 1,
+        "symbols": [
+          "LevelUpdate"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/book/RestingOrderView.java",
+        "batchIndex": 5,
+        "symbols": [
+          "remainingQuantity",
+          "RestingOrderView"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/command/NewOrderCommand.java",
+        "batchIndex": 4,
+        "symbols": [
+          "NewOrderCommand"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/domain/OrderRequest.java",
+        "batchIndex": 2,
+        "symbols": [
+          "of",
+          "limit",
+          "ioc",
+          "fok",
+          "postOnly",
+          "market",
+          "getParticipant",
+          "getClientOrderId",
+          "getSide",
+          "getOrderType",
+          "getQuantity",
+          "getPrice",
+          "equals",
+          "hashCode",
+          "toString",
+          "OrderRequest"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/domain/OrderType.java",
+        "batchIndex": 5,
+        "symbols": [
+          "canRest",
+          "OrderType"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/domain/Side.java",
+        "batchIndex": 5,
+        "symbols": [
+          "opposite",
+          "Side"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/core/Exchange.java",
+        "batchIndex": 6,
+        "symbols": [
+          "open",
+          "quarantine",
+          "compact",
+          "submit",
+          "cancel",
+          "cancelAll",
+          "snapshot",
+          "resend",
+          "lastSequenceNumber",
+          "recovery",
+          "replayedOnOpen",
+          "truncatedBytesOnOpen",
+          "quarantined",
+          "close",
+          "Exchange"
+        ]
+      }
+    ],
+    "src/test/java/exchangeserver/bench/MatchingBenchmark.java": [
+      {
+        "path": "src/main/java/exchangeserver/command/NewOrderCommand.java",
+        "batchIndex": 4,
+        "symbols": [
+          "NewOrderCommand"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/domain/OrderRequest.java",
+        "batchIndex": 2,
+        "symbols": [
+          "of",
+          "limit",
+          "ioc",
+          "fok",
+          "postOnly",
+          "market",
+          "getParticipant",
+          "getClientOrderId",
+          "getSide",
+          "getOrderType",
+          "getQuantity",
+          "getPrice",
+          "equals",
+          "hashCode",
+          "toString",
+          "OrderRequest"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/domain/Side.java",
+        "batchIndex": 5,
+        "symbols": [
+          "opposite",
+          "Side"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/engine/CancelOutput.java",
+        "batchIndex": 1,
+        "symbols": [
+          "trades",
+          "passiveFills",
+          "CancelOutput"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/engine/OrderOutput.java",
+        "batchIndex": 1,
+        "symbols": [
+          "trades",
+          "OrderOutput"
+        ]
+      }
+    ],
+    "src/test/java/exchangeserver/book/OrderBookTest.java": [
+      {
+        "path": "src/main/java/exchangeserver/command/NewOrderCommand.java",
+        "batchIndex": 4,
+        "symbols": [
+          "NewOrderCommand"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/domain/OrderRequest.java",
+        "batchIndex": 2,
+        "symbols": [
+          "of",
+          "limit",
+          "ioc",
+          "fok",
+          "postOnly",
+          "market",
+          "getParticipant",
+          "getClientOrderId",
+          "getSide",
+          "getOrderType",
+          "getQuantity",
+          "getPrice",
+          "equals",
+          "hashCode",
+          "toString",
+          "OrderRequest"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/domain/OrderType.java",
+        "batchIndex": 5,
+        "symbols": [
+          "canRest",
+          "OrderType"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/domain/Side.java",
+        "batchIndex": 5,
+        "symbols": [
+          "opposite",
+          "Side"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/engine/OrderOutput.java",
+        "batchIndex": 1,
+        "symbols": [
+          "trades",
+          "OrderOutput"
+        ]
+      }
+    ],
+    "src/test/java/exchangeserver/engine/MatchingEngineTest.java": [
+      {
+        "path": "src/main/java/exchangeserver/book/CancelResult.java",
+        "batchIndex": 1,
+        "symbols": [
+          "cancelled",
+          "unknown",
+          "CancelResult"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/book/LevelUpdate.java",
+        "batchIndex": 1,
+        "symbols": [
+          "LevelUpdate"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/command/Command.java",
+        "batchIndex": 4,
+        "symbols": [
+          "Command"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/command/NewOrderCommand.java",
+        "batchIndex": 4,
+        "symbols": [
+          "NewOrderCommand"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/domain/OrderRequest.java",
+        "batchIndex": 2,
+        "symbols": [
+          "of",
+          "limit",
+          "ioc",
+          "fok",
+          "postOnly",
+          "market",
+          "getParticipant",
+          "getClientOrderId",
+          "getSide",
+          "getOrderType",
+          "getQuantity",
+          "getPrice",
+          "equals",
+          "hashCode",
+          "toString",
+          "OrderRequest"
+        ]
+      },
+      {
+        "path": "src/main/java/exchangeserver/domain/Side.java",
+        "batchIndex": 5,
+        "symbols": [
+          "opposite",
+          "Side"
+        ]
+      }
+    ]
+  }
+}

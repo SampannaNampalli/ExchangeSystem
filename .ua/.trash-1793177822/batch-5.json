@@ -1,0 +1,885 @@
+{
+ "nodes": [
+  {
+   "id": "file:src/main/java/exchangeserver/book/Fill.java",
+   "type": "file",
+   "name": "Fill.java",
+   "filePath": "src/main/java/exchangeserver/book/Fill.java",
+   "summary": "Immutable record describing what OrderBook.fillBest did to one resting order, so the matching engine learns fill details without holding the live Order object from the book.",
+   "tags": [
+    "data-model",
+    "value-object",
+    "order-book",
+    "immutability"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Java 17 record: a concise immutable carrier with generated accessors, equals and hashCode."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/book/Fill.java:Fill",
+   "type": "class",
+   "name": "Fill",
+   "filePath": "src/main/java/exchangeserver/book/Fill.java",
+   "lineRange": [
+    11,
+    13
+   ],
+   "summary": "Record of a single fill against a resting order: resting order id, participant, client order id, side, price, filled quantity and leaves quantity.",
+   "tags": [
+    "data-model",
+    "record",
+    "fill",
+    "order-book"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "type": "file",
+   "name": "RestingOrderView.java",
+   "filePath": "src/main/java/exchangeserver/book/RestingOrderView.java",
+   "summary": "Immutable snapshot of one resting order used to read the book without exposing the mutable Order; serves the engine's fillability walk, cancel-all and snapshot persistence (D67, D71, D72).",
+   "tags": [
+    "data-model",
+    "value-object",
+    "order-book",
+    "read-model"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Java record with one derived accessor method; immutability preserves the package-level ownership of PriceLevel/Order mutation."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/book/RestingOrderView.java:RestingOrderView",
+   "type": "class",
+   "name": "RestingOrderView",
+   "filePath": "src/main/java/exchangeserver/book/RestingOrderView.java",
+   "lineRange": [
+    14,
+    20
+   ],
+   "summary": "Read-only view of a resting order carrying id, participant, client order id, side, type, price, quantities and timestamp.",
+   "tags": [
+    "data-model",
+    "record",
+    "read-model",
+    "order-book"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/book/RestingOrderView.java:remainingQuantity",
+   "type": "function",
+   "name": "remainingQuantity",
+   "filePath": "src/main/java/exchangeserver/book/RestingOrderView.java",
+   "lineRange": [
+    17,
+    19
+   ],
+   "summary": "Derives remaining quantity as original minus filled quantity.",
+   "tags": [
+    "accessor",
+    "derived-value",
+    "quantity"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "type": "file",
+   "name": "Snapshot.java",
+   "filePath": "src/main/java/exchangeserver/core/Snapshot.java",
+   "summary": "Persistent exchange state after a given sequence number (D71): writes and reads the checksummed '<journal>.snapshot-<seq>' file of SNAPSHOT/ORDER/OSEQ/END records so recovery can start mid-history instead of replaying from sequence 1.",
+   "tags": [
+    "persistence",
+    "serialization",
+    "recovery",
+    "snapshot",
+    "validation"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Package-private Java record with a compact canonical constructor that defensively copies collections; parsing is strict, rejecting any checksum, field-count or END-count mismatch."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/core/Snapshot.java:Snapshot",
+   "type": "class",
+   "name": "Snapshot",
+   "filePath": "src/main/java/exchangeserver/core/Snapshot.java",
+   "lineRange": [
+    41,
+    137
+   ],
+   "summary": "Record holding last sequence, last order id, last timestamp, last trade price, output digest, resting orders in book priority and per-participant output sequence numbers, with text serialization to a durable snapshot file.",
+   "tags": [
+    "snapshot",
+    "serialization",
+    "recovery",
+    "data-model"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Snapshot.java:write",
+   "type": "function",
+   "name": "write",
+   "filePath": "src/main/java/exchangeserver/core/Snapshot.java",
+   "lineRange": [
+    64,
+    77
+   ],
+   "summary": "Serializes the snapshot into checksummed lines (header, ORDER records in book priority, sorted OSEQ records, END count record) and writes them atomically via Durable.",
+   "tags": [
+    "serialization",
+    "persistence",
+    "atomic-write"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Snapshot.java:read",
+   "type": "function",
+   "name": "read",
+   "filePath": "src/main/java/exchangeserver/core/Snapshot.java",
+   "lineRange": [
+    79,
+    116
+   ],
+   "summary": "Parses and validates a snapshot file: checks existence, format version, per-line CRC, record types and field counts, digest hex, and that END counts match; wraps failures as a corrupt-snapshot IllegalStateException with the line number.",
+   "tags": [
+    "deserialization",
+    "validation",
+    "recovery",
+    "error-handling"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Snapshot.java:fields",
+   "type": "function",
+   "name": "fields",
+   "filePath": "src/main/java/exchangeserver/core/Snapshot.java",
+   "lineRange": [
+    122,
+    136
+   ],
+   "summary": "Fetches one record line, verifies its trailing CRC-32C and splits it into fields, enforcing the expected record type and field count.",
+   "tags": [
+    "parsing",
+    "checksum",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "type": "file",
+   "name": "OrderType.java",
+   "filePath": "src/main/java/exchangeserver/domain/OrderType.java",
+   "summary": "Enumeration of supported order types (LIMIT, IOC, FOK, MARKET, POST_ONLY) with documented matching semantics, and the rule for which types may rest on the book.",
+   "tags": [
+    "type-definition",
+    "enum",
+    "domain",
+    "order-type"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/domain/OrderType.java:OrderType",
+   "type": "class",
+   "name": "OrderType",
+   "filePath": "src/main/java/exchangeserver/domain/OrderType.java",
+   "lineRange": [
+    12,
+    23
+   ],
+   "summary": "Enum of the five order types; only LIMIT and POST_ONLY can rest on the book.",
+   "tags": [
+    "enum",
+    "domain",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/domain/OrderType.java:canRest",
+   "type": "function",
+   "name": "canRest",
+   "filePath": "src/main/java/exchangeserver/domain/OrderType.java",
+   "lineRange": [
+    20,
+    22
+   ],
+   "summary": "Returns true only for LIMIT and POST_ONLY, the order types that may rest on the book.",
+   "tags": [
+    "domain-rule",
+    "predicate",
+    "order-type"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "file",
+   "name": "Side.java",
+   "filePath": "src/main/java/exchangeserver/domain/Side.java",
+   "summary": "Enumeration of order sides (BUY, SELL) with an opposite() helper used throughout matching and book code.",
+   "tags": [
+    "type-definition",
+    "enum",
+    "domain",
+    "side"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/domain/Side.java:Side",
+   "type": "class",
+   "name": "Side",
+   "filePath": "src/main/java/exchangeserver/domain/Side.java",
+   "lineRange": [
+    3,
+    10
+   ],
+   "summary": "Enum for BUY and SELL order sides.",
+   "tags": [
+    "enum",
+    "domain",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/domain/Side.java:opposite",
+   "type": "function",
+   "name": "opposite",
+   "filePath": "src/main/java/exchangeserver/domain/Side.java",
+   "lineRange": [
+    7,
+    9
+   ],
+   "summary": "Returns the contra side (BUY to SELL and vice versa) used to find the book side an order matches against.",
+   "tags": [
+    "utility",
+    "domain",
+    "side"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/engine/EngineState.java",
+   "type": "file",
+   "name": "EngineState.java",
+   "filePath": "src/main/java/exchangeserver/engine/EngineState.java",
+   "summary": "Immutable record of everything the matching engine needs to continue after a snapshot (D71): last sequence number, last order id, price-band reference price, and resting orders in book priority.",
+   "tags": [
+    "data-model",
+    "value-object",
+    "snapshot",
+    "engine-state"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Compact canonical constructor validates non-negative counters and defensively copies the order list."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/engine/EngineState.java:EngineState",
+   "type": "class",
+   "name": "EngineState",
+   "filePath": "src/main/java/exchangeserver/engine/EngineState.java",
+   "lineRange": [
+    14,
+    22
+   ],
+   "summary": "Validated record of engine counters, last trade price and resting order views used to export and restore MatchingEngine state.",
+   "tags": [
+    "record",
+    "engine-state",
+    "validation",
+    "snapshot"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+   "type": "file",
+   "name": "ClientMessage.java",
+   "filePath": "src/main/java/exchangeserver/gateway/ClientMessage.java",
+   "summary": "Sealed interface of parsed client protocol messages (Login, NewOrder, Cancel, Resend, Subscribe, Unsubscribe, Ping, Quit); syntax only, the session later adds the participant and builds the OrderRequest.",
+   "tags": [
+    "type-definition",
+    "protocol",
+    "gateway",
+    "sealed-hierarchy",
+    "security"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Java 17 sealed interface with nested record implementations enables exhaustive handling; Login overrides toString so the secret never reaches logs."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/gateway/ClientMessage.java:ClientMessage",
+   "type": "class",
+   "name": "ClientMessage",
+   "filePath": "src/main/java/exchangeserver/gateway/ClientMessage.java",
+   "lineRange": [
+    9,
+    40
+   ],
+   "summary": "Package-private sealed interface whose nested records model each parsed client command; Login's toString redacts the secret.",
+   "tags": [
+    "sealed-interface",
+    "protocol",
+    "message",
+    "gateway"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/journal/Checksums.java",
+   "type": "file",
+   "name": "Checksums.java",
+   "filePath": "src/main/java/exchangeserver/journal/Checksums.java",
+   "summary": "Shared CRC-32C checksum helper (D69) used to seal every journal and snapshot record as 8 lowercase hex digits of the record's UTF-8 text.",
+   "tags": [
+    "utility",
+    "checksum",
+    "integrity",
+    "journal"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/journal/Checksums.java:Checksums",
+   "type": "class",
+   "name": "Checksums",
+   "filePath": "src/main/java/exchangeserver/journal/Checksums.java",
+   "lineRange": [
+    8,
+    18
+   ],
+   "summary": "Non-instantiable utility class providing the per-record checksum function.",
+   "tags": [
+    "utility",
+    "static-helper",
+    "checksum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/Checksums.java:crcHex",
+   "type": "function",
+   "name": "crcHex",
+   "filePath": "src/main/java/exchangeserver/journal/Checksums.java",
+   "lineRange": [
+    13,
+    17
+   ],
+   "summary": "Computes the CRC-32C of a string's UTF-8 bytes and formats it as 8 zero-padded hex digits.",
+   "tags": [
+    "checksum",
+    "crc32c",
+    "integrity"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+   "type": "file",
+   "name": "PriceLevelTest.java",
+   "filePath": "src/test/java/exchangeserver/book/PriceLevelTest.java",
+   "summary": "Unit tests for PriceLevel's intrusive doubly-linked order queue: add ordering, head fills, unlinking (including foreign and sentinel nodes) and node walking, checking forward and backward walks agree.",
+   "tags": [
+    "test",
+    "order-book",
+    "linked-list",
+    "invariants"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/book/PriceLevelTest.java:PriceLevelTest",
+   "type": "class",
+   "name": "PriceLevelTest",
+   "filePath": "src/test/java/exchangeserver/book/PriceLevelTest.java",
+   "lineRange": [
+    18,
+    256
+   ],
+   "summary": "JUnit 5 test class with @Nested groups AddOrder, FillHead and Unlink exercising PriceLevel's time-priority queue and error cases.",
+   "tags": [
+    "test",
+    "junit",
+    "order-book"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+   "type": "file",
+   "name": "SnapshotTest.java",
+   "filePath": "src/test/java/exchangeserver/core/SnapshotTest.java",
+   "summary": "Unit tests for Snapshot file round-tripping and corruption detection: changed characters, truncation, inconsistent END records, missing files and the empty starting snapshot.",
+   "tags": [
+    "test",
+    "snapshot",
+    "recovery",
+    "integrity"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/core/SnapshotTest.java:SnapshotTest",
+   "type": "class",
+   "name": "SnapshotTest",
+   "filePath": "src/test/java/exchangeserver/core/SnapshotTest.java",
+   "lineRange": [
+    22,
+    88
+   ],
+   "summary": "JUnit 5 tests using a @TempDir to write, read and tamper with snapshot files.",
+   "tags": [
+    "test",
+    "junit",
+    "snapshot"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/engine/ResponseTest.java",
+   "type": "file",
+   "name": "ResponseTest.java",
+   "filePath": "src/test/java/exchangeserver/engine/ResponseTest.java",
+   "summary": "Unit tests for Response constructor consistency checks (D22): status vs. filled/remaining quantities, reason and self-trade-prevention pairing, defensive copy of trades, and Trade field validation.",
+   "tags": [
+    "test",
+    "validation",
+    "engine",
+    "response"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/engine/ResponseTest.java:ResponseTest",
+   "type": "class",
+   "name": "ResponseTest",
+   "filePath": "src/test/java/exchangeserver/engine/ResponseTest.java",
+   "lineRange": [
+    14,
+    87
+   ],
+   "summary": "JUnit 5 test class asserting that contradictory Response field combinations throw and consistent ones are accepted.",
+   "tags": [
+    "test",
+    "junit",
+    "validation"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:src/main/java/exchangeserver/book/Fill.java",
+   "target": "class:src/main/java/exchangeserver/book/Fill.java:Fill",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/Fill.java",
+   "target": "class:src/main/java/exchangeserver/book/Fill.java:Fill",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "target": "class:src/main/java/exchangeserver/book/RestingOrderView.java:RestingOrderView",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "target": "class:src/main/java/exchangeserver/book/RestingOrderView.java:RestingOrderView",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "target": "function:src/main/java/exchangeserver/book/RestingOrderView.java:remainingQuantity",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "target": "function:src/main/java/exchangeserver/book/RestingOrderView.java:remainingQuantity",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "class:src/main/java/exchangeserver/core/Snapshot.java:Snapshot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "function:src/main/java/exchangeserver/core/Snapshot.java:write",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "function:src/main/java/exchangeserver/core/Snapshot.java:read",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "function:src/main/java/exchangeserver/core/Snapshot.java:fields",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "target": "class:src/main/java/exchangeserver/domain/OrderType.java:OrderType",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "target": "class:src/main/java/exchangeserver/domain/OrderType.java:OrderType",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "target": "function:src/main/java/exchangeserver/domain/OrderType.java:canRest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "target": "function:src/main/java/exchangeserver/domain/OrderType.java:canRest",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Side.java",
+   "target": "class:src/main/java/exchangeserver/domain/Side.java:Side",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Side.java",
+   "target": "class:src/main/java/exchangeserver/domain/Side.java:Side",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Side.java",
+   "target": "function:src/main/java/exchangeserver/domain/Side.java:opposite",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Side.java",
+   "target": "function:src/main/java/exchangeserver/domain/Side.java:opposite",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/EngineState.java",
+   "target": "class:src/main/java/exchangeserver/engine/EngineState.java:EngineState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/EngineState.java",
+   "target": "class:src/main/java/exchangeserver/engine/EngineState.java:EngineState",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+   "target": "class:src/main/java/exchangeserver/gateway/ClientMessage.java:ClientMessage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/Checksums.java",
+   "target": "class:src/main/java/exchangeserver/journal/Checksums.java:Checksums",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/Checksums.java",
+   "target": "class:src/main/java/exchangeserver/journal/Checksums.java:Checksums",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/Checksums.java",
+   "target": "function:src/main/java/exchangeserver/journal/Checksums.java:crcHex",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/Checksums.java",
+   "target": "function:src/main/java/exchangeserver/journal/Checksums.java:crcHex",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+   "target": "class:src/test/java/exchangeserver/book/PriceLevelTest.java:PriceLevelTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+   "target": "class:src/test/java/exchangeserver/core/SnapshotTest.java:SnapshotTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/ResponseTest.java",
+   "target": "class:src/test/java/exchangeserver/engine/ResponseTest.java:ResponseTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/Fill.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "file:src/main/java/exchangeserver/engine/EngineState.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "file:src/main/java/exchangeserver/journal/Checksums.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/EngineState.java",
+   "target": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Order.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+   "target": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+   "target": "file:src/main/java/exchangeserver/journal/Checksums.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/ResponseTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Snapshot.java:write",
+   "target": "function:src/main/java/exchangeserver/journal/Durable.java:writeAtomically",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Snapshot.java:fields",
+   "target": "function:src/main/java/exchangeserver/journal/Checksums.java:crcHex",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "class:src/main/java/exchangeserver/engine/EngineState.java:EngineState",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "target": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+   "target": "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/Response.java",
+   "target": "file:src/test/java/exchangeserver/engine/ResponseTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+   "target": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/ResponseTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Response.java",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/ResponseTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

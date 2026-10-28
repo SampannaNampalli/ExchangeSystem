@@ -1,0 +1,3482 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 9,
+  "filesSkipped": [],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 9,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 9,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "results": [
+    {
+      "path": "src/main/java/exchangeserver/Main.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 238,
+      "nonEmptyLines": 217,
+      "functions": [
+        {
+          "name": "Main",
+          "startLine": 45,
+          "endLine": 46,
+          "params": []
+        },
+        {
+          "name": "main",
+          "startLine": 66,
+          "endLine": 118,
+          "params": [
+            "args"
+          ]
+        },
+        {
+          "name": "serve",
+          "startLine": 120,
+          "endLine": 184,
+          "params": [
+            "o"
+          ]
+        },
+        {
+          "name": "hint",
+          "startLine": 187,
+          "endLine": 198,
+          "params": [
+            "e"
+          ]
+        },
+        {
+          "name": "tool",
+          "startLine": 204,
+          "endLine": 210,
+          "params": [
+            "tool",
+            "what"
+          ]
+        },
+        {
+          "name": "readSecret",
+          "startLine": 212,
+          "endLine": 232,
+          "params": [
+            "participant"
+          ]
+        },
+        {
+          "name": "fail",
+          "startLine": 234,
+          "endLine": 237,
+          "params": [
+            "message"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Main",
+          "startLine": 43,
+          "endLine": 238,
+          "methods": [
+            "Main",
+            "main",
+            "serve",
+            "hint",
+            "tool",
+            "readSecret",
+            "fail"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 66,
+          "isDefault": false
+        },
+        {
+          "name": "Main",
+          "line": 43,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "main",
+          "callee": "new Options",
+          "lineNumber": 67
+        },
+        {
+          "caller": "main",
+          "callee": "Integer.parseInt",
+          "lineNumber": 71
+        },
+        {
+          "caller": "main",
+          "callee": "InetAddress.getByName",
+          "lineNumber": 72
+        },
+        {
+          "caller": "main",
+          "callee": "Path.of",
+          "lineNumber": 73
+        },
+        {
+          "caller": "main",
+          "callee": "Path.of",
+          "lineNumber": 74
+        },
+        {
+          "caller": "main",
+          "callee": "Path.of",
+          "lineNumber": 75
+        },
+        {
+          "caller": "main",
+          "callee": "Long.parseLong",
+          "lineNumber": 77
+        },
+        {
+          "caller": "main",
+          "callee": "Integer.parseInt",
+          "lineNumber": 79
+        },
+        {
+          "caller": "main",
+          "callee": "Integer.parseInt",
+          "lineNumber": 80
+        },
+        {
+          "caller": "main",
+          "callee": "Integer.parseInt",
+          "lineNumber": 81
+        },
+        {
+          "caller": "main",
+          "callee": "Integer.parseInt",
+          "lineNumber": 82
+        },
+        {
+          "caller": "main",
+          "callee": "Integer.parseInt",
+          "lineNumber": 83
+        },
+        {
+          "caller": "main",
+          "callee": "Integer.parseInt",
+          "lineNumber": 84
+        },
+        {
+          "caller": "main",
+          "callee": "Integer.parseInt",
+          "lineNumber": 85
+        },
+        {
+          "caller": "main",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 86
+        },
+        {
+          "caller": "main",
+          "callee": "fail",
+          "lineNumber": 90
+        },
+        {
+          "caller": "main",
+          "callee": "e.getMessage",
+          "lineNumber": 90
+        },
+        {
+          "caller": "main",
+          "callee": "tool",
+          "lineNumber": 95
+        },
+        {
+          "caller": "main",
+          "callee": "Credentials.addUser",
+          "lineNumber": 96
+        },
+        {
+          "caller": "main",
+          "callee": "readSecret",
+          "lineNumber": 96
+        },
+        {
+          "caller": "main",
+          "callee": "System.out.println",
+          "lineNumber": 97
+        },
+        {
+          "caller": "main",
+          "callee": "o.users.toAbsolutePath",
+          "lineNumber": 97
+        },
+        {
+          "caller": "main",
+          "callee": "tool",
+          "lineNumber": 102
+        },
+        {
+          "caller": "main",
+          "callee": "Exchange.quarantine",
+          "lineNumber": 103
+        },
+        {
+          "caller": "main",
+          "callee": "Clock.systemUTC",
+          "lineNumber": 103
+        },
+        {
+          "caller": "main",
+          "callee": "System.out.println",
+          "lineNumber": 104
+        },
+        {
+          "caller": "main",
+          "callee": "o.journal.toAbsolutePath",
+          "lineNumber": 104
+        },
+        {
+          "caller": "main",
+          "callee": "tool",
+          "lineNumber": 109
+        },
+        {
+          "caller": "main",
+          "callee": "Exchange.compact",
+          "lineNumber": 110
+        },
+        {
+          "caller": "main",
+          "callee": "System.out.println",
+          "lineNumber": 111
+        },
+        {
+          "caller": "main",
+          "callee": "c.lastSequence",
+          "lineNumber": 112
+        },
+        {
+          "caller": "main",
+          "callee": "c.restingOrders",
+          "lineNumber": 112
+        },
+        {
+          "caller": "main",
+          "callee": "c.snapshot",
+          "lineNumber": 113
+        },
+        {
+          "caller": "main",
+          "callee": "c.archive",
+          "lineNumber": 113
+        },
+        {
+          "caller": "main",
+          "callee": "serve",
+          "lineNumber": 117
+        },
+        {
+          "caller": "serve",
+          "callee": "Credentials.load",
+          "lineNumber": 124
+        },
+        {
+          "caller": "serve",
+          "callee": "Tls.serverContext",
+          "lineNumber": 126
+        },
+        {
+          "caller": "serve",
+          "callee": "Tls.passwordFromEnvironment",
+          "lineNumber": 126
+        },
+        {
+          "caller": "serve",
+          "callee": "o.bind.isLoopbackAddress",
+          "lineNumber": 127
+        },
+        {
+          "caller": "serve",
+          "callee": "System.err.println",
+          "lineNumber": 128
+        },
+        {
+          "caller": "serve",
+          "callee": "o.bind.getHostAddress",
+          "lineNumber": 128
+        },
+        {
+          "caller": "serve",
+          "callee": "new TcpGateway",
+          "lineNumber": 130
+        },
+        {
+          "caller": "serve",
+          "callee": "TcpGateway.Settings.defaults(o.port, credentials)\r\n                    .withBindAddress(o.bind)\r\n                    .withTls(tls)\r\n                    .withTimeouts(Duration.ofSeconds(o.loginTimeout), Duration.ofSeconds(o.idleTimeout)).withFlowControl",
+          "lineNumber": 130
+        },
+        {
+          "caller": "serve",
+          "callee": "TcpGateway.Settings.defaults(o.port, credentials)\r\n                    .withBindAddress(o.bind)\r\n                    .withTls(tls).withTimeouts",
+          "lineNumber": 130
+        },
+        {
+          "caller": "serve",
+          "callee": "TcpGateway.Settings.defaults(o.port, credentials)\r\n                    .withBindAddress(o.bind).withTls",
+          "lineNumber": 130
+        },
+        {
+          "caller": "serve",
+          "callee": "TcpGateway.Settings.defaults(o.port, credentials).withBindAddress",
+          "lineNumber": 130
+        },
+        {
+          "caller": "serve",
+          "callee": "TcpGateway.Settings.defaults",
+          "lineNumber": 130
+        },
+        {
+          "caller": "serve",
+          "callee": "Duration.ofSeconds",
+          "lineNumber": 133
+        },
+        {
+          "caller": "serve",
+          "callee": "Duration.ofSeconds",
+          "lineNumber": 133
+        },
+        {
+          "caller": "serve",
+          "callee": "fail",
+          "lineNumber": 136
+        },
+        {
+          "caller": "serve",
+          "callee": "e.getMessage",
+          "lineNumber": 136
+        },
+        {
+          "caller": "serve",
+          "callee": "gateway.startAccepting",
+          "lineNumber": 139
+        },
+        {
+          "caller": "serve",
+          "callee": "ExchangeService.start",
+          "lineNumber": 141
+        },
+        {
+          "caller": "serve",
+          "callee": "ExchangeService.Settings.defaults().withExchangeOptions",
+          "lineNumber": 141
+        },
+        {
+          "caller": "serve",
+          "callee": "ExchangeService.Settings.defaults",
+          "lineNumber": 141
+        },
+        {
+          "caller": "serve",
+          "callee": "new Exchange.Options",
+          "lineNumber": 142
+        },
+        {
+          "caller": "serve",
+          "callee": "gateway.close",
+          "lineNumber": 144
+        },
+        {
+          "caller": "serve",
+          "callee": "System.err.println",
+          "lineNumber": 145
+        },
+        {
+          "caller": "serve",
+          "callee": "e.getMessage",
+          "lineNumber": 145
+        },
+        {
+          "caller": "serve",
+          "callee": "System.err.println",
+          "lineNumber": 146
+        },
+        {
+          "caller": "serve",
+          "callee": "hint",
+          "lineNumber": 146
+        },
+        {
+          "caller": "serve",
+          "callee": "System.exit",
+          "lineNumber": 147
+        },
+        {
+          "caller": "serve",
+          "callee": "gateway.attach",
+          "lineNumber": 150
+        },
+        {
+          "caller": "serve",
+          "callee": "service.recovery",
+          "lineNumber": 151
+        },
+        {
+          "caller": "serve",
+          "callee": "System.out.println",
+          "lineNumber": 152
+        },
+        {
+          "caller": "serve",
+          "callee": "o.bind.getHostAddress",
+          "lineNumber": 152
+        },
+        {
+          "caller": "serve",
+          "callee": "gateway.port",
+          "lineNumber": 152
+        },
+        {
+          "caller": "serve",
+          "callee": "o.journal.toAbsolutePath",
+          "lineNumber": 153
+        },
+        {
+          "caller": "serve",
+          "callee": "System.out.println",
+          "lineNumber": 154
+        },
+        {
+          "caller": "serve",
+          "callee": "r.lastSequence",
+          "lineNumber": 154
+        },
+        {
+          "caller": "serve",
+          "callee": "r.baseSequence",
+          "lineNumber": 154
+        },
+        {
+          "caller": "serve",
+          "callee": "r.baseSequence",
+          "lineNumber": 154
+        },
+        {
+          "caller": "serve",
+          "callee": "r.replayed",
+          "lineNumber": 155
+        },
+        {
+          "caller": "serve",
+          "callee": "r.truncatedBytes",
+          "lineNumber": 155
+        },
+        {
+          "caller": "serve",
+          "callee": "r.quarantined().isEmpty",
+          "lineNumber": 156
+        },
+        {
+          "caller": "serve",
+          "callee": "r.quarantined",
+          "lineNumber": 156
+        },
+        {
+          "caller": "serve",
+          "callee": "r.quarantined",
+          "lineNumber": 156
+        },
+        {
+          "caller": "serve",
+          "callee": "r.adoptedRulesFrom",
+          "lineNumber": 157
+        },
+        {
+          "caller": "serve",
+          "callee": "r.adoptedRulesFrom",
+          "lineNumber": 157
+        },
+        {
+          "caller": "serve",
+          "callee": "Runtime.getRuntime().addShutdownHook",
+          "lineNumber": 159
+        },
+        {
+          "caller": "serve",
+          "callee": "Runtime.getRuntime",
+          "lineNumber": 159
+        },
+        {
+          "caller": "serve",
+          "callee": "new Thread",
+          "lineNumber": 159
+        },
+        {
+          "caller": "serve",
+          "callee": "gateway.close",
+          "lineNumber": 162
+        },
+        {
+          "caller": "serve",
+          "callee": "service.stop",
+          "lineNumber": 163
+        },
+        {
+          "caller": "serve",
+          "callee": "Duration.ofSeconds",
+          "lineNumber": 163
+        },
+        {
+          "caller": "serve",
+          "callee": "System.err.println",
+          "lineNumber": 164
+        },
+        {
+          "caller": "serve",
+          "callee": "System.err.println",
+          "lineNumber": 168
+        },
+        {
+          "caller": "serve",
+          "callee": "service.state",
+          "lineNumber": 171
+        },
+        {
+          "caller": "serve",
+          "callee": "System.out.flush",
+          "lineNumber": 174
+        },
+        {
+          "caller": "serve",
+          "callee": "System.err.flush",
+          "lineNumber": 175
+        },
+        {
+          "caller": "serve",
+          "callee": "Runtime.getRuntime().halt",
+          "lineNumber": 176
+        },
+        {
+          "caller": "serve",
+          "callee": "Runtime.getRuntime",
+          "lineNumber": 176
+        },
+        {
+          "caller": "serve",
+          "callee": "service.awaitTermination",
+          "lineNumber": 179
+        },
+        {
+          "caller": "serve",
+          "callee": "service.state",
+          "lineNumber": 180
+        },
+        {
+          "caller": "serve",
+          "callee": "System.err.println",
+          "lineNumber": 181
+        },
+        {
+          "caller": "serve",
+          "callee": "service.haltCause",
+          "lineNumber": 181
+        },
+        {
+          "caller": "serve",
+          "callee": "System.exit",
+          "lineNumber": 182
+        },
+        {
+          "caller": "hint",
+          "callee": "t.getCause",
+          "lineNumber": 188
+        },
+        {
+          "caller": "hint",
+          "callee": "r.kind",
+          "lineNumber": 190
+        },
+        {
+          "caller": "hint",
+          "callee": "r.sequenceNumber",
+          "lineNumber": 191
+        },
+        {
+          "caller": "hint",
+          "callee": "r.sequenceNumber",
+          "lineNumber": 192
+        },
+        {
+          "caller": "tool",
+          "callee": "tool.run",
+          "lineNumber": 206
+        },
+        {
+          "caller": "tool",
+          "callee": "fail",
+          "lineNumber": 208
+        },
+        {
+          "caller": "tool",
+          "callee": "e.getMessage",
+          "lineNumber": 208
+        },
+        {
+          "caller": "readSecret",
+          "callee": "System.console",
+          "lineNumber": 213
+        },
+        {
+          "caller": "readSecret",
+          "callee": "console.readPassword",
+          "lineNumber": 215
+        },
+        {
+          "caller": "readSecret",
+          "callee": "console.readPassword",
+          "lineNumber": 216
+        },
+        {
+          "caller": "readSecret",
+          "callee": "Arrays.equals",
+          "lineNumber": 217
+        },
+        {
+          "caller": "readSecret",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 218
+        },
+        {
+          "caller": "readSecret",
+          "callee": "new String",
+          "lineNumber": 220
+        },
+        {
+          "caller": "readSecret",
+          "callee": "new BufferedReader(new InputStreamReader(System.in, UTF_8)).readLine",
+          "lineNumber": 224
+        },
+        {
+          "caller": "readSecret",
+          "callee": "new BufferedReader",
+          "lineNumber": 224
+        },
+        {
+          "caller": "readSecret",
+          "callee": "new InputStreamReader",
+          "lineNumber": 224
+        },
+        {
+          "caller": "readSecret",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 226
+        },
+        {
+          "caller": "readSecret",
+          "callee": "line.isEmpty",
+          "lineNumber": 228
+        },
+        {
+          "caller": "readSecret",
+          "callee": "line.charAt",
+          "lineNumber": 228
+        },
+        {
+          "caller": "readSecret",
+          "callee": "line.substring",
+          "lineNumber": 229
+        },
+        {
+          "caller": "readSecret",
+          "callee": "line.strip",
+          "lineNumber": 231
+        },
+        {
+          "caller": "fail",
+          "callee": "System.err.println",
+          "lineNumber": 235
+        },
+        {
+          "caller": "fail",
+          "callee": "System.exit",
+          "lineNumber": 236
+        }
+      ],
+      "metrics": {
+        "importCount": 6,
+        "exportCount": 2,
+        "functionCount": 7,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/client/ClientMain.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 78,
+      "nonEmptyLines": 66,
+      "functions": [
+        {
+          "name": "ClientMain",
+          "startLine": 24,
+          "endLine": 25,
+          "params": []
+        },
+        {
+          "name": "main",
+          "startLine": 27,
+          "endLine": 77,
+          "params": [
+            "args"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "ClientMain",
+          "startLine": 22,
+          "endLine": 78,
+          "methods": [
+            "ClientMain",
+            "main"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 27,
+          "isDefault": false
+        },
+        {
+          "name": "ClientMain",
+          "line": 22,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "main",
+          "callee": "Path.of",
+          "lineNumber": 36
+        },
+        {
+          "caller": "main",
+          "callee": "Integer.parseInt",
+          "lineNumber": 41
+        },
+        {
+          "caller": "main",
+          "callee": "SocketFactory.getDefault",
+          "lineNumber": 46
+        },
+        {
+          "caller": "main",
+          "callee": "Tls.clientContext(truststore, truststore == null ? null : Tls.passwordFromEnvironment(\"ES2_TRUSTSTORE_PASSWORD\")).getSocketFactory",
+          "lineNumber": 47
+        },
+        {
+          "caller": "main",
+          "callee": "Tls.clientContext",
+          "lineNumber": 47
+        },
+        {
+          "caller": "main",
+          "callee": "Tls.passwordFromEnvironment",
+          "lineNumber": 47
+        },
+        {
+          "caller": "main",
+          "callee": "new ExchangeClient",
+          "lineNumber": 50
+        },
+        {
+          "caller": "main",
+          "callee": "new Thread",
+          "lineNumber": 51
+        },
+        {
+          "caller": "main",
+          "callee": "client.nextLine",
+          "lineNumber": 54
+        },
+        {
+          "caller": "main",
+          "callee": "System.out.println",
+          "lineNumber": 55
+        },
+        {
+          "caller": "main",
+          "callee": "System.out.println",
+          "lineNumber": 57
+        },
+        {
+          "caller": "main",
+          "callee": "printer.setDaemon",
+          "lineNumber": 62
+        },
+        {
+          "caller": "main",
+          "callee": "printer.start",
+          "lineNumber": 63
+        },
+        {
+          "caller": "main",
+          "callee": "System.out.println",
+          "lineNumber": 65
+        },
+        {
+          "caller": "main",
+          "callee": "new BufferedReader",
+          "lineNumber": 67
+        },
+        {
+          "caller": "main",
+          "callee": "new InputStreamReader",
+          "lineNumber": 67
+        },
+        {
+          "caller": "main",
+          "callee": "stdin.readLine",
+          "lineNumber": 69
+        },
+        {
+          "caller": "main",
+          "callee": "client.send",
+          "lineNumber": 70
+        },
+        {
+          "caller": "main",
+          "callee": "line.strip",
+          "lineNumber": 70
+        },
+        {
+          "caller": "main",
+          "callee": "line.strip().equals",
+          "lineNumber": 71
+        },
+        {
+          "caller": "main",
+          "callee": "line.strip",
+          "lineNumber": 71
+        },
+        {
+          "caller": "main",
+          "callee": "printer.join",
+          "lineNumber": 72
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/command/Sequencer.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 94,
+      "nonEmptyLines": 75,
+      "functions": [
+        {
+          "name": "Sequencer",
+          "startLine": 27,
+          "endLine": 29,
+          "params": [
+            "clock"
+          ]
+        },
+        {
+          "name": "Sequencer",
+          "startLine": 31,
+          "endLine": 36,
+          "params": [
+            "clock",
+            "nextSequenceNumber",
+            "nextOrderId",
+            "previousTimestamp"
+          ]
+        },
+        {
+          "name": "resume",
+          "startLine": 40,
+          "endLine": 46,
+          "params": [
+            "clock",
+            "lastSequenceNumber",
+            "lastOrderId",
+            "lastTimestamp"
+          ]
+        },
+        {
+          "name": "stampNewOrder",
+          "startLine": 48,
+          "endLine": 52,
+          "params": [
+            "request"
+          ]
+        },
+        {
+          "name": "stampCancel",
+          "startLine": 54,
+          "endLine": 58,
+          "params": [
+            "participant",
+            "orderId"
+          ]
+        },
+        {
+          "name": "stampCancelAll",
+          "startLine": 60,
+          "endLine": 64,
+          "params": [
+            "participant"
+          ]
+        },
+        {
+          "name": "stampCheck",
+          "startLine": 66,
+          "endLine": 70,
+          "params": [
+            "digest"
+          ]
+        },
+        {
+          "name": "stampSkip",
+          "startLine": 72,
+          "endLine": 76,
+          "params": [
+            "skippedSequenceNumber"
+          ]
+        },
+        {
+          "name": "nextSequenceNumber",
+          "startLine": 78,
+          "endLine": 80,
+          "params": []
+        },
+        {
+          "name": "nextOrderId",
+          "startLine": 82,
+          "endLine": 84,
+          "params": []
+        },
+        {
+          "name": "nextTimestamp",
+          "startLine": 86,
+          "endLine": 93,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "Sequencer",
+          "startLine": 20,
+          "endLine": 94,
+          "methods": [
+            "Sequencer",
+            "Sequencer",
+            "resume",
+            "stampNewOrder",
+            "stampCancel",
+            "stampCancelAll",
+            "stampCheck",
+            "stampSkip",
+            "nextSequenceNumber",
+            "nextOrderId",
+            "nextTimestamp"
+          ],
+          "properties": [
+            "clock",
+            "nextSequenceNumber",
+            "nextOrderId",
+            "previousTimestamp"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "Sequencer",
+          "line": 27,
+          "isDefault": false
+        },
+        {
+          "name": "resume",
+          "line": 40,
+          "isDefault": false
+        },
+        {
+          "name": "stampNewOrder",
+          "line": 48,
+          "isDefault": false
+        },
+        {
+          "name": "stampCancel",
+          "line": 54,
+          "isDefault": false
+        },
+        {
+          "name": "stampCancelAll",
+          "line": 60,
+          "isDefault": false
+        },
+        {
+          "name": "stampCheck",
+          "line": 66,
+          "isDefault": false
+        },
+        {
+          "name": "stampSkip",
+          "line": 72,
+          "isDefault": false
+        },
+        {
+          "name": "nextSequenceNumber",
+          "line": 78,
+          "isDefault": false
+        },
+        {
+          "name": "nextOrderId",
+          "line": 82,
+          "isDefault": false
+        },
+        {
+          "name": "Sequencer",
+          "line": 20,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Sequencer",
+          "callee": "Objects.requireNonNull",
+          "lineNumber": 32
+        },
+        {
+          "caller": "Sequencer",
+          "callee": "Objects.requireNonNull",
+          "lineNumber": 35
+        },
+        {
+          "caller": "resume",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 42
+        },
+        {
+          "caller": "resume",
+          "callee": "new Sequencer",
+          "lineNumber": 44
+        },
+        {
+          "caller": "stampNewOrder",
+          "callee": "Objects.requireNonNull",
+          "lineNumber": 49
+        },
+        {
+          "caller": "stampNewOrder",
+          "callee": "nextTimestamp",
+          "lineNumber": 50
+        },
+        {
+          "caller": "stampNewOrder",
+          "callee": "new NewOrderCommand",
+          "lineNumber": 51
+        },
+        {
+          "caller": "stampCancel",
+          "callee": "new CancelOrderCommand",
+          "lineNumber": 55
+        },
+        {
+          "caller": "stampCancel",
+          "callee": "nextTimestamp",
+          "lineNumber": 55
+        },
+        {
+          "caller": "stampCancelAll",
+          "callee": "new CancelAllCommand",
+          "lineNumber": 61
+        },
+        {
+          "caller": "stampCancelAll",
+          "callee": "nextTimestamp",
+          "lineNumber": 61
+        },
+        {
+          "caller": "stampCheck",
+          "callee": "new CheckCommand",
+          "lineNumber": 67
+        },
+        {
+          "caller": "stampCheck",
+          "callee": "nextTimestamp",
+          "lineNumber": 67
+        },
+        {
+          "caller": "stampSkip",
+          "callee": "new SkipCommand",
+          "lineNumber": 73
+        },
+        {
+          "caller": "stampSkip",
+          "callee": "nextTimestamp",
+          "lineNumber": 73
+        },
+        {
+          "caller": "nextTimestamp",
+          "callee": "clock.instant",
+          "lineNumber": 87
+        },
+        {
+          "caller": "nextTimestamp",
+          "callee": "now.isBefore",
+          "lineNumber": 88
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 10,
+        "functionCount": 11,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/core/Exchange.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 359,
+      "nonEmptyLines": 313,
+      "functions": [
+        {
+          "name": "Exchange",
+          "startLine": 96,
+          "endLine": 106,
+          "params": [
+            "journal",
+            "journalFile",
+            "sequencer",
+            "ledger",
+            "skipped",
+            "recovery",
+            "interceptor",
+            "options"
+          ]
+        },
+        {
+          "name": "open",
+          "startLine": 108,
+          "endLine": 110,
+          "params": [
+            "journalFile",
+            "clock"
+          ]
+        },
+        {
+          "name": "open",
+          "startLine": 112,
+          "endLine": 114,
+          "params": [
+            "journalFile",
+            "clock",
+            "interceptor"
+          ]
+        },
+        {
+          "name": "open",
+          "startLine": 116,
+          "endLine": 137,
+          "params": [
+            "journalFile",
+            "clock",
+            "interceptor",
+            "options"
+          ]
+        },
+        {
+          "name": "quarantine",
+          "startLine": 141,
+          "endLine": 166,
+          "params": [
+            "journalFile",
+            "sequenceNumber",
+            "clock"
+          ]
+        },
+        {
+          "name": "compact",
+          "startLine": 174,
+          "endLine": 194,
+          "params": [
+            "journalFile"
+          ]
+        },
+        {
+          "name": "process",
+          "startLine": 198,
+          "endLine": 253,
+          "params": [
+            "batch",
+            "listener"
+          ]
+        },
+        {
+          "name": "read",
+          "startLine": 255,
+          "endLine": 266,
+          "params": [
+            "request"
+          ]
+        },
+        {
+          "name": "result",
+          "startLine": 268,
+          "endLine": 276,
+          "params": [
+            "output"
+          ]
+        },
+        {
+          "name": "quarantine",
+          "startLine": 278,
+          "endLine": 287,
+          "params": [
+            "poison",
+            "cause"
+          ]
+        },
+        {
+          "name": "submit",
+          "startLine": 291,
+          "endLine": 293,
+          "params": [
+            "request"
+          ]
+        },
+        {
+          "name": "cancel",
+          "startLine": 295,
+          "endLine": 297,
+          "params": [
+            "participant",
+            "orderId"
+          ]
+        },
+        {
+          "name": "cancelAll",
+          "startLine": 299,
+          "endLine": 301,
+          "params": [
+            "participant"
+          ]
+        },
+        {
+          "name": "snapshot",
+          "startLine": 303,
+          "endLine": 305,
+          "params": [
+            "depth"
+          ]
+        },
+        {
+          "name": "resend",
+          "startLine": 307,
+          "endLine": 309,
+          "params": [
+            "participant",
+            "fromOseq"
+          ]
+        },
+        {
+          "name": "runOne",
+          "startLine": 311,
+          "endLine": 322,
+          "params": [
+            "request"
+          ]
+        },
+        {
+          "name": "lastSequenceNumber",
+          "startLine": 326,
+          "endLine": 328,
+          "params": []
+        },
+        {
+          "name": "recovery",
+          "startLine": 330,
+          "endLine": 332,
+          "params": []
+        },
+        {
+          "name": "replayedOnOpen",
+          "startLine": 334,
+          "endLine": 336,
+          "params": []
+        },
+        {
+          "name": "truncatedBytesOnOpen",
+          "startLine": 338,
+          "endLine": 340,
+          "params": []
+        },
+        {
+          "name": "quarantined",
+          "startLine": 342,
+          "endLine": 344,
+          "params": []
+        },
+        {
+          "name": "engine",
+          "startLine": 347,
+          "endLine": 349,
+          "params": []
+        },
+        {
+          "name": "digest",
+          "startLine": 351,
+          "endLine": 353,
+          "params": []
+        },
+        {
+          "name": "close",
+          "startLine": 355,
+          "endLine": 358,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "Exchange",
+          "startLine": 58,
+          "endLine": 359,
+          "methods": [
+            "Exchange",
+            "open",
+            "open",
+            "open",
+            "quarantine",
+            "compact",
+            "process",
+            "read",
+            "result",
+            "quarantine",
+            "submit",
+            "cancel",
+            "cancelAll",
+            "snapshot",
+            "resend",
+            "runOne",
+            "lastSequenceNumber",
+            "recovery",
+            "replayedOnOpen",
+            "truncatedBytesOnOpen",
+            "quarantined",
+            "engine",
+            "digest",
+            "close"
+          ],
+          "properties": [
+            "LOG",
+            "journal",
+            "journalFile",
+            "sequencer",
+            "interceptor",
+            "options",
+            "skipped",
+            "recovery",
+            "ledger",
+            "commandsSinceCheck"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "open",
+          "line": 108,
+          "isDefault": false
+        },
+        {
+          "name": "quarantine",
+          "line": 141,
+          "isDefault": false
+        },
+        {
+          "name": "compact",
+          "line": 174,
+          "isDefault": false
+        },
+        {
+          "name": "submit",
+          "line": 291,
+          "isDefault": false
+        },
+        {
+          "name": "cancel",
+          "line": 295,
+          "isDefault": false
+        },
+        {
+          "name": "cancelAll",
+          "line": 299,
+          "isDefault": false
+        },
+        {
+          "name": "snapshot",
+          "line": 303,
+          "isDefault": false
+        },
+        {
+          "name": "resend",
+          "line": 307,
+          "isDefault": false
+        },
+        {
+          "name": "lastSequenceNumber",
+          "line": 326,
+          "isDefault": false
+        },
+        {
+          "name": "recovery",
+          "line": 330,
+          "isDefault": false
+        },
+        {
+          "name": "replayedOnOpen",
+          "line": 334,
+          "isDefault": false
+        },
+        {
+          "name": "truncatedBytesOnOpen",
+          "line": 338,
+          "isDefault": false
+        },
+        {
+          "name": "quarantined",
+          "line": 342,
+          "isDefault": false
+        },
+        {
+          "name": "close",
+          "line": 355,
+          "isDefault": false
+        },
+        {
+          "name": "Exchange",
+          "line": 58,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "defaults",
+          "callee": "new Options",
+          "lineNumber": 73
+        },
+        {
+          "caller": "open",
+          "callee": "open",
+          "lineNumber": 109
+        },
+        {
+          "caller": "open",
+          "callee": "Options.defaults",
+          "lineNumber": 109
+        },
+        {
+          "caller": "open",
+          "callee": "open",
+          "lineNumber": 113
+        },
+        {
+          "caller": "open",
+          "callee": "Options.defaults",
+          "lineNumber": 113
+        },
+        {
+          "caller": "open",
+          "callee": "Objects.requireNonNull",
+          "lineNumber": 117
+        },
+        {
+          "caller": "open",
+          "callee": "Objects.requireNonNull",
+          "lineNumber": 118
+        },
+        {
+          "caller": "open",
+          "callee": "CommandJournal.open",
+          "lineNumber": 119
+        },
+        {
+          "caller": "open",
+          "callee": "Replay.run",
+          "lineNumber": 121
+        },
+        {
+          "caller": "open",
+          "callee": "options.outputRetention",
+          "lineNumber": 121
+        },
+        {
+          "caller": "open",
+          "callee": "Sequencer.resume",
+          "lineNumber": 122
+        },
+        {
+          "caller": "open",
+          "callee": "replay.lastSequenceNumber",
+          "lineNumber": 122
+        },
+        {
+          "caller": "open",
+          "callee": "replay.lastOrderId",
+          "lineNumber": 122
+        },
+        {
+          "caller": "open",
+          "callee": "replay.lastTimestamp",
+          "lineNumber": 123
+        },
+        {
+          "caller": "open",
+          "callee": "new Recovery",
+          "lineNumber": 124
+        },
+        {
+          "caller": "open",
+          "callee": "replay.baseSequence",
+          "lineNumber": 124
+        },
+        {
+          "caller": "open",
+          "callee": "replay.lastSequenceNumber",
+          "lineNumber": 124
+        },
+        {
+          "caller": "open",
+          "callee": "replay.fed",
+          "lineNumber": 124
+        },
+        {
+          "caller": "open",
+          "callee": "journal.getTruncatedBytesOnOpen",
+          "lineNumber": 125
+        },
+        {
+          "caller": "open",
+          "callee": "replay.skipped",
+          "lineNumber": 125
+        },
+        {
+          "caller": "open",
+          "callee": "journal.adoptedRulesFrom",
+          "lineNumber": 125
+        },
+        {
+          "caller": "open",
+          "callee": "new Exchange",
+          "lineNumber": 126
+        },
+        {
+          "caller": "open",
+          "callee": "replay.ledger",
+          "lineNumber": 126
+        },
+        {
+          "caller": "open",
+          "callee": "new HashSet<>",
+          "lineNumber": 126
+        },
+        {
+          "caller": "open",
+          "callee": "replay.skipped",
+          "lineNumber": 126
+        },
+        {
+          "caller": "open",
+          "callee": "journal.close",
+          "lineNumber": 131
+        },
+        {
+          "caller": "open",
+          "callee": "e.addSuppressed",
+          "lineNumber": 133
+        },
+        {
+          "caller": "quarantine",
+          "callee": "CommandJournal.open",
+          "lineNumber": 142
+        },
+        {
+          "caller": "quarantine",
+          "callee": "journal.baseSequence",
+          "lineNumber": 143
+        },
+        {
+          "caller": "quarantine",
+          "callee": "new HashSet<>",
+          "lineNumber": 146
+        },
+        {
+          "caller": "quarantine",
+          "callee": "journal.read",
+          "lineNumber": 147
+        },
+        {
+          "caller": "quarantine",
+          "callee": "c.sequenceNumber",
+          "lineNumber": 148
+        },
+        {
+          "caller": "quarantine",
+          "callee": "c.timestamp",
+          "lineNumber": 149
+        },
+        {
+          "caller": "quarantine",
+          "callee": "c.sequenceNumber",
+          "lineNumber": 150
+        },
+        {
+          "caller": "quarantine",
+          "callee": "alreadySkipped.add",
+          "lineNumber": 154
+        },
+        {
+          "caller": "quarantine",
+          "callee": "s.skippedSequenceNumber",
+          "lineNumber": 154
+        },
+        {
+          "caller": "quarantine",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 158
+        },
+        {
+          "caller": "quarantine",
+          "callee": "alreadySkipped.contains",
+          "lineNumber": 160
+        },
+        {
+          "caller": "quarantine",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 161
+        },
+        {
+          "caller": "quarantine",
+          "callee": "Sequencer.resume",
+          "lineNumber": 163
+        },
+        {
+          "caller": "quarantine",
+          "callee": "journal.append",
+          "lineNumber": 164
+        },
+        {
+          "caller": "quarantine",
+          "callee": "sequencer.stampSkip",
+          "lineNumber": 164
+        },
+        {
+          "caller": "compact",
+          "callee": "JournalLock.acquire",
+          "lineNumber": 175
+        },
+        {
+          "caller": "compact",
+          "callee": "CommandJournal.open",
+          "lineNumber": 177
+        },
+        {
+          "caller": "compact",
+          "callee": "Replay.run",
+          "lineNumber": 178
+        },
+        {
+          "caller": "compact",
+          "callee": "Options.defaults().outputRetention",
+          "lineNumber": 179
+        },
+        {
+          "caller": "compact",
+          "callee": "Options.defaults",
+          "lineNumber": 179
+        },
+        {
+          "caller": "compact",
+          "callee": "replay.lastSequenceNumber",
+          "lineNumber": 181
+        },
+        {
+          "caller": "compact",
+          "callee": "replay.baseSequence",
+          "lineNumber": 181
+        },
+        {
+          "caller": "compact",
+          "callee": "replay.lastSequenceNumber",
+          "lineNumber": 184
+        },
+        {
+          "caller": "compact",
+          "callee": "replay.ledger().snapshot",
+          "lineNumber": 185
+        },
+        {
+          "caller": "compact",
+          "callee": "replay.ledger",
+          "lineNumber": 185
+        },
+        {
+          "caller": "compact",
+          "callee": "replay.lastOrderId",
+          "lineNumber": 185
+        },
+        {
+          "caller": "compact",
+          "callee": "replay.lastTimestamp",
+          "lineNumber": 185
+        },
+        {
+          "caller": "compact",
+          "callee": "Snapshot.path",
+          "lineNumber": 186
+        },
+        {
+          "caller": "compact",
+          "callee": "snapshot.write",
+          "lineNumber": 187
+        },
+        {
+          "caller": "compact",
+          "callee": "journalFile.resolveSibling",
+          "lineNumber": 188
+        },
+        {
+          "caller": "compact",
+          "callee": "journalFile.getFileName",
+          "lineNumber": 188
+        },
+        {
+          "caller": "compact",
+          "callee": "replay.baseSequence",
+          "lineNumber": 189
+        },
+        {
+          "caller": "compact",
+          "callee": "Durable.copyDurably",
+          "lineNumber": 190
+        },
+        {
+          "caller": "compact",
+          "callee": "CommandJournal.writeFresh",
+          "lineNumber": 191
+        },
+        {
+          "caller": "compact",
+          "callee": "new Compaction",
+          "lineNumber": 192
+        },
+        {
+          "caller": "compact",
+          "callee": "snapshot.orders().size",
+          "lineNumber": 192
+        },
+        {
+          "caller": "compact",
+          "callee": "snapshot.orders",
+          "lineNumber": 192
+        },
+        {
+          "caller": "process",
+          "callee": "new ArrayList<>",
+          "lineNumber": 199
+        },
+        {
+          "caller": "process",
+          "callee": "batch.size",
+          "lineNumber": 199
+        },
+        {
+          "caller": "process",
+          "callee": "options.checkInterval",
+          "lineNumber": 200
+        },
+        {
+          "caller": "process",
+          "callee": "commands.add",
+          "lineNumber": 201
+        },
+        {
+          "caller": "process",
+          "callee": "sequencer.stampCheck",
+          "lineNumber": 201
+        },
+        {
+          "caller": "process",
+          "callee": "ledger.digest",
+          "lineNumber": 201
+        },
+        {
+          "caller": "process",
+          "callee": "sequencer.stampNewOrder",
+          "lineNumber": 207
+        },
+        {
+          "caller": "process",
+          "callee": "s.order",
+          "lineNumber": 207
+        },
+        {
+          "caller": "process",
+          "callee": "sequencer.stampCancel",
+          "lineNumber": 209
+        },
+        {
+          "caller": "process",
+          "callee": "c.participant",
+          "lineNumber": 209
+        },
+        {
+          "caller": "process",
+          "callee": "c.orderId",
+          "lineNumber": 209
+        },
+        {
+          "caller": "process",
+          "callee": "sequencer.stampCancelAll",
+          "lineNumber": 211
+        },
+        {
+          "caller": "process",
+          "callee": "c.participant",
+          "lineNumber": 211
+        },
+        {
+          "caller": "process",
+          "callee": "p.fail",
+          "lineNumber": 215
+        },
+        {
+          "caller": "process",
+          "callee": "commands.add",
+          "lineNumber": 219
+        },
+        {
+          "caller": "process",
+          "callee": "journal.appendAll",
+          "lineNumber": 223
+        },
+        {
+          "caller": "process",
+          "callee": "p.complete",
+          "lineNumber": 232
+        },
+        {
+          "caller": "process",
+          "callee": "read",
+          "lineNumber": 232
+        },
+        {
+          "caller": "process",
+          "callee": "interceptor.beforeEngine",
+          "lineNumber": 237
+        },
+        {
+          "caller": "process",
+          "callee": "ledger.apply",
+          "lineNumber": 238
+        },
+        {
+          "caller": "process",
+          "callee": "quarantine",
+          "lineNumber": 240
+        },
+        {
+          "caller": "process",
+          "callee": "p.fail",
+          "lineNumber": 241
+        },
+        {
+          "caller": "process",
+          "callee": "new ExchangeException",
+          "lineNumber": 241
+        },
+        {
+          "caller": "process",
+          "callee": "p.command.sequenceNumber",
+          "lineNumber": 242
+        },
+        {
+          "caller": "process",
+          "callee": "listener.onOutput",
+          "lineNumber": 247
+        },
+        {
+          "caller": "process",
+          "callee": "applied.output",
+          "lineNumber": 247
+        },
+        {
+          "caller": "process",
+          "callee": "applied.events",
+          "lineNumber": 247
+        },
+        {
+          "caller": "process",
+          "callee": "LOG.log",
+          "lineNumber": 249
+        },
+        {
+          "caller": "process",
+          "callee": "applied.output().sequenceNumber",
+          "lineNumber": 249
+        },
+        {
+          "caller": "process",
+          "callee": "applied.output",
+          "lineNumber": 249
+        },
+        {
+          "caller": "process",
+          "callee": "p.complete",
+          "lineNumber": 251
+        },
+        {
+          "caller": "process",
+          "callee": "result",
+          "lineNumber": 251
+        },
+        {
+          "caller": "process",
+          "callee": "applied.output",
+          "lineNumber": 251
+        },
+        {
+          "caller": "read",
+          "callee": "ledger.engine().snapshot",
+          "lineNumber": 257
+        },
+        {
+          "caller": "read",
+          "callee": "ledger.engine",
+          "lineNumber": 257
+        },
+        {
+          "caller": "read",
+          "callee": "s.depth",
+          "lineNumber": 257
+        },
+        {
+          "caller": "read",
+          "callee": "ledger.log().lastOseq",
+          "lineNumber": 260
+        },
+        {
+          "caller": "read",
+          "callee": "ledger.log",
+          "lineNumber": 260
+        },
+        {
+          "caller": "read",
+          "callee": "a.participant",
+          "lineNumber": 260
+        },
+        {
+          "caller": "read",
+          "callee": "ledger.log().since",
+          "lineNumber": 263
+        },
+        {
+          "caller": "read",
+          "callee": "ledger.log",
+          "lineNumber": 263
+        },
+        {
+          "caller": "read",
+          "callee": "r.participant",
+          "lineNumber": 263
+        },
+        {
+          "caller": "read",
+          "callee": "r.fromOseq",
+          "lineNumber": 263
+        },
+        {
+          "caller": "read",
+          "callee": "new IllegalStateException",
+          "lineNumber": 265
+        },
+        {
+          "caller": "result",
+          "callee": "o.response",
+          "lineNumber": 270
+        },
+        {
+          "caller": "result",
+          "callee": "c.result",
+          "lineNumber": 273
+        },
+        {
+          "caller": "result",
+          "callee": "((CancelAllOutput) output).results",
+          "lineNumber": 275
+        },
+        {
+          "caller": "quarantine",
+          "callee": "LOG.log",
+          "lineNumber": 279
+        },
+        {
+          "caller": "quarantine",
+          "callee": "poison.sequenceNumber",
+          "lineNumber": 279
+        },
+        {
+          "caller": "quarantine",
+          "callee": "journal.append",
+          "lineNumber": 280
+        },
+        {
+          "caller": "quarantine",
+          "callee": "sequencer.stampSkip",
+          "lineNumber": 280
+        },
+        {
+          "caller": "quarantine",
+          "callee": "poison.sequenceNumber",
+          "lineNumber": 280
+        },
+        {
+          "caller": "quarantine",
+          "callee": "skipped.add",
+          "lineNumber": 281
+        },
+        {
+          "caller": "quarantine",
+          "callee": "poison.sequenceNumber",
+          "lineNumber": 281
+        },
+        {
+          "caller": "quarantine",
+          "callee": "Replay.rebuild",
+          "lineNumber": 286
+        },
+        {
+          "caller": "quarantine",
+          "callee": "poison.sequenceNumber",
+          "lineNumber": 286
+        },
+        {
+          "caller": "quarantine",
+          "callee": "options.outputRetention",
+          "lineNumber": 286
+        },
+        {
+          "caller": "submit",
+          "callee": "runOne",
+          "lineNumber": 292
+        },
+        {
+          "caller": "submit",
+          "callee": "new Request.Submit",
+          "lineNumber": 292
+        },
+        {
+          "caller": "submit",
+          "callee": "Objects.requireNonNull",
+          "lineNumber": 292
+        },
+        {
+          "caller": "cancel",
+          "callee": "runOne",
+          "lineNumber": 296
+        },
+        {
+          "caller": "cancel",
+          "callee": "new Request.Cancel",
+          "lineNumber": 296
+        },
+        {
+          "caller": "cancelAll",
+          "callee": "runOne",
+          "lineNumber": 300
+        },
+        {
+          "caller": "cancelAll",
+          "callee": "new Request.CancelAll",
+          "lineNumber": 300
+        },
+        {
+          "caller": "snapshot",
+          "callee": "runOne",
+          "lineNumber": 304
+        },
+        {
+          "caller": "snapshot",
+          "callee": "new Request.Snapshot",
+          "lineNumber": 304
+        },
+        {
+          "caller": "resend",
+          "callee": "runOne",
+          "lineNumber": 308
+        },
+        {
+          "caller": "resend",
+          "callee": "new Request.Resend",
+          "lineNumber": 308
+        },
+        {
+          "caller": "runOne",
+          "callee": "new Pending<>",
+          "lineNumber": 312
+        },
+        {
+          "caller": "runOne",
+          "callee": "process",
+          "lineNumber": 313
+        },
+        {
+          "caller": "runOne",
+          "callee": "List.of",
+          "lineNumber": 313
+        },
+        {
+          "caller": "runOne",
+          "callee": "p.result.join",
+          "lineNumber": 315
+        },
+        {
+          "caller": "runOne",
+          "callee": "e.getCause",
+          "lineNumber": 317
+        },
+        {
+          "caller": "lastSequenceNumber",
+          "callee": "sequencer.nextSequenceNumber",
+          "lineNumber": 327
+        },
+        {
+          "caller": "replayedOnOpen",
+          "callee": "recovery.replayed",
+          "lineNumber": 335
+        },
+        {
+          "caller": "truncatedBytesOnOpen",
+          "callee": "recovery.truncatedBytes",
+          "lineNumber": 339
+        },
+        {
+          "caller": "quarantined",
+          "callee": "Set.copyOf",
+          "lineNumber": 343
+        },
+        {
+          "caller": "engine",
+          "callee": "ledger.engine",
+          "lineNumber": 348
+        },
+        {
+          "caller": "digest",
+          "callee": "ledger.digest",
+          "lineNumber": 352
+        },
+        {
+          "caller": "close",
+          "callee": "journal.close",
+          "lineNumber": 357
+        }
+      ],
+      "metrics": {
+        "importCount": 19,
+        "exportCount": 15,
+        "functionCount": 24,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/core/ReplayException.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 37,
+      "nonEmptyLines": 27,
+      "functions": [
+        {
+          "name": "ReplayException",
+          "startLine": 24,
+          "endLine": 28,
+          "params": [
+            "kind",
+            "sequenceNumber",
+            "message",
+            "cause"
+          ]
+        },
+        {
+          "name": "kind",
+          "startLine": 30,
+          "endLine": 32,
+          "params": []
+        },
+        {
+          "name": "sequenceNumber",
+          "startLine": 34,
+          "endLine": 36,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "ReplayException",
+          "startLine": 12,
+          "endLine": 37,
+          "methods": [
+            "ReplayException",
+            "kind",
+            "sequenceNumber"
+          ],
+          "properties": [
+            "serialVersionUID",
+            "kind",
+            "sequenceNumber"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "kind",
+          "line": 30,
+          "isDefault": false
+        },
+        {
+          "name": "sequenceNumber",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "ReplayException",
+          "line": 12,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 3,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/gateway/Credentials.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 150,
+      "nonEmptyLines": 126,
+      "functions": [
+        {
+          "name": "Credentials",
+          "startLine": 50,
+          "endLine": 54,
+          "params": [
+            "entries"
+          ]
+        },
+        {
+          "name": "load",
+          "startLine": 56,
+          "endLine": 62,
+          "params": [
+            "file"
+          ]
+        },
+        {
+          "name": "of",
+          "startLine": 65,
+          "endLine": 69,
+          "params": [
+            "secrets",
+            "iterations"
+          ]
+        },
+        {
+          "name": "addUser",
+          "startLine": 72,
+          "endLine": 80,
+          "params": [
+            "file",
+            "participant",
+            "secret",
+            "iterations"
+          ]
+        },
+        {
+          "name": "verify",
+          "startLine": 82,
+          "endLine": 87,
+          "params": [
+            "participant",
+            "secret"
+          ]
+        },
+        {
+          "name": "size",
+          "startLine": 89,
+          "endLine": 91,
+          "params": []
+        },
+        {
+          "name": "parse",
+          "startLine": 93,
+          "endLine": 118,
+          "params": [
+            "file"
+          ]
+        },
+        {
+          "name": "hash",
+          "startLine": 120,
+          "endLine": 124,
+          "params": [
+            "secret",
+            "iterations"
+          ]
+        },
+        {
+          "name": "pbkdf2",
+          "startLine": 126,
+          "endLine": 135,
+          "params": [
+            "secret",
+            "salt",
+            "iterations"
+          ]
+        },
+        {
+          "name": "validParticipant",
+          "startLine": 137,
+          "endLine": 142,
+          "params": [
+            "participant"
+          ]
+        },
+        {
+          "name": "validSecret",
+          "startLine": 144,
+          "endLine": 149,
+          "params": [
+            "secret"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Credentials",
+          "startLine": 34,
+          "endLine": 150,
+          "methods": [
+            "Credentials",
+            "load",
+            "of",
+            "addUser",
+            "verify",
+            "size",
+            "parse",
+            "hash",
+            "pbkdf2",
+            "validParticipant",
+            "validSecret"
+          ],
+          "properties": [
+            "DEFAULT_ITERATIONS",
+            "SECRET",
+            "SCHEME",
+            "SALT_BYTES",
+            "HASH_BITS",
+            "entries",
+            "dummy"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "DEFAULT_ITERATIONS",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "SECRET",
+          "line": 38,
+          "isDefault": false
+        },
+        {
+          "name": "load",
+          "line": 56,
+          "isDefault": false
+        },
+        {
+          "name": "of",
+          "line": 65,
+          "isDefault": false
+        },
+        {
+          "name": "addUser",
+          "line": 72,
+          "isDefault": false
+        },
+        {
+          "name": "verify",
+          "line": 82,
+          "isDefault": false
+        },
+        {
+          "name": "size",
+          "line": 89,
+          "isDefault": false
+        },
+        {
+          "name": "Credentials",
+          "line": 34,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Credentials",
+          "callee": "Map.copyOf",
+          "lineNumber": 51
+        },
+        {
+          "caller": "Credentials",
+          "callee": "entries.values().stream().findFirst().orElseGet",
+          "lineNumber": 52
+        },
+        {
+          "caller": "Credentials",
+          "callee": "entries.values().stream().findFirst",
+          "lineNumber": 52
+        },
+        {
+          "caller": "Credentials",
+          "callee": "entries.values().stream",
+          "lineNumber": 52
+        },
+        {
+          "caller": "Credentials",
+          "callee": "entries.values",
+          "lineNumber": 52
+        },
+        {
+          "caller": "Credentials",
+          "callee": "new Entry",
+          "lineNumber": 53
+        },
+        {
+          "caller": "load",
+          "callee": "Files.exists",
+          "lineNumber": 57
+        },
+        {
+          "caller": "load",
+          "callee": "new IllegalStateException",
+          "lineNumber": 58
+        },
+        {
+          "caller": "load",
+          "callee": "file.toAbsolutePath",
+          "lineNumber": 58
+        },
+        {
+          "caller": "load",
+          "callee": "new Credentials",
+          "lineNumber": 61
+        },
+        {
+          "caller": "load",
+          "callee": "parse",
+          "lineNumber": 61
+        },
+        {
+          "caller": "of",
+          "callee": "new TreeMap<>",
+          "lineNumber": 66
+        },
+        {
+          "caller": "of",
+          "callee": "secrets.forEach",
+          "lineNumber": 67
+        },
+        {
+          "caller": "of",
+          "callee": "entries.put",
+          "lineNumber": 67
+        },
+        {
+          "caller": "of",
+          "callee": "validParticipant",
+          "lineNumber": 67
+        },
+        {
+          "caller": "of",
+          "callee": "hash",
+          "lineNumber": 67
+        },
+        {
+          "caller": "of",
+          "callee": "validSecret",
+          "lineNumber": 67
+        },
+        {
+          "caller": "of",
+          "callee": "new Credentials",
+          "lineNumber": 68
+        },
+        {
+          "caller": "addUser",
+          "callee": "Files.exists",
+          "lineNumber": 73
+        },
+        {
+          "caller": "addUser",
+          "callee": "parse",
+          "lineNumber": 73
+        },
+        {
+          "caller": "addUser",
+          "callee": "new TreeMap<>",
+          "lineNumber": 73
+        },
+        {
+          "caller": "addUser",
+          "callee": "entries.put",
+          "lineNumber": 74
+        },
+        {
+          "caller": "addUser",
+          "callee": "validParticipant",
+          "lineNumber": 74
+        },
+        {
+          "caller": "addUser",
+          "callee": "hash",
+          "lineNumber": 74
+        },
+        {
+          "caller": "addUser",
+          "callee": "validSecret",
+          "lineNumber": 74
+        },
+        {
+          "caller": "addUser",
+          "callee": "new StringBuilder",
+          "lineNumber": 75
+        },
+        {
+          "caller": "addUser",
+          "callee": "entries.forEach",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "sb.append(p).append(':').append(SCHEME).append(':').append(e.iterations()).append(':')\r\n                .append(Base64.getEncoder().encodeToString(e.salt())).append(':')\r\n                .append(Base64.getEncoder().encodeToString(e.hash())).append",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "sb.append(p).append(':').append(SCHEME).append(':').append(e.iterations()).append(':')\r\n                .append(Base64.getEncoder().encodeToString(e.salt())).append(':').append",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "sb.append(p).append(':').append(SCHEME).append(':').append(e.iterations()).append(':')\r\n                .append(Base64.getEncoder().encodeToString(e.salt())).append",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "sb.append(p).append(':').append(SCHEME).append(':').append(e.iterations()).append(':').append",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "sb.append(p).append(':').append(SCHEME).append(':').append(e.iterations()).append",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "sb.append(p).append(':').append(SCHEME).append(':').append",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "sb.append(p).append(':').append(SCHEME).append",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "sb.append(p).append(':').append",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "sb.append(p).append",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "sb.append",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "e.iterations",
+          "lineNumber": 76
+        },
+        {
+          "caller": "addUser",
+          "callee": "Base64.getEncoder().encodeToString",
+          "lineNumber": 77
+        },
+        {
+          "caller": "addUser",
+          "callee": "Base64.getEncoder",
+          "lineNumber": 77
+        },
+        {
+          "caller": "addUser",
+          "callee": "e.salt",
+          "lineNumber": 77
+        },
+        {
+          "caller": "addUser",
+          "callee": "Base64.getEncoder().encodeToString",
+          "lineNumber": 78
+        },
+        {
+          "caller": "addUser",
+          "callee": "Base64.getEncoder",
+          "lineNumber": 78
+        },
+        {
+          "caller": "addUser",
+          "callee": "e.hash",
+          "lineNumber": 78
+        },
+        {
+          "caller": "addUser",
+          "callee": "Durable.writeAtomically",
+          "lineNumber": 79
+        },
+        {
+          "caller": "addUser",
+          "callee": "sb.toString",
+          "lineNumber": 79
+        },
+        {
+          "caller": "verify",
+          "callee": "entries.get",
+          "lineNumber": 83
+        },
+        {
+          "caller": "verify",
+          "callee": "pbkdf2",
+          "lineNumber": 85
+        },
+        {
+          "caller": "verify",
+          "callee": "against.salt",
+          "lineNumber": 85
+        },
+        {
+          "caller": "verify",
+          "callee": "against.iterations",
+          "lineNumber": 85
+        },
+        {
+          "caller": "verify",
+          "callee": "MessageDigest.isEqual",
+          "lineNumber": 86
+        },
+        {
+          "caller": "verify",
+          "callee": "against.hash",
+          "lineNumber": 86
+        },
+        {
+          "caller": "size",
+          "callee": "entries.size",
+          "lineNumber": 90
+        },
+        {
+          "caller": "parse",
+          "callee": "new TreeMap<>",
+          "lineNumber": 94
+        },
+        {
+          "caller": "parse",
+          "callee": "Files.readAllLines",
+          "lineNumber": 96
+        },
+        {
+          "caller": "parse",
+          "callee": "line.isBlank",
+          "lineNumber": 98
+        },
+        {
+          "caller": "parse",
+          "callee": "line.startsWith",
+          "lineNumber": 98
+        },
+        {
+          "caller": "parse",
+          "callee": "line.split",
+          "lineNumber": 101
+        },
+        {
+          "caller": "parse",
+          "callee": "f[1].equals",
+          "lineNumber": 103
+        },
+        {
+          "caller": "parse",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 104
+        },
+        {
+          "caller": "parse",
+          "callee": "new Entry",
+          "lineNumber": 106
+        },
+        {
+          "caller": "parse",
+          "callee": "Integer.parseInt",
+          "lineNumber": 106
+        },
+        {
+          "caller": "parse",
+          "callee": "Base64.getDecoder().decode",
+          "lineNumber": 106
+        },
+        {
+          "caller": "parse",
+          "callee": "Base64.getDecoder",
+          "lineNumber": 106
+        },
+        {
+          "caller": "parse",
+          "callee": "Base64.getDecoder().decode",
+          "lineNumber": 106
+        },
+        {
+          "caller": "parse",
+          "callee": "Base64.getDecoder",
+          "lineNumber": 106
+        },
+        {
+          "caller": "parse",
+          "callee": "e.iterations",
+          "lineNumber": 107
+        },
+        {
+          "caller": "parse",
+          "callee": "e.hash",
+          "lineNumber": 107
+        },
+        {
+          "caller": "parse",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 108
+        },
+        {
+          "caller": "parse",
+          "callee": "entries.put",
+          "lineNumber": 110
+        },
+        {
+          "caller": "parse",
+          "callee": "validParticipant",
+          "lineNumber": 110
+        },
+        {
+          "caller": "parse",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 111
+        },
+        {
+          "caller": "parse",
+          "callee": "new IllegalStateException",
+          "lineNumber": 114
+        },
+        {
+          "caller": "parse",
+          "callee": "e.getMessage",
+          "lineNumber": 114
+        },
+        {
+          "caller": "hash",
+          "callee": "new SecureRandom().nextBytes",
+          "lineNumber": 122
+        },
+        {
+          "caller": "hash",
+          "callee": "new SecureRandom",
+          "lineNumber": 122
+        },
+        {
+          "caller": "hash",
+          "callee": "new Entry",
+          "lineNumber": 123
+        },
+        {
+          "caller": "hash",
+          "callee": "pbkdf2",
+          "lineNumber": 123
+        },
+        {
+          "caller": "pbkdf2",
+          "callee": "new PBEKeySpec",
+          "lineNumber": 127
+        },
+        {
+          "caller": "pbkdf2",
+          "callee": "secret.toCharArray",
+          "lineNumber": 127
+        },
+        {
+          "caller": "pbkdf2",
+          "callee": "SecretKeyFactory.getInstance(\"PBKDF2WithHmacSHA256\").generateSecret(spec).getEncoded",
+          "lineNumber": 129
+        },
+        {
+          "caller": "pbkdf2",
+          "callee": "SecretKeyFactory.getInstance(\"PBKDF2WithHmacSHA256\").generateSecret",
+          "lineNumber": 129
+        },
+        {
+          "caller": "pbkdf2",
+          "callee": "SecretKeyFactory.getInstance",
+          "lineNumber": 129
+        },
+        {
+          "caller": "pbkdf2",
+          "callee": "new IllegalStateException",
+          "lineNumber": 131
+        },
+        {
+          "caller": "pbkdf2",
+          "callee": "spec.clearPassword",
+          "lineNumber": 133
+        },
+        {
+          "caller": "validParticipant",
+          "callee": "Rules.PARTICIPANT.matcher(participant).matches",
+          "lineNumber": 138
+        },
+        {
+          "caller": "validParticipant",
+          "callee": "Rules.PARTICIPANT.matcher",
+          "lineNumber": 138
+        },
+        {
+          "caller": "validParticipant",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 139
+        },
+        {
+          "caller": "validSecret",
+          "callee": "SECRET.matcher(secret).matches",
+          "lineNumber": 145
+        },
+        {
+          "caller": "validSecret",
+          "callee": "SECRET.matcher",
+          "lineNumber": 145
+        },
+        {
+          "caller": "validSecret",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 146
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 8,
+        "functionCount": 11,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/gateway/Tls.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 67,
+      "nonEmptyLines": 57,
+      "functions": [
+        {
+          "name": "Tls",
+          "startLine": 24,
+          "endLine": 25,
+          "params": []
+        },
+        {
+          "name": "serverContext",
+          "startLine": 27,
+          "endLine": 37,
+          "params": [
+            "keystore",
+            "password"
+          ]
+        },
+        {
+          "name": "clientContext",
+          "startLine": 40,
+          "endLine": 50,
+          "params": [
+            "truststore",
+            "password"
+          ]
+        },
+        {
+          "name": "passwordFromEnvironment",
+          "startLine": 52,
+          "endLine": 58,
+          "params": [
+            "variable"
+          ]
+        },
+        {
+          "name": "load",
+          "startLine": 60,
+          "endLine": 66,
+          "params": [
+            "file",
+            "password"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Tls",
+          "startLine": 20,
+          "endLine": 67,
+          "methods": [
+            "Tls",
+            "serverContext",
+            "clientContext",
+            "passwordFromEnvironment",
+            "load"
+          ],
+          "properties": [
+            "PROTOCOLS"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "PROTOCOLS",
+          "line": 22,
+          "isDefault": false
+        },
+        {
+          "name": "serverContext",
+          "line": 27,
+          "isDefault": false
+        },
+        {
+          "name": "clientContext",
+          "line": 40,
+          "isDefault": false
+        },
+        {
+          "name": "passwordFromEnvironment",
+          "line": 52,
+          "isDefault": false
+        },
+        {
+          "name": "Tls",
+          "line": 20,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "serverContext",
+          "callee": "KeyManagerFactory.getInstance",
+          "lineNumber": 29
+        },
+        {
+          "caller": "serverContext",
+          "callee": "KeyManagerFactory.getDefaultAlgorithm",
+          "lineNumber": 29
+        },
+        {
+          "caller": "serverContext",
+          "callee": "kmf.init",
+          "lineNumber": 30
+        },
+        {
+          "caller": "serverContext",
+          "callee": "load",
+          "lineNumber": 30
+        },
+        {
+          "caller": "serverContext",
+          "callee": "SSLContext.getInstance",
+          "lineNumber": 31
+        },
+        {
+          "caller": "serverContext",
+          "callee": "context.init",
+          "lineNumber": 32
+        },
+        {
+          "caller": "serverContext",
+          "callee": "kmf.getKeyManagers",
+          "lineNumber": 32
+        },
+        {
+          "caller": "serverContext",
+          "callee": "new IOException",
+          "lineNumber": 35
+        },
+        {
+          "caller": "serverContext",
+          "callee": "e.getMessage",
+          "lineNumber": 35
+        },
+        {
+          "caller": "clientContext",
+          "callee": "TrustManagerFactory.getInstance",
+          "lineNumber": 42
+        },
+        {
+          "caller": "clientContext",
+          "callee": "TrustManagerFactory.getDefaultAlgorithm",
+          "lineNumber": 42
+        },
+        {
+          "caller": "clientContext",
+          "callee": "tmf.init",
+          "lineNumber": 43
+        },
+        {
+          "caller": "clientContext",
+          "callee": "load",
+          "lineNumber": 43
+        },
+        {
+          "caller": "clientContext",
+          "callee": "SSLContext.getInstance",
+          "lineNumber": 44
+        },
+        {
+          "caller": "clientContext",
+          "callee": "context.init",
+          "lineNumber": 45
+        },
+        {
+          "caller": "clientContext",
+          "callee": "tmf.getTrustManagers",
+          "lineNumber": 45
+        },
+        {
+          "caller": "clientContext",
+          "callee": "new IOException",
+          "lineNumber": 48
+        },
+        {
+          "caller": "clientContext",
+          "callee": "e.getMessage",
+          "lineNumber": 48
+        },
+        {
+          "caller": "passwordFromEnvironment",
+          "callee": "System.getenv",
+          "lineNumber": 53
+        },
+        {
+          "caller": "passwordFromEnvironment",
+          "callee": "new IllegalStateException",
+          "lineNumber": 55
+        },
+        {
+          "caller": "passwordFromEnvironment",
+          "callee": "value.toCharArray",
+          "lineNumber": 57
+        },
+        {
+          "caller": "load",
+          "callee": "KeyStore.getInstance",
+          "lineNumber": 61
+        },
+        {
+          "caller": "load",
+          "callee": "Files.newInputStream",
+          "lineNumber": 62
+        },
+        {
+          "caller": "load",
+          "callee": "store.load",
+          "lineNumber": 63
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 5,
+        "functionCount": 5,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/journal/Durable.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 64,
+      "nonEmptyLines": 57,
+      "functions": [
+        {
+          "name": "Durable",
+          "startLine": 20,
+          "endLine": 21,
+          "params": []
+        },
+        {
+          "name": "writeAtomically",
+          "startLine": 25,
+          "endLine": 36,
+          "params": [
+            "target",
+            "content"
+          ]
+        },
+        {
+          "name": "copyDurably",
+          "startLine": 39,
+          "endLine": 45,
+          "params": [
+            "source",
+            "target"
+          ]
+        },
+        {
+          "name": "fsyncDirectory",
+          "startLine": 50,
+          "endLine": 63,
+          "params": [
+            "file"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Durable",
+          "startLine": 18,
+          "endLine": 64,
+          "methods": [
+            "Durable",
+            "writeAtomically",
+            "copyDurably",
+            "fsyncDirectory"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "writeAtomically",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "copyDurably",
+          "line": 39,
+          "isDefault": false
+        },
+        {
+          "name": "fsyncDirectory",
+          "line": 50,
+          "isDefault": false
+        },
+        {
+          "name": "Durable",
+          "line": 18,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "writeAtomically",
+          "callee": "target.resolveSibling",
+          "lineNumber": 26
+        },
+        {
+          "caller": "writeAtomically",
+          "callee": "target.getFileName",
+          "lineNumber": 26
+        },
+        {
+          "caller": "writeAtomically",
+          "callee": "FileChannel.open",
+          "lineNumber": 27
+        },
+        {
+          "caller": "writeAtomically",
+          "callee": "ByteBuffer.wrap",
+          "lineNumber": 28
+        },
+        {
+          "caller": "writeAtomically",
+          "callee": "content.getBytes",
+          "lineNumber": 28
+        },
+        {
+          "caller": "writeAtomically",
+          "callee": "bytes.hasRemaining",
+          "lineNumber": 29
+        },
+        {
+          "caller": "writeAtomically",
+          "callee": "ch.write",
+          "lineNumber": 30
+        },
+        {
+          "caller": "writeAtomically",
+          "callee": "ch.force",
+          "lineNumber": 32
+        },
+        {
+          "caller": "writeAtomically",
+          "callee": "Files.move",
+          "lineNumber": 34
+        },
+        {
+          "caller": "writeAtomically",
+          "callee": "fsyncDirectory",
+          "lineNumber": 35
+        },
+        {
+          "caller": "copyDurably",
+          "callee": "Files.copy",
+          "lineNumber": 40
+        },
+        {
+          "caller": "copyDurably",
+          "callee": "FileChannel.open",
+          "lineNumber": 41
+        },
+        {
+          "caller": "copyDurably",
+          "callee": "ch.force",
+          "lineNumber": 42
+        },
+        {
+          "caller": "copyDurably",
+          "callee": "fsyncDirectory",
+          "lineNumber": 44
+        },
+        {
+          "caller": "fsyncDirectory",
+          "callee": "file.toAbsolutePath().getParent",
+          "lineNumber": 51
+        },
+        {
+          "caller": "fsyncDirectory",
+          "callee": "file.toAbsolutePath",
+          "lineNumber": 51
+        },
+        {
+          "caller": "fsyncDirectory",
+          "callee": "FileChannel.open",
+          "lineNumber": 54
+        },
+        {
+          "caller": "fsyncDirectory",
+          "callee": "ch.force",
+          "lineNumber": 59
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 4,
+        "functionCount": 4,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/journal/JournalLock.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 84,
+      "nonEmptyLines": 72,
+      "functions": [
+        {
+          "name": "JournalLock",
+          "startLine": 32,
+          "endLine": 35,
+          "params": [
+            "key",
+            "channel"
+          ]
+        },
+        {
+          "name": "acquire",
+          "startLine": 37,
+          "endLine": 66,
+          "params": [
+            "journal"
+          ]
+        },
+        {
+          "name": "close",
+          "startLine": 69,
+          "endLine": 79,
+          "params": []
+        },
+        {
+          "name": "alreadyOpen",
+          "startLine": 81,
+          "endLine": 83,
+          "params": [
+            "journal"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "JournalLock",
+          "startLine": 25,
+          "endLine": 84,
+          "methods": [
+            "JournalLock",
+            "acquire",
+            "close",
+            "alreadyOpen"
+          ],
+          "properties": [
+            "HELD",
+            "key",
+            "channel"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "acquire",
+          "line": 37,
+          "isDefault": false
+        },
+        {
+          "name": "close",
+          "line": 69,
+          "isDefault": false
+        },
+        {
+          "name": "JournalLock",
+          "line": 25,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "acquire",
+          "callee": "journal.resolveSibling",
+          "lineNumber": 38
+        },
+        {
+          "caller": "acquire",
+          "callee": "journal.getFileName",
+          "lineNumber": 38
+        },
+        {
+          "caller": "acquire",
+          "callee": "Files.createFile",
+          "lineNumber": 40
+        },
+        {
+          "caller": "acquire",
+          "callee": "lockFile.toRealPath",
+          "lineNumber": 44
+        },
+        {
+          "caller": "acquire",
+          "callee": "HELD.add",
+          "lineNumber": 45
+        },
+        {
+          "caller": "acquire",
+          "callee": "alreadyOpen",
+          "lineNumber": 46
+        },
+        {
+          "caller": "acquire",
+          "callee": "FileChannel.open",
+          "lineNumber": 50
+        },
+        {
+          "caller": "acquire",
+          "callee": "channel.tryLock",
+          "lineNumber": 51
+        },
+        {
+          "caller": "acquire",
+          "callee": "alreadyOpen",
+          "lineNumber": 52
+        },
+        {
+          "caller": "acquire",
+          "callee": "new JournalLock",
+          "lineNumber": 54
+        },
+        {
+          "caller": "acquire",
+          "callee": "channel.close",
+          "lineNumber": 58
+        },
+        {
+          "caller": "acquire",
+          "callee": "e.addSuppressed",
+          "lineNumber": 61
+        },
+        {
+          "caller": "acquire",
+          "callee": "HELD.remove",
+          "lineNumber": 63
+        },
+        {
+          "caller": "close",
+          "callee": "channel.isOpen",
+          "lineNumber": 71
+        },
+        {
+          "caller": "close",
+          "callee": "channel.close",
+          "lineNumber": 75
+        },
+        {
+          "caller": "close",
+          "callee": "HELD.remove",
+          "lineNumber": 77
+        },
+        {
+          "caller": "alreadyOpen",
+          "callee": "new IllegalStateException",
+          "lineNumber": 82
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 4,
+        "classCount": 1
+      }
+    }
+  ]
+}

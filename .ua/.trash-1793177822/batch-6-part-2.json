@@ -1,0 +1,582 @@
+{
+ "nodes": [
+  {
+   "id": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "type": "file",
+   "name": "Credentials.java",
+   "filePath": "src/main/java/exchangeserver/gateway/Credentials.java",
+   "summary": "Immutable participant credential store backed by a users file of salted PBKDF2-HMAC-SHA256 hashes; verifies secrets in constant time and rewrites the file atomically when adding users.",
+   "tags": [
+    "security",
+    "authentication",
+    "pbkdf2",
+    "credentials",
+    "persistence"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "MessageDigest.isEqual gives a constant-time comparison; unknown users still pay a PBKDF2 cost to avoid a timing oracle."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/gateway/Credentials.java:Credentials",
+   "type": "class",
+   "name": "Credentials",
+   "filePath": "src/main/java/exchangeserver/gateway/Credentials.java",
+   "lineRange": [
+    34,
+    150
+   ],
+   "summary": "Loaded map of participant to PBKDF2 entry with load/of/addUser/verify operations.",
+   "tags": [
+    "security",
+    "authentication",
+    "pbkdf2"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Credentials.java:load",
+   "type": "function",
+   "name": "load",
+   "filePath": "src/main/java/exchangeserver/gateway/Credentials.java",
+   "lineRange": [
+    56,
+    62
+   ],
+   "summary": "Loads and validates a users file into an immutable Credentials.",
+   "tags": [
+    "security",
+    "authentication",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Credentials.java:of",
+   "type": "function",
+   "name": "of",
+   "filePath": "src/main/java/exchangeserver/gateway/Credentials.java",
+   "lineRange": [
+    65,
+    69
+   ],
+   "summary": "Builds Credentials from a participant-to-secret map, hashing each (test/tool seam).",
+   "tags": [
+    "security",
+    "authentication",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Credentials.java:addUser",
+   "type": "function",
+   "name": "addUser",
+   "filePath": "src/main/java/exchangeserver/gateway/Credentials.java",
+   "lineRange": [
+    72,
+    80
+   ],
+   "summary": "Adds or replaces a participant's hashed secret and rewrites the users file atomically.",
+   "tags": [
+    "security",
+    "authentication",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Credentials.java:verify",
+   "type": "function",
+   "name": "verify",
+   "filePath": "src/main/java/exchangeserver/gateway/Credentials.java",
+   "lineRange": [
+    82,
+    87
+   ],
+   "summary": "Verifies a secret in constant time; unknown participants cost the same as known ones.",
+   "tags": [
+    "security",
+    "authentication",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Credentials.java:parse",
+   "type": "function",
+   "name": "parse",
+   "filePath": "src/main/java/exchangeserver/gateway/Credentials.java",
+   "lineRange": [
+    93,
+    118
+   ],
+   "summary": "Parses and validates each pbkdf2-sha256 line of the users file, rejecting duplicates and malformed entries.",
+   "tags": [
+    "security",
+    "authentication",
+    "method"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Credentials.java:pbkdf2",
+   "type": "function",
+   "name": "pbkdf2",
+   "filePath": "src/main/java/exchangeserver/gateway/Credentials.java",
+   "lineRange": [
+    126,
+    135
+   ],
+   "summary": "Computes PBKDF2-HMAC-SHA256 of a secret with salt and iteration count.",
+   "tags": [
+    "security",
+    "authentication",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/gateway/Tls.java",
+   "type": "file",
+   "name": "Tls.java",
+   "filePath": "src/main/java/exchangeserver/gateway/Tls.java",
+   "summary": "Builds optional TLS SSLContexts for the gateway server (PKCS#12 keystore) and client (truststore), reading passwords only from environment variables.",
+   "tags": [
+    "security",
+    "tls",
+    "networking",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/gateway/Tls.java:Tls",
+   "type": "class",
+   "name": "Tls",
+   "filePath": "src/main/java/exchangeserver/gateway/Tls.java",
+   "lineRange": [
+    20,
+    67
+   ],
+   "summary": "Static factory for server and client SSLContexts.",
+   "tags": [
+    "security",
+    "tls",
+    "networking"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Tls.java:serverContext",
+   "type": "function",
+   "name": "serverContext",
+   "filePath": "src/main/java/exchangeserver/gateway/Tls.java",
+   "lineRange": [
+    27,
+    37
+   ],
+   "summary": "Builds a server SSLContext from a PKCS#12 keystore.",
+   "tags": [
+    "security",
+    "tls",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Tls.java:clientContext",
+   "type": "function",
+   "name": "clientContext",
+   "filePath": "src/main/java/exchangeserver/gateway/Tls.java",
+   "lineRange": [
+    40,
+    50
+   ],
+   "summary": "Builds a client SSLContext from an optional truststore, defaulting to the JDK's trusted certificates.",
+   "tags": [
+    "security",
+    "tls",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Tls.java:passwordFromEnvironment",
+   "type": "function",
+   "name": "passwordFromEnvironment",
+   "filePath": "src/main/java/exchangeserver/gateway/Tls.java",
+   "lineRange": [
+    52,
+    58
+   ],
+   "summary": "Reads a keystore password from an environment variable, failing if unset.",
+   "tags": [
+    "security",
+    "tls",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "type": "file",
+   "name": "Durable.java",
+   "filePath": "src/main/java/exchangeserver/journal/Durable.java",
+   "summary": "Crash-safe file helpers: atomic write via temp file, fsync and rename, durable copy, and directory fsync so new directory entries survive a crash.",
+   "tags": [
+    "utility",
+    "durability",
+    "fsync",
+    "file-io",
+    "crash-safety"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/journal/Durable.java:Durable",
+   "type": "class",
+   "name": "Durable",
+   "filePath": "src/main/java/exchangeserver/journal/Durable.java",
+   "lineRange": [
+    18,
+    64
+   ],
+   "summary": "Static crash-safe file operation helpers.",
+   "tags": [
+    "utility",
+    "durability",
+    "fsync"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/Durable.java:writeAtomically",
+   "type": "function",
+   "name": "writeAtomically",
+   "filePath": "src/main/java/exchangeserver/journal/Durable.java",
+   "lineRange": [
+    25,
+    36
+   ],
+   "summary": "Replaces a file with new content atomically: temp file, fsync, rename over target, fsync directory.",
+   "tags": [
+    "utility",
+    "durability",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/Durable.java:copyDurably",
+   "type": "function",
+   "name": "copyDurably",
+   "filePath": "src/main/java/exchangeserver/journal/Durable.java",
+   "lineRange": [
+    39,
+    45
+   ],
+   "summary": "Copies a file and fsyncs the copy (non-atomic, for archives).",
+   "tags": [
+    "utility",
+    "durability",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/Durable.java:fsyncDirectory",
+   "type": "function",
+   "name": "fsyncDirectory",
+   "filePath": "src/main/java/exchangeserver/journal/Durable.java",
+   "lineRange": [
+    50,
+    63
+   ],
+   "summary": "Fsyncs a file's parent directory so creations and renames are durable; tolerated failure on Windows.",
+   "tags": [
+    "utility",
+    "durability",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/journal/JournalLock.java",
+   "type": "file",
+   "name": "JournalLock.java",
+   "filePath": "src/main/java/exchangeserver/journal/JournalLock.java",
+   "summary": "Per-journal exclusive ownership lock on a separate <journal>.lock file, guarding against both other processes (OS file lock) and a second acquire in the same JVM.",
+   "tags": [
+    "concurrency",
+    "file-lock",
+    "journal",
+    "resource-management"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "POSIX file locks in Java are per-process and dropped when any handle on the file closes, which is why the lock lives on a dedicated file and a static in-JVM set refuses re-entrant acquires."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/journal/JournalLock.java:JournalLock",
+   "type": "class",
+   "name": "JournalLock",
+   "filePath": "src/main/java/exchangeserver/journal/JournalLock.java",
+   "lineRange": [
+    25,
+    84
+   ],
+   "summary": "AutoCloseable lock handle combining an in-JVM held set with an OS FileChannel lock.",
+   "tags": [
+    "concurrency",
+    "file-lock",
+    "journal"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/JournalLock.java:acquire",
+   "type": "function",
+   "name": "acquire",
+   "filePath": "src/main/java/exchangeserver/journal/JournalLock.java",
+   "lineRange": [
+    37,
+    66
+   ],
+   "summary": "Creates or reuses the lock file, rejects a second in-JVM holder, and takes an exclusive OS file lock.",
+   "tags": [
+    "concurrency",
+    "file-lock",
+    "method"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/JournalLock.java:close",
+   "type": "function",
+   "name": "close",
+   "filePath": "src/main/java/exchangeserver/journal/JournalLock.java",
+   "lineRange": [
+    69,
+    79
+   ],
+   "summary": "Idempotently releases the OS lock and the in-JVM held entry.",
+   "tags": [
+    "concurrency",
+    "file-lock",
+    "method"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "target": "class:src/main/java/exchangeserver/gateway/Credentials.java:Credentials",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "target": "class:src/main/java/exchangeserver/gateway/Credentials.java:Credentials",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Credentials.java:load",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Credentials.java:of",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Credentials.java:addUser",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Credentials.java:verify",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Credentials.java:parse",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Credentials.java:pbkdf2",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "target": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Tls.java",
+   "target": "class:src/main/java/exchangeserver/gateway/Tls.java:Tls",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Tls.java",
+   "target": "class:src/main/java/exchangeserver/gateway/Tls.java:Tls",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Tls.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Tls.java:serverContext",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Tls.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Tls.java:clientContext",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Tls.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Tls.java:passwordFromEnvironment",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "target": "class:src/main/java/exchangeserver/journal/Durable.java:Durable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "target": "class:src/main/java/exchangeserver/journal/Durable.java:Durable",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "target": "function:src/main/java/exchangeserver/journal/Durable.java:writeAtomically",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "target": "function:src/main/java/exchangeserver/journal/Durable.java:copyDurably",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "target": "function:src/main/java/exchangeserver/journal/Durable.java:fsyncDirectory",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalLock.java",
+   "target": "class:src/main/java/exchangeserver/journal/JournalLock.java:JournalLock",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalLock.java",
+   "target": "class:src/main/java/exchangeserver/journal/JournalLock.java:JournalLock",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalLock.java",
+   "target": "function:src/main/java/exchangeserver/journal/JournalLock.java:acquire",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalLock.java",
+   "target": "function:src/main/java/exchangeserver/journal/JournalLock.java:close",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/gateway/Credentials.java:load",
+   "target": "function:src/main/java/exchangeserver/gateway/Credentials.java:parse",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/gateway/Credentials.java:addUser",
+   "target": "function:src/main/java/exchangeserver/gateway/Credentials.java:parse",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/gateway/Credentials.java:addUser",
+   "target": "function:src/main/java/exchangeserver/journal/Durable.java:writeAtomically",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/gateway/Credentials.java:verify",
+   "target": "function:src/main/java/exchangeserver/gateway/Credentials.java:pbkdf2",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/journal/Durable.java:writeAtomically",
+   "target": "function:src/main/java/exchangeserver/journal/Durable.java:fsyncDirectory",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/journal/Durable.java:copyDurably",
+   "target": "function:src/main/java/exchangeserver/journal/Durable.java:fsyncDirectory",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+Found 14 batch files (10 logical batches, 4 multi-part):
+  batch-1-part-1.json: 40 nodes, 89 edges
+  batch-1-part-2.json: 42 nodes, 113 edges
+  batch-2-part-1.json: 33 nodes, 78 edges
+  batch-2-part-2.json: 32 nodes, 93 edges
+  batch-3-part-1.json: 25 nodes, 54 edges
+  batch-3-part-2.json: 25 nodes, 83 edges
+  batch-4.json: 46 nodes, 108 edges
+  batch-5.json: 29 nodes, 58 edges
+  batch-6-part-1.json: 35 nodes, 105 edges
+  batch-6-part-2.json: 22 nodes, 30 edges
+  batch-7.json: 4 nodes, 57 edges
+  batch-8.json: 20 nodes, 109 edges
+  batch-9.json: 9 nodes, 93 edges
+  batch-10.json: 28 nodes, 44 edges
+
+Input: 390 nodes, 1114 edges
+
+Fixed (3 corrections):
+     3 × tested_by edges flipped (test \u2192 production became production \u2192 test)
+
+Tested-by linker:
+     0 × tested_by edges produced (path-convention supplement, production \u2192 test)
+    23 × production nodes tagged "tested"
+
+Could not fix (1 issues — needs agent review):
+  - Edge function:src/main/java/exchangeserver/Main.java:serve \u2192 function:src/main/java/exchangeserver/core/ExchangeService.java:recovery (calls): dropped, missing target 'function:src/main/java/exchangeserver/core/ExchangeService.java:recovery'
+
+Output: 390 nodes, 1113 edges
+
+Imports edge recovery:
+  Recovered 0 `imports` edges from importMap (127 entries scanned)
+
+Written to S:\Codes and Programs\Programs\Dev\Exchange Server Misc\ExchangeServer2\.ua\intermediate\assembled-graph.json (491 KB)

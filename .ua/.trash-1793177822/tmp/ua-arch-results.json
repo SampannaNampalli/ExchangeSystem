@@ -1,0 +1,1279 @@
+{
+  "scriptCompleted": true,
+  "directoryGroups": {
+    "book": [
+      "file:src/main/java/exchangeserver/book/CancelResult.java",
+      "file:src/main/java/exchangeserver/book/CancelStatus.java",
+      "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+      "file:src/main/java/exchangeserver/book/OrderBook.java",
+      "file:src/main/java/exchangeserver/book/OrderNode.java",
+      "file:src/main/java/exchangeserver/book/PriceLevel.java",
+      "file:src/main/java/exchangeserver/book/Fill.java",
+      "file:src/main/java/exchangeserver/book/RestingOrderView.java"
+    ],
+    "client": [
+      "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+      "file:src/main/java/exchangeserver/client/ClientMain.java"
+    ],
+    "core": [
+      "file:src/main/java/exchangeserver/core/OutputDigest.java",
+      "file:src/main/java/exchangeserver/core/OutputListener.java",
+      "file:src/main/java/exchangeserver/core/OutputLog.java",
+      "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+      "file:src/main/java/exchangeserver/core/ExchangeException.java",
+      "file:src/main/java/exchangeserver/core/ExchangeService.java",
+      "file:src/main/java/exchangeserver/core/Request.java",
+      "file:src/main/java/exchangeserver/core/ResendResult.java",
+      "file:src/main/java/exchangeserver/core/Ledger.java",
+      "file:src/main/java/exchangeserver/core/CommandInterceptor.java",
+      "file:src/main/java/exchangeserver/core/Pending.java",
+      "file:src/main/java/exchangeserver/core/Replay.java",
+      "file:src/main/java/exchangeserver/core/Snapshot.java",
+      "file:src/main/java/exchangeserver/core/Exchange.java",
+      "file:src/main/java/exchangeserver/core/ReplayException.java"
+    ],
+    "engine": [
+      "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+      "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+      "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+      "file:src/main/java/exchangeserver/engine/Execution.java",
+      "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+      "file:src/main/java/exchangeserver/engine/Reason.java",
+      "file:src/main/java/exchangeserver/engine/Trade.java",
+      "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+      "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+      "file:src/main/java/exchangeserver/engine/Response.java",
+      "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+      "file:src/main/java/exchangeserver/engine/EngineState.java"
+    ],
+    "gateway": [
+      "file:src/main/java/exchangeserver/gateway/Protocol.java",
+      "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+      "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+      "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+      "file:src/main/java/exchangeserver/gateway/Credentials.java",
+      "file:src/main/java/exchangeserver/gateway/Tls.java",
+      "file:src/main/java/exchangeserver/gateway/ProtocolException.java"
+    ],
+    "test/core": [
+      "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+      "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+      "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+      "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+      "file:src/test/java/exchangeserver/core/ReplayTest.java",
+      "file:src/test/java/exchangeserver/core/SnapshotTest.java"
+    ],
+    "test/gateway": [
+      "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+      "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+      "file:src/test/java/exchangeserver/gateway/ClientSessionTest.java",
+      "file:src/test/java/exchangeserver/gateway/CredentialsTest.java"
+    ],
+    "domain": [
+      "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+      "file:src/main/java/exchangeserver/domain/Order.java",
+      "file:src/main/java/exchangeserver/domain/Rules.java",
+      "file:src/main/java/exchangeserver/domain/OrderType.java",
+      "file:src/main/java/exchangeserver/domain/Side.java"
+    ],
+    "test/(root-pkg)": [
+      "file:src/test/java/exchangeserver/MainTest.java"
+    ],
+    "test/bench": [
+      "file:src/test/java/exchangeserver/bench/BatchingBenchmark.java",
+      "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java"
+    ],
+    "test/command": [
+      "file:src/test/java/exchangeserver/command/SequencerTest.java"
+    ],
+    "test/testing": [
+      "file:src/test/java/exchangeserver/testing/MutableClock.java"
+    ],
+    "command": [
+      "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+      "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+      "file:src/main/java/exchangeserver/command/CheckCommand.java",
+      "file:src/main/java/exchangeserver/command/Command.java",
+      "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+      "file:src/main/java/exchangeserver/command/SkipCommand.java",
+      "file:src/main/java/exchangeserver/command/Sequencer.java"
+    ],
+    "test/book": [
+      "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+      "file:src/test/java/exchangeserver/book/PriceLevelTest.java"
+    ],
+    "test/engine": [
+      "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+      "file:src/test/java/exchangeserver/engine/ResponseTest.java"
+    ],
+    "journal": [
+      "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+      "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+      "file:src/main/java/exchangeserver/journal/Checksums.java",
+      "file:src/main/java/exchangeserver/journal/Durable.java",
+      "file:src/main/java/exchangeserver/journal/JournalLock.java"
+    ],
+    "test/journal": [
+      "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+      "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+      "file:src/test/java/exchangeserver/journal/DurableTest.java"
+    ],
+    "(root-pkg)": [
+      "file:src/main/java/exchangeserver/Main.java"
+    ],
+    "(root)": [
+      "document:CLAUDE.md",
+      "document:README.md",
+      "file:mvnw.cmd",
+      "config:pom.xml",
+      "file:.gitattributes",
+      "file:mvnw"
+    ],
+    "docs/understanding": [
+      "document:docs/understanding/00-START-HERE.md",
+      "document:docs/understanding/01-big-picture.md",
+      "document:docs/understanding/02-tech-stack.md",
+      "document:docs/understanding/03-codebase-map.md",
+      "document:docs/understanding/04-running-and-tooling.md",
+      "document:docs/understanding/05-core-flows.md",
+      "document:docs/understanding/05a-core-flows-trading.md",
+      "document:docs/understanding/05b-core-flows-lifecycle.md",
+      "document:docs/understanding/06-data-and-state.md",
+      "document:docs/understanding/08-cross-cutting.md",
+      "document:docs/understanding/09-design-decisions.md",
+      "document:docs/understanding/09a-design-decisions-foundations.md",
+      "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+      "document:docs/understanding/10-testing.md",
+      "document:docs/understanding/11-risks-and-smells.md",
+      "document:docs/understanding/12-change-recipes.md",
+      "document:docs/understanding/13-glossary.md",
+      "document:docs/understanding/14-exercises.md",
+      "document:docs/understanding/15-open-questions.md",
+      "document:docs/understanding/AI-TUTOR-PROMPT.md",
+      "document:docs/understanding/07-modules/book.md",
+      "document:docs/understanding/07-modules/client-and-main.md",
+      "document:docs/understanding/07-modules/domain-and-commands.md",
+      "document:docs/understanding/07-modules/engine.md",
+      "document:docs/understanding/07-modules/exchange-and-replay.md",
+      "document:docs/understanding/07-modules/exchange-service.md",
+      "document:docs/understanding/07-modules/gateway.md",
+      "document:docs/understanding/07-modules/journal.md",
+      "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+      "file:docs/understanding/build-full-context.java"
+    ],
+    ".mvn": [
+      "config:.mvn/wrapper/maven-wrapper.properties"
+    ],
+    "docs": [
+      "document:docs/ExchangeServer2_Spec.md",
+      "document:docs/ExchangeServer2_Vision.md"
+    ],
+    "test/client": [
+      "file:src/test/java/exchangeserver/client/ExchangeClientTest.java"
+    ],
+    "test/domain": [
+      "file:src/test/java/exchangeserver/domain/OrderRequestTest.java",
+      "file:src/test/java/exchangeserver/domain/OrderTest.java",
+      "file:src/test/java/exchangeserver/domain/RulesTest.java"
+    ]
+  },
+  "nodeTypeGroups": {
+    "file": [
+      "file:src/main/java/exchangeserver/book/CancelResult.java",
+      "file:src/main/java/exchangeserver/book/CancelStatus.java",
+      "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+      "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+      "file:src/main/java/exchangeserver/core/OutputDigest.java",
+      "file:src/main/java/exchangeserver/core/OutputListener.java",
+      "file:src/main/java/exchangeserver/core/OutputLog.java",
+      "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+      "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+      "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+      "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+      "file:src/main/java/exchangeserver/engine/Execution.java",
+      "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+      "file:src/main/java/exchangeserver/engine/Reason.java",
+      "file:src/main/java/exchangeserver/engine/Trade.java",
+      "file:src/main/java/exchangeserver/gateway/Protocol.java",
+      "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+      "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+      "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+      "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+      "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+      "file:src/main/java/exchangeserver/core/ExchangeException.java",
+      "file:src/main/java/exchangeserver/core/ExchangeService.java",
+      "file:src/main/java/exchangeserver/core/Request.java",
+      "file:src/main/java/exchangeserver/core/ResendResult.java",
+      "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+      "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+      "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+      "file:src/main/java/exchangeserver/engine/Response.java",
+      "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+      "file:src/test/java/exchangeserver/MainTest.java",
+      "file:src/test/java/exchangeserver/bench/BatchingBenchmark.java",
+      "file:src/test/java/exchangeserver/command/SequencerTest.java",
+      "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+      "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+      "file:src/test/java/exchangeserver/testing/MutableClock.java",
+      "file:src/main/java/exchangeserver/book/OrderBook.java",
+      "file:src/main/java/exchangeserver/book/OrderNode.java",
+      "file:src/main/java/exchangeserver/book/PriceLevel.java",
+      "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+      "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+      "file:src/main/java/exchangeserver/core/Ledger.java",
+      "file:src/main/java/exchangeserver/domain/Order.java",
+      "file:src/main/java/exchangeserver/domain/Rules.java",
+      "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+      "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+      "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+      "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+      "file:src/main/java/exchangeserver/command/CheckCommand.java",
+      "file:src/main/java/exchangeserver/command/Command.java",
+      "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+      "file:src/main/java/exchangeserver/command/SkipCommand.java",
+      "file:src/main/java/exchangeserver/core/CommandInterceptor.java",
+      "file:src/main/java/exchangeserver/core/Pending.java",
+      "file:src/main/java/exchangeserver/core/Replay.java",
+      "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+      "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+      "file:src/test/java/exchangeserver/core/ReplayTest.java",
+      "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+      "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+      "file:src/main/java/exchangeserver/book/Fill.java",
+      "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+      "file:src/main/java/exchangeserver/core/Snapshot.java",
+      "file:src/main/java/exchangeserver/domain/OrderType.java",
+      "file:src/main/java/exchangeserver/domain/Side.java",
+      "file:src/main/java/exchangeserver/engine/EngineState.java",
+      "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+      "file:src/main/java/exchangeserver/journal/Checksums.java",
+      "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+      "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+      "file:src/test/java/exchangeserver/engine/ResponseTest.java",
+      "file:src/main/java/exchangeserver/Main.java",
+      "file:src/main/java/exchangeserver/client/ClientMain.java",
+      "file:src/main/java/exchangeserver/command/Sequencer.java",
+      "file:src/main/java/exchangeserver/core/Exchange.java",
+      "file:src/main/java/exchangeserver/core/ReplayException.java",
+      "file:src/main/java/exchangeserver/gateway/Credentials.java",
+      "file:src/main/java/exchangeserver/gateway/Tls.java",
+      "file:src/main/java/exchangeserver/journal/Durable.java",
+      "file:src/main/java/exchangeserver/journal/JournalLock.java",
+      "file:mvnw.cmd",
+      "file:.gitattributes",
+      "file:mvnw",
+      "file:docs/understanding/build-full-context.java",
+      "file:src/main/java/exchangeserver/gateway/ProtocolException.java",
+      "file:src/test/java/exchangeserver/client/ExchangeClientTest.java",
+      "file:src/test/java/exchangeserver/domain/OrderRequestTest.java",
+      "file:src/test/java/exchangeserver/domain/OrderTest.java",
+      "file:src/test/java/exchangeserver/domain/RulesTest.java",
+      "file:src/test/java/exchangeserver/gateway/ClientSessionTest.java",
+      "file:src/test/java/exchangeserver/gateway/CredentialsTest.java",
+      "file:src/test/java/exchangeserver/journal/DurableTest.java"
+    ],
+    "document": [
+      "document:CLAUDE.md",
+      "document:README.md",
+      "document:docs/understanding/00-START-HERE.md",
+      "document:docs/understanding/01-big-picture.md",
+      "document:docs/understanding/02-tech-stack.md",
+      "document:docs/understanding/03-codebase-map.md",
+      "document:docs/understanding/04-running-and-tooling.md",
+      "document:docs/understanding/05-core-flows.md",
+      "document:docs/understanding/05a-core-flows-trading.md",
+      "document:docs/understanding/05b-core-flows-lifecycle.md",
+      "document:docs/understanding/06-data-and-state.md",
+      "document:docs/understanding/08-cross-cutting.md",
+      "document:docs/understanding/09-design-decisions.md",
+      "document:docs/understanding/09a-design-decisions-foundations.md",
+      "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+      "document:docs/understanding/10-testing.md",
+      "document:docs/understanding/11-risks-and-smells.md",
+      "document:docs/understanding/12-change-recipes.md",
+      "document:docs/understanding/13-glossary.md",
+      "document:docs/understanding/14-exercises.md",
+      "document:docs/understanding/15-open-questions.md",
+      "document:docs/understanding/AI-TUTOR-PROMPT.md",
+      "document:docs/understanding/07-modules/book.md",
+      "document:docs/understanding/07-modules/client-and-main.md",
+      "document:docs/understanding/07-modules/domain-and-commands.md",
+      "document:docs/understanding/07-modules/engine.md",
+      "document:docs/understanding/07-modules/exchange-and-replay.md",
+      "document:docs/understanding/07-modules/exchange-service.md",
+      "document:docs/understanding/07-modules/gateway.md",
+      "document:docs/understanding/07-modules/journal.md",
+      "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+      "document:docs/ExchangeServer2_Spec.md",
+      "document:docs/ExchangeServer2_Vision.md"
+    ],
+    "config": [
+      "config:pom.xml",
+      "config:.mvn/wrapper/maven-wrapper.properties"
+    ]
+  },
+  "crossCategoryEdges": [
+    {
+      "fromType": "file",
+      "toType": "file",
+      "edgeType": "tested_by",
+      "count": 24
+    },
+    {
+      "fromType": "file",
+      "toType": "file",
+      "edgeType": "depends_on",
+      "count": 24
+    },
+    {
+      "fromType": "file",
+      "toType": "file",
+      "edgeType": "related",
+      "count": 4
+    },
+    {
+      "fromType": "document",
+      "toType": "file",
+      "edgeType": "documents",
+      "count": 212
+    },
+    {
+      "fromType": "document",
+      "toType": "document",
+      "edgeType": "related",
+      "count": 33
+    },
+    {
+      "fromType": "document",
+      "toType": "config",
+      "edgeType": "related",
+      "count": 1
+    },
+    {
+      "fromType": "document",
+      "toType": "config",
+      "edgeType": "documents",
+      "count": 1
+    },
+    {
+      "fromType": "file",
+      "toType": "config",
+      "edgeType": "depends_on",
+      "count": 3
+    },
+    {
+      "fromType": "config",
+      "toType": "file",
+      "edgeType": "configures",
+      "count": 8
+    },
+    {
+      "fromType": "document",
+      "toType": "file",
+      "edgeType": "related",
+      "count": 18
+    },
+    {
+      "fromType": "file",
+      "toType": "file",
+      "edgeType": "configures",
+      "count": 1
+    }
+  ],
+  "interGroupImports": [
+    {
+      "from": "core",
+      "to": "engine",
+      "count": 29
+    },
+    {
+      "from": "test/core",
+      "to": "engine",
+      "count": 21
+    },
+    {
+      "from": "core",
+      "to": "command",
+      "count": 20
+    },
+    {
+      "from": "engine",
+      "to": "book",
+      "count": 14
+    },
+    {
+      "from": "test/core",
+      "to": "domain",
+      "count": 12
+    },
+    {
+      "from": "test/core",
+      "to": "command",
+      "count": 10
+    },
+    {
+      "from": "test/journal",
+      "to": "command",
+      "count": 10
+    },
+    {
+      "from": "book",
+      "to": "domain",
+      "count": 9
+    },
+    {
+      "from": "core",
+      "to": "book",
+      "count": 8
+    },
+    {
+      "from": "gateway",
+      "to": "core",
+      "count": 8
+    },
+    {
+      "from": "core",
+      "to": "domain",
+      "count": 7
+    },
+    {
+      "from": "engine",
+      "to": "domain",
+      "count": 7
+    },
+    {
+      "from": "gateway",
+      "to": "domain",
+      "count": 7
+    },
+    {
+      "from": "test/gateway",
+      "to": "engine",
+      "count": 7
+    },
+    {
+      "from": "test/book",
+      "to": "domain",
+      "count": 7
+    },
+    {
+      "from": "journal",
+      "to": "command",
+      "count": 7
+    },
+    {
+      "from": "gateway",
+      "to": "engine",
+      "count": 6
+    },
+    {
+      "from": "test/core",
+      "to": "book",
+      "count": 6
+    },
+    {
+      "from": "core",
+      "to": "journal",
+      "count": 6
+    },
+    {
+      "from": "test/gateway",
+      "to": "core",
+      "count": 5
+    },
+    {
+      "from": "gateway",
+      "to": "book",
+      "count": 4
+    },
+    {
+      "from": "test/bench",
+      "to": "domain",
+      "count": 4
+    },
+    {
+      "from": "test/bench",
+      "to": "engine",
+      "count": 4
+    },
+    {
+      "from": "test/core",
+      "to": "journal",
+      "count": 4
+    },
+    {
+      "from": "command",
+      "to": "domain",
+      "count": 4
+    },
+    {
+      "from": "test/engine",
+      "to": "domain",
+      "count": 4
+    },
+    {
+      "from": "test/journal",
+      "to": "domain",
+      "count": 4
+    },
+    {
+      "from": "engine",
+      "to": "command",
+      "count": 3
+    },
+    {
+      "from": "test/engine",
+      "to": "book",
+      "count": 3
+    },
+    {
+      "from": "test/engine",
+      "to": "command",
+      "count": 3
+    },
+    {
+      "from": "journal",
+      "to": "domain",
+      "count": 3
+    },
+    {
+      "from": "(root-pkg)",
+      "to": "core",
+      "count": 3
+    },
+    {
+      "from": "(root-pkg)",
+      "to": "gateway",
+      "count": 3
+    },
+    {
+      "from": "test/gateway",
+      "to": "book",
+      "count": 2
+    },
+    {
+      "from": "test/gateway",
+      "to": "domain",
+      "count": 2
+    },
+    {
+      "from": "test/(root-pkg)",
+      "to": "domain",
+      "count": 2
+    },
+    {
+      "from": "test/bench",
+      "to": "core",
+      "count": 2
+    },
+    {
+      "from": "test/command",
+      "to": "domain",
+      "count": 2
+    },
+    {
+      "from": "test/core",
+      "to": "test/testing",
+      "count": 2
+    },
+    {
+      "from": "test/bench",
+      "to": "book",
+      "count": 2
+    },
+    {
+      "from": "test/bench",
+      "to": "command",
+      "count": 2
+    },
+    {
+      "from": "test/book",
+      "to": "command",
+      "count": 2
+    },
+    {
+      "from": "test/book",
+      "to": "engine",
+      "count": 2
+    },
+    {
+      "from": "test/gateway",
+      "to": "client",
+      "count": 1
+    },
+    {
+      "from": "test/(root-pkg)",
+      "to": "core",
+      "count": 1
+    },
+    {
+      "from": "test/(root-pkg)",
+      "to": "test/testing",
+      "count": 1
+    },
+    {
+      "from": "test/command",
+      "to": "test/testing",
+      "count": 1
+    },
+    {
+      "from": "client",
+      "to": "gateway",
+      "count": 1
+    },
+    {
+      "from": "gateway",
+      "to": "journal",
+      "count": 1
+    }
+  ],
+  "intraGroupDensity": {
+    "book": {
+      "internalEdges": 0,
+      "totalEdges": 48,
+      "density": 0
+    },
+    "client": {
+      "internalEdges": 0,
+      "totalEdges": 2,
+      "density": 0
+    },
+    "core": {
+      "internalEdges": 0,
+      "totalEdges": 89,
+      "density": 0
+    },
+    "engine": {
+      "internalEdges": 0,
+      "totalEdges": 93,
+      "density": 0
+    },
+    "gateway": {
+      "internalEdges": 0,
+      "totalEdges": 30,
+      "density": 0
+    },
+    "test/core": {
+      "internalEdges": 0,
+      "totalEdges": 55,
+      "density": 0
+    },
+    "test/gateway": {
+      "internalEdges": 0,
+      "totalEdges": 17,
+      "density": 0
+    },
+    "domain": {
+      "internalEdges": 0,
+      "totalEdges": 74,
+      "density": 0
+    },
+    "test/(root-pkg)": {
+      "internalEdges": 0,
+      "totalEdges": 4,
+      "density": 0
+    },
+    "test/bench": {
+      "internalEdges": 0,
+      "totalEdges": 14,
+      "density": 0
+    },
+    "test/command": {
+      "internalEdges": 0,
+      "totalEdges": 3,
+      "density": 0
+    },
+    "test/testing": {
+      "internalEdges": 0,
+      "totalEdges": 4,
+      "density": 0
+    },
+    "command": {
+      "internalEdges": 0,
+      "totalEdges": 61,
+      "density": 0
+    },
+    "test/book": {
+      "internalEdges": 0,
+      "totalEdges": 11,
+      "density": 0
+    },
+    "test/engine": {
+      "internalEdges": 0,
+      "totalEdges": 10,
+      "density": 0
+    },
+    "journal": {
+      "internalEdges": 0,
+      "totalEdges": 21,
+      "density": 0
+    },
+    "test/journal": {
+      "internalEdges": 0,
+      "totalEdges": 14,
+      "density": 0
+    },
+    "(root-pkg)": {
+      "internalEdges": 0,
+      "totalEdges": 6,
+      "density": 0
+    },
+    "(root)": {
+      "internalEdges": 0,
+      "totalEdges": 0,
+      "density": 0
+    },
+    "docs/understanding": {
+      "internalEdges": 0,
+      "totalEdges": 0,
+      "density": 0
+    },
+    ".mvn": {
+      "internalEdges": 0,
+      "totalEdges": 0,
+      "density": 0
+    },
+    "docs": {
+      "internalEdges": 0,
+      "totalEdges": 0,
+      "density": 0
+    },
+    "test/client": {
+      "internalEdges": 0,
+      "totalEdges": 0,
+      "density": 0
+    },
+    "test/domain": {
+      "internalEdges": 0,
+      "totalEdges": 0,
+      "density": 0
+    }
+  },
+  "patternMatches": {
+    "book": "data",
+    "client": "entry",
+    "core": "service",
+    "engine": "service",
+    "gateway": "api",
+    "test/core": "test",
+    "test/gateway": "test",
+    "domain": "service",
+    "test/(root-pkg)": "test",
+    "test/bench": "test",
+    "test/command": "test",
+    "test/testing": "test",
+    "command": "service",
+    "test/book": "test",
+    "test/engine": "test",
+    "journal": "data",
+    "test/journal": "test",
+    "(root-pkg)": null,
+    "(root)": null,
+    "docs/understanding": "documentation",
+    ".mvn": "config",
+    "docs": "documentation",
+    "test/client": "test",
+    "test/domain": "test"
+  },
+  "deploymentTopology": {
+    "hasDockerfile": false,
+    "hasCompose": false,
+    "hasK8s": false,
+    "hasTerraform": false,
+    "hasCI": false,
+    "infraFiles": [
+      "mvnw.cmd",
+      "mvnw"
+    ]
+  },
+  "dataPipeline": {
+    "schemaFiles": [],
+    "migrationFiles": [],
+    "dataModelFiles": [
+      "file:src/main/java/exchangeserver/book/CancelResult.java",
+      "file:src/main/java/exchangeserver/book/CancelStatus.java",
+      "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+      "file:src/main/java/exchangeserver/book/OrderBook.java",
+      "file:src/main/java/exchangeserver/book/OrderNode.java",
+      "file:src/main/java/exchangeserver/book/PriceLevel.java",
+      "file:src/main/java/exchangeserver/book/Fill.java",
+      "file:src/main/java/exchangeserver/book/RestingOrderView.java"
+    ],
+    "apiHandlerFiles": [
+      "file:src/main/java/exchangeserver/gateway/Protocol.java",
+      "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+      "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+      "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+      "file:src/main/java/exchangeserver/gateway/Credentials.java",
+      "file:src/main/java/exchangeserver/gateway/Tls.java",
+      "file:src/main/java/exchangeserver/gateway/ProtocolException.java"
+    ]
+  },
+  "docCoverage": {
+    "groupsWithDocs": 3,
+    "totalGroups": 24,
+    "coverageRatio": 0.13,
+    "undocumentedGroups": [
+      "book",
+      "client",
+      "core",
+      "engine",
+      "gateway",
+      "test/core",
+      "test/gateway",
+      "domain",
+      "test/(root-pkg)",
+      "test/bench",
+      "test/command",
+      "test/testing",
+      "command",
+      "test/book",
+      "test/engine",
+      "journal",
+      "test/journal",
+      "(root-pkg)",
+      ".mvn",
+      "test/client",
+      "test/domain"
+    ]
+  },
+  "dependencyDirection": [
+    {
+      "dependent": "core",
+      "dependsOn": "engine",
+      "forward": 29,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/core",
+      "dependsOn": "engine",
+      "forward": 21,
+      "reverse": 0
+    },
+    {
+      "dependent": "core",
+      "dependsOn": "command",
+      "forward": 20,
+      "reverse": 0
+    },
+    {
+      "dependent": "engine",
+      "dependsOn": "book",
+      "forward": 14,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/core",
+      "dependsOn": "domain",
+      "forward": 12,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/core",
+      "dependsOn": "command",
+      "forward": 10,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/journal",
+      "dependsOn": "command",
+      "forward": 10,
+      "reverse": 0
+    },
+    {
+      "dependent": "book",
+      "dependsOn": "domain",
+      "forward": 9,
+      "reverse": 0
+    },
+    {
+      "dependent": "core",
+      "dependsOn": "book",
+      "forward": 8,
+      "reverse": 0
+    },
+    {
+      "dependent": "gateway",
+      "dependsOn": "core",
+      "forward": 8,
+      "reverse": 0
+    },
+    {
+      "dependent": "core",
+      "dependsOn": "domain",
+      "forward": 7,
+      "reverse": 0
+    },
+    {
+      "dependent": "engine",
+      "dependsOn": "domain",
+      "forward": 7,
+      "reverse": 0
+    },
+    {
+      "dependent": "gateway",
+      "dependsOn": "domain",
+      "forward": 7,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/gateway",
+      "dependsOn": "engine",
+      "forward": 7,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/book",
+      "dependsOn": "domain",
+      "forward": 7,
+      "reverse": 0
+    },
+    {
+      "dependent": "journal",
+      "dependsOn": "command",
+      "forward": 7,
+      "reverse": 0
+    },
+    {
+      "dependent": "gateway",
+      "dependsOn": "engine",
+      "forward": 6,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/core",
+      "dependsOn": "book",
+      "forward": 6,
+      "reverse": 0
+    },
+    {
+      "dependent": "core",
+      "dependsOn": "journal",
+      "forward": 6,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/gateway",
+      "dependsOn": "core",
+      "forward": 5,
+      "reverse": 0
+    },
+    {
+      "dependent": "gateway",
+      "dependsOn": "book",
+      "forward": 4,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/bench",
+      "dependsOn": "domain",
+      "forward": 4,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/bench",
+      "dependsOn": "engine",
+      "forward": 4,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/core",
+      "dependsOn": "journal",
+      "forward": 4,
+      "reverse": 0
+    },
+    {
+      "dependent": "command",
+      "dependsOn": "domain",
+      "forward": 4,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/engine",
+      "dependsOn": "domain",
+      "forward": 4,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/journal",
+      "dependsOn": "domain",
+      "forward": 4,
+      "reverse": 0
+    },
+    {
+      "dependent": "engine",
+      "dependsOn": "command",
+      "forward": 3,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/engine",
+      "dependsOn": "book",
+      "forward": 3,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/engine",
+      "dependsOn": "command",
+      "forward": 3,
+      "reverse": 0
+    },
+    {
+      "dependent": "journal",
+      "dependsOn": "domain",
+      "forward": 3,
+      "reverse": 0
+    },
+    {
+      "dependent": "(root-pkg)",
+      "dependsOn": "core",
+      "forward": 3,
+      "reverse": 0
+    },
+    {
+      "dependent": "(root-pkg)",
+      "dependsOn": "gateway",
+      "forward": 3,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/gateway",
+      "dependsOn": "book",
+      "forward": 2,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/gateway",
+      "dependsOn": "domain",
+      "forward": 2,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/(root-pkg)",
+      "dependsOn": "domain",
+      "forward": 2,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/bench",
+      "dependsOn": "core",
+      "forward": 2,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/command",
+      "dependsOn": "domain",
+      "forward": 2,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/core",
+      "dependsOn": "test/testing",
+      "forward": 2,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/bench",
+      "dependsOn": "book",
+      "forward": 2,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/bench",
+      "dependsOn": "command",
+      "forward": 2,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/book",
+      "dependsOn": "command",
+      "forward": 2,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/book",
+      "dependsOn": "engine",
+      "forward": 2,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/gateway",
+      "dependsOn": "client",
+      "forward": 1,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/(root-pkg)",
+      "dependsOn": "core",
+      "forward": 1,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/(root-pkg)",
+      "dependsOn": "test/testing",
+      "forward": 1,
+      "reverse": 0
+    },
+    {
+      "dependent": "test/command",
+      "dependsOn": "test/testing",
+      "forward": 1,
+      "reverse": 0
+    },
+    {
+      "dependent": "client",
+      "dependsOn": "gateway",
+      "forward": 1,
+      "reverse": 0
+    },
+    {
+      "dependent": "gateway",
+      "dependsOn": "journal",
+      "forward": 1,
+      "reverse": 0
+    }
+  ],
+  "fileStats": {
+    "totalFileNodes": 127,
+    "filesPerGroup": {
+      "book": 8,
+      "client": 2,
+      "core": 15,
+      "engine": 12,
+      "gateway": 7,
+      "test/core": 6,
+      "test/gateway": 4,
+      "domain": 5,
+      "test/(root-pkg)": 1,
+      "test/bench": 2,
+      "test/command": 1,
+      "test/testing": 1,
+      "command": 7,
+      "test/book": 2,
+      "test/engine": 2,
+      "journal": 5,
+      "test/journal": 3,
+      "(root-pkg)": 1,
+      "(root)": 6,
+      "docs/understanding": 30,
+      ".mvn": 1,
+      "docs": 2,
+      "test/client": 1,
+      "test/domain": 3
+    },
+    "nodeTypeCounts": {
+      "file": 92,
+      "document": 33,
+      "config": 2
+    }
+  },
+  "fileFanIn": {
+    "file:src/main/java/exchangeserver/domain/Side.java": 30,
+    "file:src/main/java/exchangeserver/book/CancelResult.java": 15,
+    "file:src/main/java/exchangeserver/book/LevelUpdate.java": 12,
+    "file:src/main/java/exchangeserver/engine/CancelAllOutput.java": 5,
+    "file:src/main/java/exchangeserver/engine/CancelOutput.java": 6,
+    "file:src/main/java/exchangeserver/engine/EngineOutput.java": 9,
+    "file:src/main/java/exchangeserver/engine/Execution.java": 6,
+    "file:src/main/java/exchangeserver/engine/OrderOutput.java": 7,
+    "file:src/main/java/exchangeserver/engine/Response.java": 12,
+    "file:src/main/java/exchangeserver/engine/Trade.java": 5,
+    "file:src/main/java/exchangeserver/command/CancelAllCommand.java": 7,
+    "file:src/main/java/exchangeserver/command/CancelOrderCommand.java": 12,
+    "file:src/main/java/exchangeserver/command/Command.java": 12,
+    "file:src/main/java/exchangeserver/command/NewOrderCommand.java": 15,
+    "file:src/main/java/exchangeserver/book/CancelStatus.java": 2,
+    "file:src/main/java/exchangeserver/core/PrivateEvent.java": 5,
+    "file:src/main/java/exchangeserver/domain/OrderType.java": 9,
+    "file:src/main/java/exchangeserver/engine/BookSnapshot.java": 7,
+    "file:src/main/java/exchangeserver/core/ExchangeService.java": 5,
+    "file:src/main/java/exchangeserver/core/OutputListener.java": 3,
+    "file:src/main/java/exchangeserver/engine/OrderStatus.java": 5,
+    "file:src/main/java/exchangeserver/domain/OrderRequest.java": 21,
+    "file:src/main/java/exchangeserver/engine/Reason.java": 2,
+    "file:src/main/java/exchangeserver/client/ExchangeClient.java": 1,
+    "file:src/main/java/exchangeserver/core/Exchange.java": 3,
+    "file:src/main/java/exchangeserver/core/ExchangeException.java": 1,
+    "file:src/main/java/exchangeserver/core/ResendResult.java": 1,
+    "file:src/main/java/exchangeserver/domain/Rules.java": 8,
+    "file:src/test/java/exchangeserver/testing/MutableClock.java": 4,
+    "file:src/main/java/exchangeserver/journal/CommandJournal.java": 5,
+    "file:src/main/java/exchangeserver/domain/Order.java": 6,
+    "file:src/main/java/exchangeserver/engine/MatchingEngine.java": 4,
+    "file:src/main/java/exchangeserver/book/Fill.java": 1,
+    "file:src/main/java/exchangeserver/book/OrderBook.java": 3,
+    "file:src/main/java/exchangeserver/book/PriceLevel.java": 2,
+    "file:src/main/java/exchangeserver/book/RestingOrderView.java": 4,
+    "file:src/main/java/exchangeserver/command/CheckCommand.java": 4,
+    "file:src/main/java/exchangeserver/command/SkipCommand.java": 6,
+    "file:src/main/java/exchangeserver/engine/EngineState.java": 1,
+    "file:src/main/java/exchangeserver/journal/Checksums.java": 2,
+    "file:src/main/java/exchangeserver/journal/Durable.java": 3,
+    "file:src/main/java/exchangeserver/core/ReplayException.java": 1,
+    "file:src/main/java/exchangeserver/gateway/Credentials.java": 1,
+    "file:src/main/java/exchangeserver/gateway/TcpGateway.java": 1,
+    "file:src/main/java/exchangeserver/gateway/Tls.java": 2,
+    "file:src/main/java/exchangeserver/command/Sequencer.java": 1,
+    "file:src/main/java/exchangeserver/journal/JournalLock.java": 1
+  },
+  "fileFanOut": {
+    "file:src/main/java/exchangeserver/book/LevelUpdate.java": 1,
+    "file:src/main/java/exchangeserver/core/OutputDigest.java": 9,
+    "file:src/main/java/exchangeserver/core/OutputListener.java": 1,
+    "file:src/main/java/exchangeserver/core/OutputLog.java": 10,
+    "file:src/main/java/exchangeserver/core/PrivateEvent.java": 4,
+    "file:src/main/java/exchangeserver/engine/CancelAllOutput.java": 2,
+    "file:src/main/java/exchangeserver/engine/CancelOutput.java": 2,
+    "file:src/main/java/exchangeserver/engine/EngineOutput.java": 1,
+    "file:src/main/java/exchangeserver/engine/Execution.java": 1,
+    "file:src/main/java/exchangeserver/engine/OrderOutput.java": 1,
+    "file:src/main/java/exchangeserver/engine/Trade.java": 1,
+    "file:src/main/java/exchangeserver/gateway/Protocol.java": 10,
+    "file:src/main/java/exchangeserver/gateway/TcpGateway.java": 6,
+    "file:src/test/java/exchangeserver/core/OutputDigestTest.java": 9,
+    "file:src/test/java/exchangeserver/core/OutputLogTest.java": 13,
+    "file:src/test/java/exchangeserver/gateway/ProtocolTest.java": 11,
+    "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java": 6,
+    "file:src/main/java/exchangeserver/core/ExchangeService.java": 4,
+    "file:src/main/java/exchangeserver/core/Request.java": 4,
+    "file:src/main/java/exchangeserver/engine/BookSnapshot.java": 1,
+    "file:src/main/java/exchangeserver/gateway/ClientSession.java": 6,
+    "file:src/test/java/exchangeserver/MainTest.java": 4,
+    "file:src/test/java/exchangeserver/bench/BatchingBenchmark.java": 5,
+    "file:src/test/java/exchangeserver/command/SequencerTest.java": 3,
+    "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java": 8,
+    "file:src/test/java/exchangeserver/core/ExchangeTest.java": 12,
+    "file:src/main/java/exchangeserver/book/OrderBook.java": 2,
+    "file:src/main/java/exchangeserver/book/OrderNode.java": 1,
+    "file:src/main/java/exchangeserver/book/PriceLevel.java": 2,
+    "file:src/main/java/exchangeserver/command/CancelAllCommand.java": 1,
+    "file:src/main/java/exchangeserver/command/CancelOrderCommand.java": 1,
+    "file:src/main/java/exchangeserver/core/Ledger.java": 6,
+    "file:src/main/java/exchangeserver/engine/MatchingEngine.java": 14,
+    "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java": 9,
+    "file:src/test/java/exchangeserver/book/OrderBookTest.java": 8,
+    "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java": 9,
+    "file:src/main/java/exchangeserver/command/NewOrderCommand.java": 1,
+    "file:src/main/java/exchangeserver/core/CommandInterceptor.java": 1,
+    "file:src/main/java/exchangeserver/core/Pending.java": 1,
+    "file:src/main/java/exchangeserver/core/Replay.java": 5,
+    "file:src/main/java/exchangeserver/journal/CommandJournal.java": 1,
+    "file:src/main/java/exchangeserver/journal/JournalCodec.java": 9,
+    "file:src/test/java/exchangeserver/core/ReplayTest.java": 9,
+    "file:src/test/java/exchangeserver/journal/CommandJournalTest.java": 6,
+    "file:src/test/java/exchangeserver/journal/JournalCodecTest.java": 8,
+    "file:src/main/java/exchangeserver/book/Fill.java": 1,
+    "file:src/main/java/exchangeserver/book/RestingOrderView.java": 2,
+    "file:src/main/java/exchangeserver/core/Snapshot.java": 6,
+    "file:src/main/java/exchangeserver/engine/EngineState.java": 1,
+    "file:src/main/java/exchangeserver/gateway/ClientMessage.java": 2,
+    "file:src/test/java/exchangeserver/book/PriceLevelTest.java": 3,
+    "file:src/test/java/exchangeserver/core/SnapshotTest.java": 4,
+    "file:src/test/java/exchangeserver/engine/ResponseTest.java": 1,
+    "file:src/main/java/exchangeserver/Main.java": 6,
+    "file:src/main/java/exchangeserver/client/ClientMain.java": 1,
+    "file:src/main/java/exchangeserver/command/Sequencer.java": 1,
+    "file:src/main/java/exchangeserver/core/Exchange.java": 19,
+    "file:src/main/java/exchangeserver/gateway/Credentials.java": 2
+  }
+}

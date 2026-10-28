@@ -1,0 +1,119 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 2,
+  "filesSkipped": [
+    "mvnw.cmd",
+    "pom.xml"
+  ],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 2,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 2
+    }
+  },
+  "results": [
+    {
+      "path": "CLAUDE.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 121,
+      "nonEmptyLines": 100,
+      "sections": [
+        {
+          "heading": "CLAUDE.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "What this is",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Commands",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "Architecture (the parts that span several files)",
+          "level": 2,
+          "line": 49
+        },
+        {
+          "heading": "Tests",
+          "level": 2,
+          "line": 100
+        },
+        {
+          "heading": "Environment",
+          "level": 2,
+          "line": 113
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 173,
+      "nonEmptyLines": 143,
+      "sections": [
+        {
+          "heading": "ExchangeServer2",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "At a glance",
+          "level": 2,
+          "line": 14
+        },
+        {
+          "heading": "Highlights",
+          "level": 2,
+          "line": 30
+        },
+        {
+          "heading": "Build and test",
+          "level": 2,
+          "line": 80
+        },
+        {
+          "heading": "Run",
+          "level": 2,
+          "line": 94
+        },
+        {
+          "heading": "Layout",
+          "level": 2,
+          "line": 148
+        },
+        {
+          "heading": "Documentation",
+          "level": 2,
+          "line": 163
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 7
+      }
+    }
+  ]
+}

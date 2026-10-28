@@ -1,0 +1,148 @@
+{
+  "batchIndex": 8,
+  "files": [
+    {
+      "path": "docs/understanding/00-START-HERE.md",
+      "language": "markdown",
+      "sizeLines": 200,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/01-big-picture.md",
+      "language": "markdown",
+      "sizeLines": 396,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/02-tech-stack.md",
+      "language": "markdown",
+      "sizeLines": 720,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/03-codebase-map.md",
+      "language": "markdown",
+      "sizeLines": 313,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/04-running-and-tooling.md",
+      "language": "markdown",
+      "sizeLines": 646,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/05-core-flows.md",
+      "language": "markdown",
+      "sizeLines": 70,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/05a-core-flows-trading.md",
+      "language": "markdown",
+      "sizeLines": 485,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/05b-core-flows-lifecycle.md",
+      "language": "markdown",
+      "sizeLines": 426,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/06-data-and-state.md",
+      "language": "markdown",
+      "sizeLines": 396,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/08-cross-cutting.md",
+      "language": "markdown",
+      "sizeLines": 463,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/09-design-decisions.md",
+      "language": "markdown",
+      "sizeLines": 89,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/09a-design-decisions-foundations.md",
+      "language": "markdown",
+      "sizeLines": 502,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/09b-design-decisions-risk-fixes.md",
+      "language": "markdown",
+      "sizeLines": 312,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/10-testing.md",
+      "language": "markdown",
+      "sizeLines": 299,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/11-risks-and-smells.md",
+      "language": "markdown",
+      "sizeLines": 208,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/12-change-recipes.md",
+      "language": "markdown",
+      "sizeLines": 302,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/13-glossary.md",
+      "language": "markdown",
+      "sizeLines": 248,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/14-exercises.md",
+      "language": "markdown",
+      "sizeLines": 292,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/15-open-questions.md",
+      "language": "markdown",
+      "sizeLines": 142,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/AI-TUTOR-PROMPT.md",
+      "language": "markdown",
+      "sizeLines": 89,
+      "fileCategory": "docs"
+    }
+  ],
+  "batchImportData": {
+    "docs/understanding/00-START-HERE.md": [],
+    "docs/understanding/01-big-picture.md": [],
+    "docs/understanding/02-tech-stack.md": [],
+    "docs/understanding/03-codebase-map.md": [],
+    "docs/understanding/04-running-and-tooling.md": [],
+    "docs/understanding/05-core-flows.md": [],
+    "docs/understanding/05a-core-flows-trading.md": [],
+    "docs/understanding/05b-core-flows-lifecycle.md": [],
+    "docs/understanding/06-data-and-state.md": [],
+    "docs/understanding/08-cross-cutting.md": [],
+    "docs/understanding/09-design-decisions.md": [],
+    "docs/understanding/09a-design-decisions-foundations.md": [],
+    "docs/understanding/09b-design-decisions-risk-fixes.md": [],
+    "docs/understanding/10-testing.md": [],
+    "docs/understanding/11-risks-and-smells.md": [],
+    "docs/understanding/12-change-recipes.md": [],
+    "docs/understanding/13-glossary.md": [],
+    "docs/understanding/14-exercises.md": [],
+    "docs/understanding/15-open-questions.md": [],
+    "docs/understanding/AI-TUTOR-PROMPT.md": []
+  },
+  "neighborMap": {}
+}

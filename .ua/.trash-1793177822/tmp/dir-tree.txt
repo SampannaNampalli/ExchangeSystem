@@ -1,0 +1,17 @@
+.
+./.claude
+./.claude/settings.local.json
+./.mvn
+./.mvn/wrapper
+./CLAUDE.md
+./README.md
+./docs
+./docs/ExchangeServer2_Spec.md
+./docs/ExchangeServer2_Vision.md
+./docs/understanding
+./mvnw
+./mvnw.cmd
+./pom.xml
+./src
+./src/main
+./src/test

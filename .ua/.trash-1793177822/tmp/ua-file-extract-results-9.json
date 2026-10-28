@@ -1,0 +1,1038 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 9,
+  "filesSkipped": [],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 9,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 9
+    }
+  },
+  "results": [
+    {
+      "path": "docs/understanding/07-modules/book.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 609,
+      "nonEmptyLines": 514,
+      "sections": [
+        {
+          "heading": "07 — Module: book",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Responsibility",
+          "level": 2,
+          "line": 55
+        },
+        {
+          "heading": "Public interface and who calls it",
+          "level": 2,
+          "line": 69
+        },
+        {
+          "heading": "The invariants",
+          "level": 2,
+          "line": 92
+        },
+        {
+          "heading": "Internal walkthrough: `PriceLevel`",
+          "level": 2,
+          "line": 120
+        },
+        {
+          "heading": "Construction and the sentinels",
+          "level": 3,
+          "line": 122
+        },
+        {
+          "heading": "`addOrder`: append at the tail, checks first",
+          "level": 3,
+          "line": 163
+        },
+        {
+          "heading": "`fillHead`: fill, never remove",
+          "level": 3,
+          "line": 194
+        },
+        {
+          "heading": "`unlink`: O(1) removal, shared by fills and cancels",
+          "level": 3,
+          "line": 217
+        },
+        {
+          "heading": "Internal walkthrough: `OrderBook`",
+          "level": 2,
+          "line": 248
+        },
+        {
+          "heading": "`add`: all-or-nothing",
+          "level": 3,
+          "line": 250
+        },
+        {
+          "heading": "`fillBest`: fill, remove the exhausted order, remove an emptied level",
+          "level": 3,
+          "line": 283
+        },
+        {
+          "heading": "`cancel`: owner-only, unknown otherwise",
+          "level": 3,
+          "line": 317
+        },
+        {
+          "heading": "`removeNode`: the single removal path",
+          "level": 3,
+          "line": 340
+        },
+        {
+          "heading": "`drainLevelUpdates`: deterministic L2 output",
+          "level": 3,
+          "line": 369
+        },
+        {
+          "heading": "Read walks: `walk`, `restingOrders`, `headParticipant`",
+          "level": 3,
+          "line": 398
+        },
+        {
+          "heading": "Read-only views",
+          "level": 3,
+          "line": 475
+        },
+        {
+          "heading": "Worked example",
+          "level": 2,
+          "line": 482
+        },
+        {
+          "heading": "Complexity",
+          "level": 2,
+          "line": 514
+        },
+        {
+          "heading": "Dependencies in and out",
+          "level": 2,
+          "line": 524
+        },
+        {
+          "heading": "How it's tested",
+          "level": 2,
+          "line": 540
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 561
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 577
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 592
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 25
+      }
+    },
+    {
+      "path": "docs/understanding/07-modules/client-and-main.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 387,
+      "nonEmptyLines": 337,
+      "sections": [
+        {
+          "heading": "07 — Module: client and Main (ExchangeClient, ClientMain, Main)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Dependencies",
+          "level": 2,
+          "line": 23
+        },
+        {
+          "heading": "Main",
+          "level": 2,
+          "line": 38
+        },
+        {
+          "heading": "Options",
+          "level": 3,
+          "line": 40
+        },
+        {
+          "heading": "The tools",
+          "level": 3,
+          "line": 81
+        },
+        {
+          "heading": "--add-user and the PowerShell byte-order mark",
+          "level": 4,
+          "line": 112
+        },
+        {
+          "heading": "serve(): the start-up order",
+          "level": 3,
+          "line": 148
+        },
+        {
+          "heading": "Advice that fits (L2)",
+          "level": 3,
+          "line": 195
+        },
+        {
+          "heading": "Shutdown and exit codes",
+          "level": 3,
+          "line": 219
+        },
+        {
+          "heading": "ExchangeClient",
+          "level": 2,
+          "line": 270
+        },
+        {
+          "heading": "linesUntil: consume exactly what is returned (L4)",
+          "level": 3,
+          "line": 293
+        },
+        {
+          "heading": "ClientMain",
+          "level": 2,
+          "line": 329
+        },
+        {
+          "heading": "How it is tested",
+          "level": 2,
+          "line": 340
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 353
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 364
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 375
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 17
+      }
+    },
+    {
+      "path": "docs/understanding/07-modules/domain-and-commands.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 640,
+      "nonEmptyLines": 560,
+      "sections": [
+        {
+          "heading": "07 — Module: domain and command",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Responsibility",
+          "level": 2,
+          "line": 66
+        },
+        {
+          "heading": "Public interface and who calls it",
+          "level": 2,
+          "line": 78
+        },
+        {
+          "heading": "Internal walkthrough: `domain`",
+          "level": 2,
+          "line": 98
+        },
+        {
+          "heading": "`Side` and `OrderType`",
+          "level": 3,
+          "line": 100
+        },
+        {
+          "heading": "`Rules`: everything replay depends on",
+          "level": 3,
+          "line": 139
+        },
+        {
+          "heading": "`OrderRequest`: the only field-validation layer",
+          "level": 3,
+          "line": 207
+        },
+        {
+          "heading": "`Order`: an accepted order",
+          "level": 3,
+          "line": 271
+        },
+        {
+          "heading": "Internal walkthrough: `command`",
+          "level": 2,
+          "line": 318
+        },
+        {
+          "heading": "The sealed `Command` interface and its five records",
+          "level": 3,
+          "line": 320
+        },
+        {
+          "heading": "`Sequencer`: the only clock reader and counter",
+          "level": 3,
+          "line": 429
+        },
+        {
+          "heading": "Dependencies in and out",
+          "level": 2,
+          "line": 545
+        },
+        {
+          "heading": "How it's tested",
+          "level": 2,
+          "line": 572
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 586
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 603
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 621
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 17
+      }
+    },
+    {
+      "path": "docs/understanding/07-modules/engine.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 847,
+      "nonEmptyLines": 749,
+      "sections": [
+        {
+          "heading": "07 — Module: engine",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Responsibility",
+          "level": 2,
+          "line": 78
+        },
+        {
+          "heading": "Public interface and who calls it",
+          "level": 2,
+          "line": 94
+        },
+        {
+          "heading": "Internal walkthrough",
+          "level": 2,
+          "line": 115
+        },
+        {
+          "heading": "State, and the `Limits` seam",
+          "level": 3,
+          "line": 117
+        },
+        {
+          "heading": "`onNewOrder`, `onCancel`, `onCancelAll`",
+          "level": 3,
+          "line": 153
+        },
+        {
+          "heading": "`process`: three phases (Spec D24)",
+          "level": 3,
+          "line": 235
+        },
+        {
+          "heading": "Phase 1: checks that change nothing",
+          "level": 4,
+          "line": 273
+        },
+        {
+          "heading": "The one definition of \"crosses\" (D28) and the match limit (D50, D66)",
+          "level": 4,
+          "line": 364
+        },
+        {
+          "heading": "`fillability`: the read-only pre-walk (FOK and caps)",
+          "level": 4,
+          "line": 420
+        },
+        {
+          "heading": "Phase 2: the match loop, with self-trade prevention (D67)",
+          "level": 4,
+          "line": 468
+        },
+        {
+          "heading": "Phase 3: the outcome, an exhaustive switch",
+          "level": 4,
+          "line": 518
+        },
+        {
+          "heading": "Worked example",
+          "level": 3,
+          "line": 575
+        },
+        {
+          "heading": "State export and restore (Spec D71)",
+          "level": 3,
+          "line": 593
+        },
+        {
+          "heading": "Output types",
+          "level": 3,
+          "line": 664
+        },
+        {
+          "heading": "Dependencies in and out",
+          "level": 2,
+          "line": 736
+        },
+        {
+          "heading": "Determinism, concretely",
+          "level": 2,
+          "line": 750
+        },
+        {
+          "heading": "How it's tested",
+          "level": 2,
+          "line": 766
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 781
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 802
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 824
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 22
+      }
+    },
+    {
+      "path": "docs/understanding/07-modules/exchange-and-replay.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 495,
+      "nonEmptyLines": 431,
+      "sections": [
+        {
+          "heading": "07 — Module: core (Exchange, Replay and their helpers)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Dependencies",
+          "level": 2,
+          "line": 30
+        },
+        {
+          "heading": "Interface",
+          "level": 2,
+          "line": 50
+        },
+        {
+          "heading": "Exchange.open: replay before anyone can call in",
+          "level": 2,
+          "line": 91
+        },
+        {
+          "heading": "Exchange.process: one batch",
+          "level": 2,
+          "line": 127
+        },
+        {
+          "heading": "Poison pills: quarantine and rebuild from the snapshot",
+          "level": 2,
+          "line": 237
+        },
+        {
+          "heading": "The operator tools",
+          "level": 2,
+          "line": 266
+        },
+        {
+          "heading": "--quarantine (D51, L3)",
+          "level": 3,
+          "line": 268
+        },
+        {
+          "heading": "--compact (D71)",
+          "level": 3,
+          "line": 298
+        },
+        {
+          "heading": "Replay",
+          "level": 2,
+          "line": 346
+        },
+        {
+          "heading": "The small types",
+          "level": 2,
+          "line": 412
+        },
+        {
+          "heading": "How it is tested",
+          "level": 2,
+          "line": 450
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 461
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 472
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 480
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 16
+      }
+    },
+    {
+      "path": "docs/understanding/07-modules/exchange-service.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 314,
+      "nonEmptyLines": 270,
+      "sections": [
+        {
+          "heading": "07 — Module: core (ExchangeService, the single-writer thread)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Dependencies",
+          "level": 2,
+          "line": 27
+        },
+        {
+          "heading": "Interface",
+          "level": 2,
+          "line": 41
+        },
+        {
+          "heading": "Starting",
+          "level": 2,
+          "line": 73
+        },
+        {
+          "heading": "Hand-in: one lock for \"refused\" and \"never lost\"",
+          "level": 2,
+          "line": 96
+        },
+        {
+          "heading": "Future variants and D61",
+          "level": 3,
+          "line": 145
+        },
+        {
+          "heading": "The writer loop",
+          "level": 2,
+          "line": 166
+        },
+        {
+          "heading": "Linger (benchmark only)",
+          "level": 3,
+          "line": 220
+        },
+        {
+          "heading": "States, stop and halt",
+          "level": 2,
+          "line": 226
+        },
+        {
+          "heading": "How it is tested",
+          "level": 2,
+          "line": 270
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 285
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 294
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 302
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 14
+      }
+    },
+    {
+      "path": "docs/understanding/07-modules/gateway.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 653,
+      "nonEmptyLines": 570,
+      "sections": [
+        {
+          "heading": "07 — Module: gateway (TcpGateway, ClientSession, Protocol, Credentials, Tls)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Dependencies and threads",
+          "level": 2,
+          "line": 29
+        },
+        {
+          "heading": "Interface",
+          "level": 2,
+          "line": 47
+        },
+        {
+          "heading": "TcpGateway",
+          "level": 2,
+          "line": 61
+        },
+        {
+          "heading": "Settings",
+          "level": 3,
+          "line": 63
+        },
+        {
+          "heading": "Construction: TLS or plain, bound to one address",
+          "level": 3,
+          "line": 90
+        },
+        {
+          "heading": "Start order: accept before replay (L6)",
+          "level": 3,
+          "line": 119
+        },
+        {
+          "heading": "The acceptor: back off, alarm if it persists",
+          "level": 3,
+          "line": 150
+        },
+        {
+          "heading": "Routing private events and market data",
+          "level": 3,
+          "line": 182
+        },
+        {
+          "heading": "removed(): unregister, and cancel-on-disconnect (D72)",
+          "level": 3,
+          "line": 213
+        },
+        {
+          "heading": "ClientSession",
+          "level": 2,
+          "line": 252
+        },
+        {
+          "heading": "Reading, timeouts and the end of reading",
+          "level": 3,
+          "line": 254
+        },
+        {
+          "heading": "handle(): order of the checks",
+          "level": 3,
+          "line": 301
+        },
+        {
+          "heading": "Login (D74, D73)",
+          "level": 3,
+          "line": 342
+        },
+        {
+          "heading": "Limits: admit() (D75)",
+          "level": 3,
+          "line": 388
+        },
+        {
+          "heading": "Close after the replies (D76)",
+          "level": 3,
+          "line": 416
+        },
+        {
+          "heading": "RESEND",
+          "level": 3,
+          "line": 477
+        },
+        {
+          "heading": "Subscriptions and sending",
+          "level": 3,
+          "line": 505
+        },
+        {
+          "heading": "Protocol and ClientMessage",
+          "level": 2,
+          "line": 512
+        },
+        {
+          "heading": "Credentials (D74)",
+          "level": 2,
+          "line": 563
+        },
+        {
+          "heading": "Tls",
+          "level": 2,
+          "line": 588
+        },
+        {
+          "heading": "How it is tested",
+          "level": 2,
+          "line": 597
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 617
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 626
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 638
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 26
+      }
+    },
+    {
+      "path": "docs/understanding/07-modules/journal.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 834,
+      "nonEmptyLines": 745,
+      "sections": [
+        {
+          "heading": "07 — Module: journal",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Responsibility",
+          "level": 2,
+          "line": 49
+        },
+        {
+          "heading": "Public interface and who calls it",
+          "level": 2,
+          "line": 68
+        },
+        {
+          "heading": "The format: `JournalCodec` (v3)",
+          "level": 2,
+          "line": 90
+        },
+        {
+          "heading": "Sealing: the checksum per record (D69)",
+          "level": 3,
+          "line": 132
+        },
+        {
+          "heading": "Encoding",
+          "level": 3,
+          "line": 188
+        },
+        {
+          "heading": "Decoding",
+          "level": 3,
+          "line": 224
+        },
+        {
+          "heading": "The file: `CommandJournal`",
+          "level": 2,
+          "line": 277
+        },
+        {
+          "heading": "`open`: lock, then check, then change (D64, D65, D71)",
+          "level": 3,
+          "line": 279
+        },
+        {
+          "heading": "`JournalLock`: one owner per journal (D65)",
+          "level": 3,
+          "line": 395
+        },
+        {
+          "heading": "History: the first D65 implementation (replaced)",
+          "level": 4,
+          "line": 473
+        },
+        {
+          "heading": "`Durable`: crash-safe file operations (D69, D71)",
+          "level": 3,
+          "line": 484
+        },
+        {
+          "heading": "`appendAll`: one write, one fsync, per batch",
+          "level": 3,
+          "line": 538
+        },
+        {
+          "heading": "`read`: streaming bytes, not lines",
+          "level": 3,
+          "line": 594
+        },
+        {
+          "heading": "Recovery: `cutTornTail` and the backwards block scan",
+          "level": 3,
+          "line": 650
+        },
+        {
+          "heading": "Lifecycle and failure states",
+          "level": 2,
+          "line": 706
+        },
+        {
+          "heading": "Dependencies in and out",
+          "level": 2,
+          "line": 731
+        },
+        {
+          "heading": "How it's tested",
+          "level": 2,
+          "line": 745
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 772
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 792
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 813
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 22
+      }
+    },
+    {
+      "path": "docs/understanding/07-modules/ledger-and-snapshots.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 390,
+      "nonEmptyLines": 336,
+      "sections": [
+        {
+          "heading": "07 — Module: core (Ledger, output digest, private streams, snapshots)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Dependencies",
+          "level": 2,
+          "line": 36
+        },
+        {
+          "heading": "Interface",
+          "level": 2,
+          "line": 57
+        },
+        {
+          "heading": "Ledger: one unit, rebuilt together",
+          "level": 2,
+          "line": 72
+        },
+        {
+          "heading": "OutputDigest (D70)",
+          "level": 2,
+          "line": 122
+        },
+        {
+          "heading": "Why digest outputs, not state? (D70)",
+          "level": 3,
+          "line": 168
+        },
+        {
+          "heading": "OutputLog and PrivateEvent (D73)",
+          "level": 2,
+          "line": 177
+        },
+        {
+          "heading": "Why the numbering is deterministic",
+          "level": 3,
+          "line": 219
+        },
+        {
+          "heading": "Retention and RESEND",
+          "level": 3,
+          "line": 229
+        },
+        {
+          "heading": "Snapshot (D71)",
+          "level": 2,
+          "line": 258
+        },
+        {
+          "heading": "Reading and validation",
+          "level": 3,
+          "line": 290
+        },
+        {
+          "heading": "How it is tested",
+          "level": 2,
+          "line": 337
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 350
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 363
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 375
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 16
+      }
+    }
+  ]
+}

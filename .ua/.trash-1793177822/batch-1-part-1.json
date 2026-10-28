@@ -1,0 +1,1292 @@
+{
+ "nodes": [
+  {
+   "id": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "file",
+   "name": "CancelResult.java",
+   "filePath": "src/main/java/exchangeserver/book/CancelResult.java",
+   "summary": "Immutable record describing the outcome of a cancel (status, order id, cancelled quantity), with validation and factory methods; an unknown order is a normal return value, not an exception (D17).",
+   "tags": [
+    "data-model",
+    "value-object",
+    "order-book",
+    "cancel"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Java record with a compact canonical constructor that enforces invariants between status and quantity."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/book/CancelResult.java:CancelResult",
+   "type": "class",
+   "name": "CancelResult",
+   "filePath": "src/main/java/exchangeserver/book/CancelResult.java",
+   "lineRange": [
+    6,
+    25
+   ],
+   "summary": "Record of a cancel outcome with invariant checks and cancelled()/unknown() factories.",
+   "tags": [
+    "data-model",
+    "value-object",
+    "order-book",
+    "cancel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/book/CancelStatus.java",
+   "type": "file",
+   "name": "CancelStatus.java",
+   "filePath": "src/main/java/exchangeserver/book/CancelStatus.java",
+   "summary": "Enum of cancel outcomes: CANCELLED or UNKNOWN_ORDER, where not owning an order deliberately maps to UNKNOWN_ORDER (D48).",
+   "tags": [
+    "type-definition",
+    "enum",
+    "order-book",
+    "cancel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/book/CancelStatus.java:CancelStatus",
+   "type": "class",
+   "name": "CancelStatus",
+   "filePath": "src/main/java/exchangeserver/book/CancelStatus.java",
+   "lineRange": [
+    9,
+    12
+   ],
+   "summary": "Enum: CANCELLED or UNKNOWN_ORDER.",
+   "tags": [
+    "type-definition",
+    "enum",
+    "order-book",
+    "cancel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "file",
+   "name": "LevelUpdate.java",
+   "filePath": "src/main/java/exchangeserver/book/LevelUpdate.java",
+   "summary": "Record for level-2 market data: the side, price, total volume and order count of one price level after a command; volume 0 means the level is gone.",
+   "tags": [
+    "data-model",
+    "market-data",
+    "order-book",
+    "value-object"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/book/LevelUpdate.java:LevelUpdate",
+   "type": "class",
+   "name": "LevelUpdate",
+   "filePath": "src/main/java/exchangeserver/book/LevelUpdate.java",
+   "lineRange": [
+    10,
+    11
+   ],
+   "summary": "Record of one price level's side, price, volume and order count after a command.",
+   "tags": [
+    "data-model",
+    "market-data",
+    "order-book",
+    "value-object"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "type": "file",
+   "name": "ExchangeClient.java",
+   "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+   "summary": "Minimal blocking client for the line protocol used by ClientMain and the gateway tests; a background reader thread queues lines and await() finds matching lines while keeping skipped ones for later lookups.",
+   "tags": [
+    "client",
+    "networking",
+    "line-protocol",
+    "test-support"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/client/ExchangeClient.java:ExchangeClient",
+   "type": "class",
+   "name": "ExchangeClient",
+   "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+   "lineRange": [
+    31,
+    174
+   ],
+   "summary": "AutoCloseable socket client with a background reader queue and predicate-based waits that keep skipped lines.",
+   "tags": [
+    "client",
+    "networking",
+    "line-protocol",
+    "test-support"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "type": "file",
+   "name": "OutputDigest.java",
+   "filePath": "src/main/java/exchangeserver/core/OutputDigest.java",
+   "summary": "Running FNV-1a 64 digest over a canonical, field-by-field text encoding of every engine output (D70), written into journal CHECK records so replay divergence after a behaviour change is detected.",
+   "tags": [
+    "determinism",
+    "checksum",
+    "replay",
+    "serialization",
+    "core"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Encodes fields explicitly instead of relying on toString()/hashCode(), whose formats Java does not guarantee."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/core/OutputDigest.java:OutputDigest",
+   "type": "class",
+   "name": "OutputDigest",
+   "filePath": "src/main/java/exchangeserver/core/OutputDigest.java",
+   "lineRange": [
+    25,
+    88
+   ],
+   "summary": "Package-private FNV-1a 64 running digest of engine outputs, resumable from its hex form.",
+   "tags": [
+    "determinism",
+    "checksum",
+    "replay",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/core/OutputListener.java",
+   "type": "file",
+   "name": "OutputListener.java",
+   "filePath": "src/main/java/exchangeserver/core/OutputListener.java",
+   "summary": "Functional interface invoked on the writer thread with each command's engine output and numbered private events, before the request future completes (D76); implemented by the gateway and never called during replay.",
+   "tags": [
+    "interface",
+    "event-handler",
+    "callback",
+    "core"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/core/OutputListener.java:OutputListener",
+   "type": "class",
+   "name": "OutputListener",
+   "filePath": "src/main/java/exchangeserver/core/OutputListener.java",
+   "lineRange": [
+    18,
+    24
+   ],
+   "summary": "Functional interface with onOutput(EngineOutput, List<PrivateEvent>) and a no-op NONE instance.",
+   "tags": [
+    "interface",
+    "event-handler",
+    "callback",
+    "core"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "type": "file",
+   "name": "OutputLog.java",
+   "filePath": "src/main/java/exchangeserver/core/OutputLog.java",
+   "summary": "Numbers each participant's private events (oseq) deterministically from engine outputs and retains the most recent ones per participant to serve RESEND requests (D73); can resume numbering from a snapshot.",
+   "tags": [
+    "core",
+    "event-sourcing",
+    "determinism",
+    "resend",
+    "service"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/core/OutputLog.java:OutputLog",
+   "type": "class",
+   "name": "OutputLog",
+   "filePath": "src/main/java/exchangeserver/core/OutputLog.java",
+   "lineRange": [
+    31,
+    123
+   ],
+   "summary": "Package-private per-participant event numbering and bounded retention store for RESEND.",
+   "tags": [
+    "core",
+    "event-sourcing",
+    "determinism",
+    "resend"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "type": "file",
+   "name": "PrivateEvent.java",
+   "filePath": "src/main/java/exchangeserver/core/PrivateEvent.java",
+   "summary": "Sealed interface for a participant's private stream messages (D73): OrderReply, CancelReply and MakerFill records, each numbered per participant so replay rebuilds identical oseq numbering.",
+   "tags": [
+    "type-definition",
+    "sealed-interface",
+    "event",
+    "data-model"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Sealed interface with nested record permits, enabling exhaustive pattern matching."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/core/PrivateEvent.java:PrivateEvent",
+   "type": "class",
+   "name": "PrivateEvent",
+   "filePath": "src/main/java/exchangeserver/core/PrivateEvent.java",
+   "lineRange": [
+    15,
+    32
+   ],
+   "summary": "Sealed interface over OrderReply, CancelReply and MakerFill private stream records.",
+   "tags": [
+    "type-definition",
+    "sealed-interface",
+    "event",
+    "data-model"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "type": "file",
+   "name": "CancelAllOutput.java",
+   "filePath": "src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "summary": "Engine output record for a CANCEL_ALL (D72): one CANCELLED result per removed order in book priority order plus the resulting level updates; never contains trades or fills.",
+   "tags": [
+    "data-model",
+    "engine-output",
+    "cancel",
+    "value-object"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/engine/CancelAllOutput.java:CancelAllOutput",
+   "type": "class",
+   "name": "CancelAllOutput",
+   "filePath": "src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "lineRange": [
+    11,
+    29
+   ],
+   "summary": "EngineOutput record for a CANCEL_ALL with per-order cancel results.",
+   "tags": [
+    "data-model",
+    "engine-output",
+    "cancel",
+    "value-object"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "type": "file",
+   "name": "CancelOutput.java",
+   "filePath": "src/main/java/exchangeserver/engine/CancelOutput.java",
+   "summary": "Engine output record for a single cancel command: the CancelResult and level updates, with empty trade and passive-fill lists.",
+   "tags": [
+    "data-model",
+    "engine-output",
+    "cancel",
+    "value-object"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/engine/CancelOutput.java:CancelOutput",
+   "type": "class",
+   "name": "CancelOutput",
+   "filePath": "src/main/java/exchangeserver/engine/CancelOutput.java",
+   "lineRange": [
+    10,
+    27
+   ],
+   "summary": "EngineOutput record for a single cancel.",
+   "tags": [
+    "data-model",
+    "engine-output",
+    "cancel",
+    "value-object"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "type": "file",
+   "name": "EngineOutput.java",
+   "filePath": "src/main/java/exchangeserver/engine/EngineOutput.java",
+   "summary": "Sealed interface for everything one command produced: sequence number, timestamp, trades, passive fills and level updates, separating private results from public market data.",
+   "tags": [
+    "type-definition",
+    "sealed-interface",
+    "engine-output",
+    "market-data"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/engine/EngineOutput.java:EngineOutput",
+   "type": "class",
+   "name": "EngineOutput",
+   "filePath": "src/main/java/exchangeserver/engine/EngineOutput.java",
+   "lineRange": [
+    14,
+    25
+   ],
+   "summary": "Sealed interface permitting OrderOutput, CancelOutput and CancelAllOutput.",
+   "tags": [
+    "type-definition",
+    "sealed-interface",
+    "engine-output",
+    "market-data"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/book/CancelResult.java:cancelled",
+   "type": "function",
+   "name": "cancelled",
+   "filePath": "src/main/java/exchangeserver/book/CancelResult.java",
+   "lineRange": [
+    18,
+    20
+   ],
+   "summary": "Factory for a CANCELLED result with the order id and removed quantity.",
+   "tags": [
+    "factory",
+    "cancel",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/book/CancelResult.java:unknown",
+   "type": "function",
+   "name": "unknown",
+   "filePath": "src/main/java/exchangeserver/book/CancelResult.java",
+   "lineRange": [
+    22,
+    24
+   ],
+   "summary": "Factory for an UNKNOWN_ORDER result with zero quantity.",
+   "tags": [
+    "factory",
+    "cancel",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/client/ExchangeClient.java:send",
+   "type": "function",
+   "name": "send",
+   "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+   "lineRange": [
+    54,
+    58
+   ],
+   "summary": "Writes one protocol line to the server and flushes it.",
+   "tags": [
+    "networking",
+    "client",
+    "io"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/client/ExchangeClient.java:await",
+   "type": "function",
+   "name": "await",
+   "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+   "lineRange": [
+    61,
+    85
+   ],
+   "summary": "Returns the first line matching a predicate within a timeout, searching previously skipped lines first and keeping new non-matching lines for later.",
+   "tags": [
+    "networking",
+    "client",
+    "synchronization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/client/ExchangeClient.java:awaitPrefix",
+   "type": "function",
+   "name": "awaitPrefix",
+   "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+   "lineRange": [
+    87,
+    89
+   ],
+   "summary": "Convenience wait for the first line starting with a given prefix.",
+   "tags": [
+    "client",
+    "utility",
+    "synchronization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/client/ExchangeClient.java:linesUntil",
+   "type": "function",
+   "name": "linesUntil",
+   "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+   "lineRange": [
+    93,
+    120
+   ],
+   "summary": "Collects lines up to and including one matching a predicate, within a timeout.",
+   "tags": [
+    "client",
+    "networking",
+    "synchronization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/client/ExchangeClient.java:nextLine",
+   "type": "function",
+   "name": "nextLine",
+   "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+   "lineRange": [
+    123,
+    130
+   ],
+   "summary": "Takes the next unseen line from the incoming queue within a timeout.",
+   "tags": [
+    "client",
+    "networking",
+    "io"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/client/ExchangeClient.java:isClosedByServer",
+   "type": "function",
+   "name": "isClosedByServer",
+   "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+   "lineRange": [
+    132,
+    145
+   ],
+   "summary": "Reports whether the server closed the connection (EOF reached) within a timeout.",
+   "tags": [
+    "client",
+    "networking",
+    "lifecycle"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/client/ExchangeClient.java:readLoop",
+   "type": "function",
+   "name": "readLoop",
+   "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+   "lineRange": [
+    147,
+    158
+   ],
+   "summary": "Background reader loop that pushes each received line, then an EOF marker, onto the incoming queue.",
+   "tags": [
+    "client",
+    "networking",
+    "background-thread"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/client/ExchangeClient.java:field",
+   "type": "function",
+   "name": "field",
+   "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+   "lineRange": [
+    161,
+    168
+   ],
+   "summary": "Static helper extracting a key=value field from a server line.",
+   "tags": [
+    "utility",
+    "parser",
+    "client"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/client/ExchangeClient.java:close",
+   "type": "function",
+   "name": "close",
+   "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+   "lineRange": [
+    170,
+    173
+   ],
+   "summary": "Closes the client socket.",
+   "tags": [
+    "lifecycle",
+    "client",
+    "networking"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/OutputDigest.java:update",
+   "type": "function",
+   "name": "update",
+   "filePath": "src/main/java/exchangeserver/core/OutputDigest.java",
+   "lineRange": [
+    48,
+    83
+   ],
+   "summary": "Folds one engine output into the digest by encoding its sequence, timestamp, response, trades, fills, cancel results and level updates field by field.",
+   "tags": [
+    "checksum",
+    "serialization",
+    "determinism"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/OutputLog.java:record",
+   "type": "function",
+   "name": "record",
+   "filePath": "src/main/java/exchangeserver/core/OutputLog.java",
+   "lineRange": [
+    58,
+    76
+   ],
+   "summary": "Turns one command's engine output into numbered private events (requester reply first, then maker fills) and retains them; throws on a mismatched command/output pair.",
+   "tags": [
+    "event-sourcing",
+    "core",
+    "determinism"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/OutputLog.java:since",
+   "type": "function",
+   "name": "since",
+   "filePath": "src/main/java/exchangeserver/core/OutputLog.java",
+   "lineRange": [
+    84,
+    97
+   ],
+   "summary": "Returns a participant's retained events from a given oseq onward for RESEND, or signals a gap if they are no longer retained.",
+   "tags": [
+    "resend",
+    "core",
+    "query"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/CancelAllOutput.java:trades",
+   "type": "function",
+   "name": "trades",
+   "filePath": "src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "lineRange": [
+    20,
+    23
+   ],
+   "summary": "Returns an empty list: a CANCEL_ALL never trades.",
+   "tags": [
+    "engine-output",
+    "accessor",
+    "cancel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/CancelAllOutput.java:passiveFills",
+   "type": "function",
+   "name": "passiveFills",
+   "filePath": "src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "lineRange": [
+    25,
+    28
+   ],
+   "summary": "Returns an empty list: a CANCEL_ALL produces no fills.",
+   "tags": [
+    "engine-output",
+    "accessor",
+    "cancel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/CancelOutput.java:trades",
+   "type": "function",
+   "name": "trades",
+   "filePath": "src/main/java/exchangeserver/engine/CancelOutput.java",
+   "lineRange": [
+    18,
+    21
+   ],
+   "summary": "Returns an empty list: a cancel never trades.",
+   "tags": [
+    "engine-output",
+    "accessor",
+    "cancel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/CancelOutput.java:passiveFills",
+   "type": "function",
+   "name": "passiveFills",
+   "filePath": "src/main/java/exchangeserver/engine/CancelOutput.java",
+   "lineRange": [
+    23,
+    26
+   ],
+   "summary": "Returns an empty list: a cancel produces no fills.",
+   "tags": [
+    "engine-output",
+    "accessor",
+    "cancel"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "target": "class:src/main/java/exchangeserver/book/CancelResult.java:CancelResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "target": "class:src/main/java/exchangeserver/book/CancelResult.java:CancelResult",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/CancelStatus.java",
+   "target": "class:src/main/java/exchangeserver/book/CancelStatus.java:CancelStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/CancelStatus.java",
+   "target": "class:src/main/java/exchangeserver/book/CancelStatus.java:CancelStatus",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "target": "class:src/main/java/exchangeserver/book/LevelUpdate.java:LevelUpdate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "target": "class:src/main/java/exchangeserver/book/LevelUpdate.java:LevelUpdate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "class:src/main/java/exchangeserver/client/ExchangeClient.java:ExchangeClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "class:src/main/java/exchangeserver/client/ExchangeClient.java:ExchangeClient",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "class:src/main/java/exchangeserver/core/OutputDigest.java:OutputDigest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Response.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputListener.java",
+   "target": "class:src/main/java/exchangeserver/core/OutputListener.java:OutputListener",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputListener.java",
+   "target": "class:src/main/java/exchangeserver/core/OutputListener.java:OutputListener",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputListener.java",
+   "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "class:src/main/java/exchangeserver/core/OutputLog.java:OutputLog",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "target": "class:src/main/java/exchangeserver/core/PrivateEvent.java:PrivateEvent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "target": "class:src/main/java/exchangeserver/core/PrivateEvent.java:PrivateEvent",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "target": "file:src/main/java/exchangeserver/engine/Response.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "target": "class:src/main/java/exchangeserver/engine/CancelAllOutput.java:CancelAllOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "target": "class:src/main/java/exchangeserver/engine/CancelAllOutput.java:CancelAllOutput",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "target": "class:src/main/java/exchangeserver/engine/CancelOutput.java:CancelOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "target": "class:src/main/java/exchangeserver/engine/CancelOutput.java:CancelOutput",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "target": "class:src/main/java/exchangeserver/engine/EngineOutput.java:EngineOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "target": "class:src/main/java/exchangeserver/engine/EngineOutput.java:EngineOutput",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "target": "function:src/main/java/exchangeserver/book/CancelResult.java:cancelled",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "target": "function:src/main/java/exchangeserver/book/CancelResult.java:cancelled",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "target": "function:src/main/java/exchangeserver/book/CancelResult.java:unknown",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "target": "function:src/main/java/exchangeserver/book/CancelResult.java:unknown",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:send",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:send",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:await",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:await",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:awaitPrefix",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:awaitPrefix",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:linesUntil",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:linesUntil",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:nextLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:nextLine",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:isClosedByServer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:isClosedByServer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:readLoop",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:field",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:field",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:close",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:close",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "function:src/main/java/exchangeserver/core/OutputDigest.java:update",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "function:src/main/java/exchangeserver/core/OutputLog.java:record",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "function:src/main/java/exchangeserver/core/OutputLog.java:since",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "target": "function:src/main/java/exchangeserver/engine/CancelAllOutput.java:trades",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "target": "function:src/main/java/exchangeserver/engine/CancelAllOutput.java:trades",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "target": "function:src/main/java/exchangeserver/engine/CancelAllOutput.java:passiveFills",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "target": "function:src/main/java/exchangeserver/engine/CancelAllOutput.java:passiveFills",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "target": "function:src/main/java/exchangeserver/engine/CancelOutput.java:trades",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "target": "function:src/main/java/exchangeserver/engine/CancelOutput.java:trades",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "target": "function:src/main/java/exchangeserver/engine/CancelOutput.java:passiveFills",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "target": "function:src/main/java/exchangeserver/engine/CancelOutput.java:passiveFills",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "class:src/main/java/exchangeserver/engine/CancelOutput.java:CancelOutput",
+   "target": "class:src/main/java/exchangeserver/engine/EngineOutput.java:EngineOutput",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:src/main/java/exchangeserver/engine/CancelAllOutput.java:CancelAllOutput",
+   "target": "class:src/main/java/exchangeserver/engine/EngineOutput.java:EngineOutput",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/client/ExchangeClient.java:awaitPrefix",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:await",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/client/ExchangeClient.java:await",
+   "target": "function:src/main/java/exchangeserver/client/ExchangeClient.java:nextLine",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "target": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "target": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

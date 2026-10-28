@@ -1,0 +1,5403 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 12,
+  "filesSkipped": [],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 12,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 12,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "results": [
+    {
+      "path": "src/main/java/exchangeserver/command/CheckCommand.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 29,
+      "nonEmptyLines": 22,
+      "classes": [
+        {
+          "name": "CheckCommand",
+          "startLine": 16,
+          "endLine": 29,
+          "methods": [],
+          "properties": [
+            "HEX16"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "CheckCommand",
+          "line": 16,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/command/Command.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 16,
+      "nonEmptyLines": 10,
+      "classes": [
+        {
+          "name": "Command",
+          "startLine": 11,
+          "endLine": 16,
+          "methods": [
+            "sequenceNumber",
+            "timestamp"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Command",
+          "line": 11,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/command/NewOrderCommand.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 21,
+      "nonEmptyLines": 17,
+      "classes": [
+        {
+          "name": "NewOrderCommand",
+          "startLine": 8,
+          "endLine": 21,
+          "methods": [],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "NewOrderCommand",
+          "line": 8,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/command/SkipCommand.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 25,
+      "nonEmptyLines": 19,
+      "classes": [
+        {
+          "name": "SkipCommand",
+          "startLine": 14,
+          "endLine": 25,
+          "methods": [],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "SkipCommand",
+          "line": 14,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/core/CommandInterceptor.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 17,
+      "nonEmptyLines": 11,
+      "classes": [
+        {
+          "name": "CommandInterceptor",
+          "startLine": 11,
+          "endLine": 17,
+          "methods": [
+            "beforeEngine"
+          ],
+          "properties": [
+            "NONE"
+          ]
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/core/Pending.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 36,
+      "nonEmptyLines": 26,
+      "functions": [
+        {
+          "name": "Pending",
+          "startLine": 23,
+          "endLine": 25,
+          "params": [
+            "request"
+          ]
+        },
+        {
+          "name": "complete",
+          "startLine": 27,
+          "endLine": 30,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "fail",
+          "startLine": 33,
+          "endLine": 35,
+          "params": [
+            "cause"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Pending",
+          "startLine": 16,
+          "endLine": 36,
+          "methods": [
+            "Pending",
+            "complete",
+            "fail"
+          ],
+          "properties": [
+            "request",
+            "result",
+            "command",
+            "refused"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "complete",
+          "callee": "((CompletableFuture<Object>) result).complete",
+          "lineNumber": 29
+        },
+        {
+          "caller": "fail",
+          "callee": "result.completeExceptionally",
+          "lineNumber": 34
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 0,
+        "functionCount": 3,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/core/Replay.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 131,
+      "nonEmptyLines": 115,
+      "functions": [
+        {
+          "name": "Replay",
+          "startLine": 36,
+          "endLine": 37,
+          "params": []
+        },
+        {
+          "name": "run",
+          "startLine": 39,
+          "endLine": 48,
+          "params": [
+            "journal",
+            "journalFile",
+            "stopBefore",
+            "interceptor",
+            "retention"
+          ]
+        },
+        {
+          "name": "rebuild",
+          "startLine": 52,
+          "endLine": 57,
+          "params": [
+            "journal",
+            "journalFile",
+            "stopBefore",
+            "skipped",
+            "interceptor",
+            "retention"
+          ]
+        },
+        {
+          "name": "snapshotFor",
+          "startLine": 59,
+          "endLine": 69,
+          "params": [
+            "journal",
+            "journalFile"
+          ]
+        },
+        {
+          "name": "feed",
+          "startLine": 72,
+          "endLine": 99,
+          "params": [
+            "journal",
+            "ledger",
+            "stopBefore",
+            "skipped",
+            "interceptor"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Replay",
+          "startLine": 30,
+          "endLine": 131,
+          "methods": [
+            "Replay",
+            "run",
+            "rebuild",
+            "snapshotFor",
+            "feed"
+          ],
+          "properties": []
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "run",
+          "callee": "snapshotFor",
+          "lineNumber": 41
+        },
+        {
+          "caller": "run",
+          "callee": "new Verifier",
+          "lineNumber": 42
+        },
+        {
+          "caller": "run",
+          "callee": "journal.read",
+          "lineNumber": 43
+        },
+        {
+          "caller": "run",
+          "callee": "Ledger.from",
+          "lineNumber": 44
+        },
+        {
+          "caller": "run",
+          "callee": "feed",
+          "lineNumber": 45
+        },
+        {
+          "caller": "run",
+          "callee": "new Result",
+          "lineNumber": 46
+        },
+        {
+          "caller": "run",
+          "callee": "Set.copyOf",
+          "lineNumber": 47
+        },
+        {
+          "caller": "run",
+          "callee": "journal.baseSequence",
+          "lineNumber": 47
+        },
+        {
+          "caller": "rebuild",
+          "callee": "Ledger.from",
+          "lineNumber": 54
+        },
+        {
+          "caller": "rebuild",
+          "callee": "snapshotFor",
+          "lineNumber": 54
+        },
+        {
+          "caller": "rebuild",
+          "callee": "feed",
+          "lineNumber": 55
+        },
+        {
+          "caller": "snapshotFor",
+          "callee": "journal.baseSequence",
+          "lineNumber": 60
+        },
+        {
+          "caller": "snapshotFor",
+          "callee": "Snapshot.empty",
+          "lineNumber": 62
+        },
+        {
+          "caller": "snapshotFor",
+          "callee": "Snapshot.read",
+          "lineNumber": 64
+        },
+        {
+          "caller": "snapshotFor",
+          "callee": "Snapshot.path",
+          "lineNumber": 64
+        },
+        {
+          "caller": "snapshotFor",
+          "callee": "snapshot.lastSequence",
+          "lineNumber": 65
+        },
+        {
+          "caller": "snapshotFor",
+          "callee": "new IllegalStateException",
+          "lineNumber": 66
+        },
+        {
+          "caller": "snapshotFor",
+          "callee": "snapshot.lastSequence",
+          "lineNumber": 66
+        },
+        {
+          "caller": "feed",
+          "callee": "journal.read",
+          "lineNumber": 75
+        },
+        {
+          "caller": "feed",
+          "callee": "command.sequenceNumber",
+          "lineNumber": 76
+        },
+        {
+          "caller": "feed",
+          "callee": "skipped.contains",
+          "lineNumber": 77
+        },
+        {
+          "caller": "feed",
+          "callee": "check.digest().equals",
+          "lineNumber": 81
+        },
+        {
+          "caller": "feed",
+          "callee": "check.digest",
+          "lineNumber": 81
+        },
+        {
+          "caller": "feed",
+          "callee": "ledger.digest",
+          "lineNumber": 81
+        },
+        {
+          "caller": "feed",
+          "callee": "new ReplayException",
+          "lineNumber": 82
+        },
+        {
+          "caller": "feed",
+          "callee": "check.digest",
+          "lineNumber": 83
+        },
+        {
+          "caller": "feed",
+          "callee": "ledger.digest",
+          "lineNumber": 84
+        },
+        {
+          "caller": "feed",
+          "callee": "interceptor.beforeEngine",
+          "lineNumber": 90
+        },
+        {
+          "caller": "feed",
+          "callee": "ledger.apply",
+          "lineNumber": 91
+        },
+        {
+          "caller": "feed",
+          "callee": "new ReplayException",
+          "lineNumber": 93
+        },
+        {
+          "caller": "feed",
+          "callee": "e.getMessage",
+          "lineNumber": 94
+        },
+        {
+          "caller": "Verifier",
+          "callee": "snapshot.lastSequence",
+          "lineNumber": 108
+        },
+        {
+          "caller": "Verifier",
+          "callee": "snapshot.lastOrderId",
+          "lineNumber": 109
+        },
+        {
+          "caller": "Verifier",
+          "callee": "snapshot.lastTimestamp",
+          "lineNumber": 110
+        },
+        {
+          "caller": "accept",
+          "callee": "command.sequenceNumber",
+          "lineNumber": 115
+        },
+        {
+          "caller": "accept",
+          "callee": "new IllegalStateException",
+          "lineNumber": 116
+        },
+        {
+          "caller": "accept",
+          "callee": "command.sequenceNumber",
+          "lineNumber": 116
+        },
+        {
+          "caller": "accept",
+          "callee": "command.timestamp().isBefore",
+          "lineNumber": 119
+        },
+        {
+          "caller": "accept",
+          "callee": "command.timestamp",
+          "lineNumber": 119
+        },
+        {
+          "caller": "accept",
+          "callee": "new IllegalStateException",
+          "lineNumber": 120
+        },
+        {
+          "caller": "accept",
+          "callee": "command.sequenceNumber",
+          "lineNumber": 120
+        },
+        {
+          "caller": "accept",
+          "callee": "command.sequenceNumber",
+          "lineNumber": 122
+        },
+        {
+          "caller": "accept",
+          "callee": "command.timestamp",
+          "lineNumber": 123
+        },
+        {
+          "caller": "accept",
+          "callee": "n.orderId",
+          "lineNumber": 125
+        },
+        {
+          "caller": "accept",
+          "callee": "skipped.add",
+          "lineNumber": 127
+        },
+        {
+          "caller": "accept",
+          "callee": "s.skippedSequenceNumber",
+          "lineNumber": 127
+        }
+      ],
+      "metrics": {
+        "importCount": 5,
+        "exportCount": 0,
+        "functionCount": 5,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/journal/CommandJournal.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 317,
+      "nonEmptyLines": 284,
+      "functions": [
+        {
+          "name": "CommandJournal",
+          "startLine": 63,
+          "endLine": 71,
+          "params": [
+            "file",
+            "channel",
+            "lock",
+            "baseSequence",
+            "truncatedBytesOnOpen",
+            "adoptedRulesFrom"
+          ]
+        },
+        {
+          "name": "open",
+          "startLine": 75,
+          "endLine": 88,
+          "params": [
+            "file",
+            "rulesVersion"
+          ]
+        },
+        {
+          "name": "open",
+          "startLine": 91,
+          "endLine": 95,
+          "params": [
+            "file",
+            "rulesVersion",
+            "heldLock"
+          ]
+        },
+        {
+          "name": "openLocked",
+          "startLine": 98,
+          "endLine": 127,
+          "params": [
+            "file",
+            "rulesVersion",
+            "ownedLock"
+          ]
+        },
+        {
+          "name": "writeFresh",
+          "startLine": 130,
+          "endLine": 132,
+          "params": [
+            "file",
+            "rulesVersion",
+            "baseSequence"
+          ]
+        },
+        {
+          "name": "openJournals",
+          "startLine": 134,
+          "endLine": 136,
+          "params": []
+        },
+        {
+          "name": "append",
+          "startLine": 138,
+          "endLine": 140,
+          "params": [
+            "command"
+          ]
+        },
+        {
+          "name": "appendAll",
+          "startLine": 143,
+          "endLine": 166,
+          "params": [
+            "commands"
+          ]
+        },
+        {
+          "name": "read",
+          "startLine": 169,
+          "endLine": 200,
+          "params": [
+            "consumer"
+          ]
+        },
+        {
+          "name": "baseSequence",
+          "startLine": 203,
+          "endLine": 205,
+          "params": []
+        },
+        {
+          "name": "hasFailed",
+          "startLine": 207,
+          "endLine": 209,
+          "params": []
+        },
+        {
+          "name": "getTruncatedBytesOnOpen",
+          "startLine": 211,
+          "endLine": 213,
+          "params": []
+        },
+        {
+          "name": "adoptedRulesFrom",
+          "startLine": 216,
+          "endLine": 218,
+          "params": []
+        },
+        {
+          "name": "close",
+          "startLine": 221,
+          "endLine": 233,
+          "params": []
+        },
+        {
+          "name": "checkHeader",
+          "startLine": 241,
+          "endLine": 260,
+          "params": [
+            "file",
+            "rulesVersion"
+          ]
+        },
+        {
+          "name": "cutTornTail",
+          "startLine": 263,
+          "endLine": 273,
+          "params": [
+            "file"
+          ]
+        },
+        {
+          "name": "endOfLastCompleteRecord",
+          "startLine": 277,
+          "endLine": 297,
+          "params": [
+            "ch",
+            "size"
+          ]
+        },
+        {
+          "name": "readFirstRecord",
+          "startLine": 299,
+          "endLine": 316,
+          "params": [
+            "file"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "CommandJournal",
+          "startLine": 46,
+          "endLine": 317,
+          "methods": [
+            "CommandJournal",
+            "open",
+            "open",
+            "openLocked",
+            "writeFresh",
+            "openJournals",
+            "append",
+            "appendAll",
+            "read",
+            "baseSequence",
+            "hasFailed",
+            "getTruncatedBytesOnOpen",
+            "adoptedRulesFrom",
+            "close",
+            "checkHeader",
+            "cutTornTail",
+            "endOfLastCompleteRecord",
+            "readFirstRecord"
+          ],
+          "properties": [
+            "OPEN",
+            "file",
+            "channel",
+            "lock",
+            "baseSequence",
+            "truncatedBytesOnOpen",
+            "adoptedRulesFrom",
+            "failed"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "open",
+          "line": 75,
+          "isDefault": false
+        },
+        {
+          "name": "open",
+          "line": 91,
+          "isDefault": false
+        },
+        {
+          "name": "writeFresh",
+          "line": 130,
+          "isDefault": false
+        },
+        {
+          "name": "openJournals",
+          "line": 134,
+          "isDefault": false
+        },
+        {
+          "name": "append",
+          "line": 138,
+          "isDefault": false
+        },
+        {
+          "name": "appendAll",
+          "line": 143,
+          "isDefault": false
+        },
+        {
+          "name": "read",
+          "line": 169,
+          "isDefault": false
+        },
+        {
+          "name": "baseSequence",
+          "line": 203,
+          "isDefault": false
+        },
+        {
+          "name": "hasFailed",
+          "line": 207,
+          "isDefault": false
+        },
+        {
+          "name": "getTruncatedBytesOnOpen",
+          "line": 211,
+          "isDefault": false
+        },
+        {
+          "name": "adoptedRulesFrom",
+          "line": 216,
+          "isDefault": false
+        },
+        {
+          "name": "close",
+          "line": 221,
+          "isDefault": false
+        },
+        {
+          "name": "CommandJournal",
+          "line": 46,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "open",
+          "callee": "Objects.requireNonNull",
+          "lineNumber": 76
+        },
+        {
+          "caller": "open",
+          "callee": "JournalLock.acquire",
+          "lineNumber": 77
+        },
+        {
+          "caller": "open",
+          "callee": "openLocked",
+          "lineNumber": 79
+        },
+        {
+          "caller": "open",
+          "callee": "lock.close",
+          "lineNumber": 82
+        },
+        {
+          "caller": "open",
+          "callee": "e.addSuppressed",
+          "lineNumber": 84
+        },
+        {
+          "caller": "open",
+          "callee": "Objects.requireNonNull",
+          "lineNumber": 92
+        },
+        {
+          "caller": "open",
+          "callee": "Objects.requireNonNull",
+          "lineNumber": 93
+        },
+        {
+          "caller": "open",
+          "callee": "openLocked",
+          "lineNumber": 94
+        },
+        {
+          "caller": "openLocked",
+          "callee": "checkHeader",
+          "lineNumber": 99
+        },
+        {
+          "caller": "openLocked",
+          "callee": "header.rulesVersion",
+          "lineNumber": 101
+        },
+        {
+          "caller": "openLocked",
+          "callee": "header.rulesVersion",
+          "lineNumber": 102
+        },
+        {
+          "caller": "openLocked",
+          "callee": "writeFresh",
+          "lineNumber": 103
+        },
+        {
+          "caller": "openLocked",
+          "callee": "header.baseSequence",
+          "lineNumber": 103
+        },
+        {
+          "caller": "openLocked",
+          "callee": "new JournalCodec.Header",
+          "lineNumber": 104
+        },
+        {
+          "caller": "openLocked",
+          "callee": "header.baseSequence",
+          "lineNumber": 104
+        },
+        {
+          "caller": "openLocked",
+          "callee": "FileChannel.open",
+          "lineNumber": 107
+        },
+        {
+          "caller": "openLocked",
+          "callee": "cutTornTail",
+          "lineNumber": 110
+        },
+        {
+          "caller": "openLocked",
+          "callee": "channel.size",
+          "lineNumber": 111
+        },
+        {
+          "caller": "openLocked",
+          "callee": "channel.write",
+          "lineNumber": 112
+        },
+        {
+          "caller": "openLocked",
+          "callee": "ByteBuffer.wrap",
+          "lineNumber": 112
+        },
+        {
+          "caller": "openLocked",
+          "callee": "JournalCodec.encodeHeader(rulesVersion, 0).getBytes",
+          "lineNumber": 112
+        },
+        {
+          "caller": "openLocked",
+          "callee": "JournalCodec.encodeHeader",
+          "lineNumber": 112
+        },
+        {
+          "caller": "openLocked",
+          "callee": "channel.force",
+          "lineNumber": 113
+        },
+        {
+          "caller": "openLocked",
+          "callee": "Durable.fsyncDirectory",
+          "lineNumber": 114
+        },
+        {
+          "caller": "openLocked",
+          "callee": "new JournalCodec.Header",
+          "lineNumber": 115
+        },
+        {
+          "caller": "openLocked",
+          "callee": "channel.close",
+          "lineNumber": 119
+        },
+        {
+          "caller": "openLocked",
+          "callee": "e.addSuppressed",
+          "lineNumber": 121
+        },
+        {
+          "caller": "openLocked",
+          "callee": "OPEN.incrementAndGet",
+          "lineNumber": 125
+        },
+        {
+          "caller": "openLocked",
+          "callee": "new CommandJournal",
+          "lineNumber": 126
+        },
+        {
+          "caller": "openLocked",
+          "callee": "header.baseSequence",
+          "lineNumber": 126
+        },
+        {
+          "caller": "writeFresh",
+          "callee": "Durable.writeAtomically",
+          "lineNumber": 131
+        },
+        {
+          "caller": "writeFresh",
+          "callee": "JournalCodec.encodeHeader",
+          "lineNumber": 131
+        },
+        {
+          "caller": "openJournals",
+          "callee": "OPEN.get",
+          "lineNumber": 135
+        },
+        {
+          "caller": "append",
+          "callee": "appendAll",
+          "lineNumber": 139
+        },
+        {
+          "caller": "append",
+          "callee": "List.of",
+          "lineNumber": 139
+        },
+        {
+          "caller": "appendAll",
+          "callee": "new IllegalStateException",
+          "lineNumber": 145
+        },
+        {
+          "caller": "appendAll",
+          "callee": "commands.isEmpty",
+          "lineNumber": 147
+        },
+        {
+          "caller": "appendAll",
+          "callee": "new StringBuilder",
+          "lineNumber": 150
+        },
+        {
+          "caller": "appendAll",
+          "callee": "commands.size",
+          "lineNumber": 150
+        },
+        {
+          "caller": "appendAll",
+          "callee": "sb.append",
+          "lineNumber": 152
+        },
+        {
+          "caller": "appendAll",
+          "callee": "JournalCodec.encode",
+          "lineNumber": 152
+        },
+        {
+          "caller": "appendAll",
+          "callee": "ByteBuffer.wrap",
+          "lineNumber": 154
+        },
+        {
+          "caller": "appendAll",
+          "callee": "sb.toString().getBytes",
+          "lineNumber": 154
+        },
+        {
+          "caller": "appendAll",
+          "callee": "sb.toString",
+          "lineNumber": 154
+        },
+        {
+          "caller": "appendAll",
+          "callee": "records.hasRemaining",
+          "lineNumber": 157
+        },
+        {
+          "caller": "appendAll",
+          "callee": "channel.write",
+          "lineNumber": 158
+        },
+        {
+          "caller": "appendAll",
+          "callee": "channel.force",
+          "lineNumber": 160
+        },
+        {
+          "caller": "read",
+          "callee": "new ByteArrayOutputStream",
+          "lineNumber": 170
+        },
+        {
+          "caller": "read",
+          "callee": "new BufferedInputStream",
+          "lineNumber": 174
+        },
+        {
+          "caller": "read",
+          "callee": "Files.newInputStream",
+          "lineNumber": 174
+        },
+        {
+          "caller": "read",
+          "callee": "in.read",
+          "lineNumber": 176
+        },
+        {
+          "caller": "read",
+          "callee": "record.write",
+          "lineNumber": 180
+        },
+        {
+          "caller": "read",
+          "callee": "record.toString",
+          "lineNumber": 182
+        },
+        {
+          "caller": "read",
+          "callee": "JournalCodec.decodeHeader",
+          "lineNumber": 184
+        },
+        {
+          "caller": "read",
+          "callee": "consumer.accept",
+          "lineNumber": 186
+        },
+        {
+          "caller": "read",
+          "callee": "JournalCodec.decode",
+          "lineNumber": 186
+        },
+        {
+          "caller": "read",
+          "callee": "record.reset",
+          "lineNumber": 188
+        },
+        {
+          "caller": "read",
+          "callee": "record.write",
+          "lineNumber": 192
+        },
+        {
+          "caller": "read",
+          "callee": "record.size",
+          "lineNumber": 196
+        },
+        {
+          "caller": "read",
+          "callee": "new IllegalStateException",
+          "lineNumber": 197
+        },
+        {
+          "caller": "read",
+          "callee": "record.toString",
+          "lineNumber": 198
+        },
+        {
+          "caller": "close",
+          "callee": "channel.isOpen",
+          "lineNumber": 223
+        },
+        {
+          "caller": "close",
+          "callee": "OPEN.decrementAndGet",
+          "lineNumber": 224
+        },
+        {
+          "caller": "close",
+          "callee": "channel.close",
+          "lineNumber": 226
+        },
+        {
+          "caller": "close",
+          "callee": "lock.close",
+          "lineNumber": 229
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "Files.exists",
+          "lineNumber": 242
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "readFirstRecord",
+          "lineNumber": 245
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "first.complete",
+          "lineNumber": 246
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "JournalCodec.encodeHeader(rulesVersion, 0).startsWith",
+          "lineNumber": 247
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "JournalCodec.encodeHeader",
+          "lineNumber": 247
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "first.text",
+          "lineNumber": 247
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "new IllegalStateException",
+          "lineNumber": 248
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "first.text",
+          "lineNumber": 248
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "JournalCodec.decodeHeader",
+          "lineNumber": 252
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "first.text",
+          "lineNumber": 252
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "first.fileSize",
+          "lineNumber": 253
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "first.text().getBytes",
+          "lineNumber": 253
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "first.text",
+          "lineNumber": 253
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "header.rulesVersion",
+          "lineNumber": 254
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "new IllegalStateException",
+          "lineNumber": 255
+        },
+        {
+          "caller": "checkHeader",
+          "callee": "header.rulesVersion",
+          "lineNumber": 255
+        },
+        {
+          "caller": "cutTornTail",
+          "callee": "FileChannel.open",
+          "lineNumber": 264
+        },
+        {
+          "caller": "cutTornTail",
+          "callee": "ch.size",
+          "lineNumber": 265
+        },
+        {
+          "caller": "cutTornTail",
+          "callee": "endOfLastCompleteRecord",
+          "lineNumber": 266
+        },
+        {
+          "caller": "cutTornTail",
+          "callee": "ch.truncate",
+          "lineNumber": 268
+        },
+        {
+          "caller": "cutTornTail",
+          "callee": "ch.force",
+          "lineNumber": 269
+        },
+        {
+          "caller": "endOfLastCompleteRecord",
+          "callee": "ByteBuffer.allocate",
+          "lineNumber": 278
+        },
+        {
+          "caller": "endOfLastCompleteRecord",
+          "callee": "Math.min",
+          "lineNumber": 281
+        },
+        {
+          "caller": "endOfLastCompleteRecord",
+          "callee": "block.capacity",
+          "lineNumber": 281
+        },
+        {
+          "caller": "endOfLastCompleteRecord",
+          "callee": "block.clear().limit",
+          "lineNumber": 283
+        },
+        {
+          "caller": "endOfLastCompleteRecord",
+          "callee": "block.clear",
+          "lineNumber": 283
+        },
+        {
+          "caller": "endOfLastCompleteRecord",
+          "callee": "block.hasRemaining",
+          "lineNumber": 284
+        },
+        {
+          "caller": "endOfLastCompleteRecord",
+          "callee": "ch.read",
+          "lineNumber": 285
+        },
+        {
+          "caller": "endOfLastCompleteRecord",
+          "callee": "block.position",
+          "lineNumber": 285
+        },
+        {
+          "caller": "endOfLastCompleteRecord",
+          "callee": "new IOException",
+          "lineNumber": 286
+        },
+        {
+          "caller": "endOfLastCompleteRecord",
+          "callee": "block.get",
+          "lineNumber": 290
+        },
+        {
+          "caller": "readFirstRecord",
+          "callee": "new ByteArrayOutputStream",
+          "lineNumber": 300
+        },
+        {
+          "caller": "readFirstRecord",
+          "callee": "new BufferedInputStream",
+          "lineNumber": 302
+        },
+        {
+          "caller": "readFirstRecord",
+          "callee": "Files.newInputStream",
+          "lineNumber": 302
+        },
+        {
+          "caller": "readFirstRecord",
+          "callee": "in.read",
+          "lineNumber": 304
+        },
+        {
+          "caller": "readFirstRecord",
+          "callee": "record.write",
+          "lineNumber": 309
+        },
+        {
+          "caller": "readFirstRecord",
+          "callee": "record.size",
+          "lineNumber": 310
+        },
+        {
+          "caller": "readFirstRecord",
+          "callee": "new FirstRecord",
+          "lineNumber": 315
+        },
+        {
+          "caller": "readFirstRecord",
+          "callee": "record.toString",
+          "lineNumber": 315
+        },
+        {
+          "caller": "readFirstRecord",
+          "callee": "Files.size",
+          "lineNumber": 315
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 13,
+        "functionCount": 18,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/journal/JournalCodec.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 194,
+      "nonEmptyLines": 176,
+      "functions": [
+        {
+          "name": "JournalCodec",
+          "startLine": 55,
+          "endLine": 56,
+          "params": []
+        },
+        {
+          "name": "encodeHeader",
+          "startLine": 58,
+          "endLine": 60,
+          "params": [
+            "rulesVersion",
+            "baseSequence"
+          ]
+        },
+        {
+          "name": "decodeHeader",
+          "startLine": 63,
+          "endLine": 85,
+          "params": [
+            "record"
+          ]
+        },
+        {
+          "name": "encode",
+          "startLine": 87,
+          "endLine": 127,
+          "params": [
+            "command"
+          ]
+        },
+        {
+          "name": "decode",
+          "startLine": 130,
+          "endLine": 163,
+          "params": [
+            "record",
+            "recordNumber"
+          ]
+        },
+        {
+          "name": "seal",
+          "startLine": 166,
+          "endLine": 168,
+          "params": [
+            "text"
+          ]
+        },
+        {
+          "name": "unseal",
+          "startLine": 171,
+          "endLine": 187,
+          "params": [
+            "record"
+          ]
+        },
+        {
+          "name": "requireFieldCount",
+          "startLine": 189,
+          "endLine": 193,
+          "params": [
+            "fields",
+            "expected"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "JournalCodec",
+          "startLine": 39,
+          "endLine": 194,
+          "methods": [
+            "JournalCodec",
+            "encodeHeader",
+            "decodeHeader",
+            "encode",
+            "decode",
+            "seal",
+            "unseal",
+            "requireFieldCount"
+          ],
+          "properties": [
+            "FORMAT_VERSION",
+            "HEADER",
+            "NEW",
+            "CANCEL",
+            "CANCEL_ALL",
+            "SKIP",
+            "CHECK",
+            "NO_PRICE",
+            "SEPARATOR",
+            "END_OF_RECORD"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "encodeHeader",
+          "callee": "seal",
+          "lineNumber": 59
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "unseal(record).split",
+          "lineNumber": 65
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "unseal",
+          "lineNumber": 65
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "String.valueOf",
+          "lineNumber": 65
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "f[0].equals",
+          "lineNumber": 66
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 67
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 70
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "Integer.parseInt",
+          "lineNumber": 72
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 74
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "requireFieldCount",
+          "lineNumber": 76
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "Long.parseLong",
+          "lineNumber": 77
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 79
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "new Header",
+          "lineNumber": 81
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "Integer.parseInt",
+          "lineNumber": 81
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "new IllegalStateException",
+          "lineNumber": 83
+        },
+        {
+          "caller": "decodeHeader",
+          "callee": "e.getMessage",
+          "lineNumber": 83
+        },
+        {
+          "caller": "encode",
+          "callee": "Objects.requireNonNull",
+          "lineNumber": 88
+        },
+        {
+          "caller": "encode",
+          "callee": "new StringBuilder",
+          "lineNumber": 89
+        },
+        {
+          "caller": "encode",
+          "callee": "n.request",
+          "lineNumber": 91
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId())\r\n                    .append(SEPARATOR).append(r.getParticipant())\r\n                    .append(SEPARATOR).append(r.getClientOrderId())\r\n                    .append(SEPARATOR).append(r.getSide().name())\r\n                    .append(SEPARATOR).append(r.getOrderType().name())\r\n                    .append(SEPARATOR).append(r.getQuantity())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId())\r\n                    .append(SEPARATOR).append(r.getParticipant())\r\n                    .append(SEPARATOR).append(r.getClientOrderId())\r\n                    .append(SEPARATOR).append(r.getSide().name())\r\n                    .append(SEPARATOR).append(r.getOrderType().name())\r\n                    .append(SEPARATOR).append(r.getQuantity()).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId())\r\n                    .append(SEPARATOR).append(r.getParticipant())\r\n                    .append(SEPARATOR).append(r.getClientOrderId())\r\n                    .append(SEPARATOR).append(r.getSide().name())\r\n                    .append(SEPARATOR).append(r.getOrderType().name())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId())\r\n                    .append(SEPARATOR).append(r.getParticipant())\r\n                    .append(SEPARATOR).append(r.getClientOrderId())\r\n                    .append(SEPARATOR).append(r.getSide().name())\r\n                    .append(SEPARATOR).append(r.getOrderType().name()).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId())\r\n                    .append(SEPARATOR).append(r.getParticipant())\r\n                    .append(SEPARATOR).append(r.getClientOrderId())\r\n                    .append(SEPARATOR).append(r.getSide().name())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId())\r\n                    .append(SEPARATOR).append(r.getParticipant())\r\n                    .append(SEPARATOR).append(r.getClientOrderId())\r\n                    .append(SEPARATOR).append(r.getSide().name()).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId())\r\n                    .append(SEPARATOR).append(r.getParticipant())\r\n                    .append(SEPARATOR).append(r.getClientOrderId())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId())\r\n                    .append(SEPARATOR).append(r.getParticipant())\r\n                    .append(SEPARATOR).append(r.getClientOrderId()).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId())\r\n                    .append(SEPARATOR).append(r.getParticipant())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId())\r\n                    .append(SEPARATOR).append(r.getParticipant()).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append(n.orderId()).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append(n.timestamp()).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append(n.sequenceNumber()).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW)\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(NEW).append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append",
+          "lineNumber": 92
+        },
+        {
+          "caller": "encode",
+          "callee": "n.sequenceNumber",
+          "lineNumber": 93
+        },
+        {
+          "caller": "encode",
+          "callee": "n.timestamp",
+          "lineNumber": 94
+        },
+        {
+          "caller": "encode",
+          "callee": "n.orderId",
+          "lineNumber": 95
+        },
+        {
+          "caller": "encode",
+          "callee": "r.getParticipant",
+          "lineNumber": 96
+        },
+        {
+          "caller": "encode",
+          "callee": "r.getClientOrderId",
+          "lineNumber": 97
+        },
+        {
+          "caller": "encode",
+          "callee": "r.getSide().name",
+          "lineNumber": 98
+        },
+        {
+          "caller": "encode",
+          "callee": "r.getSide",
+          "lineNumber": 98
+        },
+        {
+          "caller": "encode",
+          "callee": "r.getOrderType().name",
+          "lineNumber": 99
+        },
+        {
+          "caller": "encode",
+          "callee": "r.getOrderType",
+          "lineNumber": 99
+        },
+        {
+          "caller": "encode",
+          "callee": "r.getQuantity",
+          "lineNumber": 100
+        },
+        {
+          "caller": "encode",
+          "callee": "r.getPrice().isPresent",
+          "lineNumber": 101
+        },
+        {
+          "caller": "encode",
+          "callee": "r.getPrice",
+          "lineNumber": 101
+        },
+        {
+          "caller": "encode",
+          "callee": "Long.toString",
+          "lineNumber": 101
+        },
+        {
+          "caller": "encode",
+          "callee": "r.getPrice().getAsLong",
+          "lineNumber": 101
+        },
+        {
+          "caller": "encode",
+          "callee": "r.getPrice",
+          "lineNumber": 101
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL)\r\n                    .append(SEPARATOR).append(c.sequenceNumber())\r\n                    .append(SEPARATOR).append(c.timestamp())\r\n                    .append(SEPARATOR).append(c.participant())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 103
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL)\r\n                    .append(SEPARATOR).append(c.sequenceNumber())\r\n                    .append(SEPARATOR).append(c.timestamp())\r\n                    .append(SEPARATOR).append(c.participant()).append",
+          "lineNumber": 103
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL)\r\n                    .append(SEPARATOR).append(c.sequenceNumber())\r\n                    .append(SEPARATOR).append(c.timestamp())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 103
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL)\r\n                    .append(SEPARATOR).append(c.sequenceNumber())\r\n                    .append(SEPARATOR).append(c.timestamp()).append",
+          "lineNumber": 103
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL)\r\n                    .append(SEPARATOR).append(c.sequenceNumber())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 103
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL)\r\n                    .append(SEPARATOR).append(c.sequenceNumber()).append",
+          "lineNumber": 103
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL)\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 103
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL).append",
+          "lineNumber": 103
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append",
+          "lineNumber": 103
+        },
+        {
+          "caller": "encode",
+          "callee": "c.sequenceNumber",
+          "lineNumber": 104
+        },
+        {
+          "caller": "encode",
+          "callee": "c.timestamp",
+          "lineNumber": 105
+        },
+        {
+          "caller": "encode",
+          "callee": "c.participant",
+          "lineNumber": 106
+        },
+        {
+          "caller": "encode",
+          "callee": "c.orderId",
+          "lineNumber": 107
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL_ALL)\r\n                    .append(SEPARATOR).append(c.sequenceNumber())\r\n                    .append(SEPARATOR).append(c.timestamp())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 109
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL_ALL)\r\n                    .append(SEPARATOR).append(c.sequenceNumber())\r\n                    .append(SEPARATOR).append(c.timestamp()).append",
+          "lineNumber": 109
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL_ALL)\r\n                    .append(SEPARATOR).append(c.sequenceNumber())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 109
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL_ALL)\r\n                    .append(SEPARATOR).append(c.sequenceNumber()).append",
+          "lineNumber": 109
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL_ALL)\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 109
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CANCEL_ALL).append",
+          "lineNumber": 109
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append",
+          "lineNumber": 109
+        },
+        {
+          "caller": "encode",
+          "callee": "c.sequenceNumber",
+          "lineNumber": 110
+        },
+        {
+          "caller": "encode",
+          "callee": "c.timestamp",
+          "lineNumber": 111
+        },
+        {
+          "caller": "encode",
+          "callee": "c.participant",
+          "lineNumber": 112
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(SKIP)\r\n                    .append(SEPARATOR).append(s.sequenceNumber())\r\n                    .append(SEPARATOR).append(s.timestamp())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 114
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(SKIP)\r\n                    .append(SEPARATOR).append(s.sequenceNumber())\r\n                    .append(SEPARATOR).append(s.timestamp()).append",
+          "lineNumber": 114
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(SKIP)\r\n                    .append(SEPARATOR).append(s.sequenceNumber())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 114
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(SKIP)\r\n                    .append(SEPARATOR).append(s.sequenceNumber()).append",
+          "lineNumber": 114
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(SKIP)\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 114
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(SKIP).append",
+          "lineNumber": 114
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append",
+          "lineNumber": 114
+        },
+        {
+          "caller": "encode",
+          "callee": "s.sequenceNumber",
+          "lineNumber": 115
+        },
+        {
+          "caller": "encode",
+          "callee": "s.timestamp",
+          "lineNumber": 116
+        },
+        {
+          "caller": "encode",
+          "callee": "s.skippedSequenceNumber",
+          "lineNumber": 117
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CHECK)\r\n                    .append(SEPARATOR).append(c.sequenceNumber())\r\n                    .append(SEPARATOR).append(c.timestamp())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 119
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CHECK)\r\n                    .append(SEPARATOR).append(c.sequenceNumber())\r\n                    .append(SEPARATOR).append(c.timestamp()).append",
+          "lineNumber": 119
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CHECK)\r\n                    .append(SEPARATOR).append(c.sequenceNumber())\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 119
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CHECK)\r\n                    .append(SEPARATOR).append(c.sequenceNumber()).append",
+          "lineNumber": 119
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CHECK)\r\n                    .append(SEPARATOR).append",
+          "lineNumber": 119
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append(CHECK).append",
+          "lineNumber": 119
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.append",
+          "lineNumber": 119
+        },
+        {
+          "caller": "encode",
+          "callee": "c.sequenceNumber",
+          "lineNumber": 120
+        },
+        {
+          "caller": "encode",
+          "callee": "c.timestamp",
+          "lineNumber": 121
+        },
+        {
+          "caller": "encode",
+          "callee": "c.digest",
+          "lineNumber": 122
+        },
+        {
+          "caller": "encode",
+          "callee": "new IllegalStateException",
+          "lineNumber": 124
+        },
+        {
+          "caller": "encode",
+          "callee": "command.getClass",
+          "lineNumber": 124
+        },
+        {
+          "caller": "encode",
+          "callee": "seal",
+          "lineNumber": 126
+        },
+        {
+          "caller": "encode",
+          "callee": "sb.toString",
+          "lineNumber": 126
+        },
+        {
+          "caller": "decode",
+          "callee": "unseal(record).split",
+          "lineNumber": 132
+        },
+        {
+          "caller": "decode",
+          "callee": "unseal",
+          "lineNumber": 132
+        },
+        {
+          "caller": "decode",
+          "callee": "String.valueOf",
+          "lineNumber": 132
+        },
+        {
+          "caller": "decode",
+          "callee": "requireFieldCount",
+          "lineNumber": 135
+        },
+        {
+          "caller": "decode",
+          "callee": "OrderType.valueOf",
+          "lineNumber": 136
+        },
+        {
+          "caller": "decode",
+          "callee": "f[9].equals",
+          "lineNumber": 137
+        },
+        {
+          "caller": "decode",
+          "callee": "OptionalLong.empty",
+          "lineNumber": 137
+        },
+        {
+          "caller": "decode",
+          "callee": "OptionalLong.of",
+          "lineNumber": 137
+        },
+        {
+          "caller": "decode",
+          "callee": "Long.parseLong",
+          "lineNumber": 137
+        },
+        {
+          "caller": "decode",
+          "callee": "OrderRequest.of",
+          "lineNumber": 138
+        },
+        {
+          "caller": "decode",
+          "callee": "Side.valueOf",
+          "lineNumber": 138
+        },
+        {
+          "caller": "decode",
+          "callee": "Long.parseLong",
+          "lineNumber": 138
+        },
+        {
+          "caller": "decode",
+          "callee": "new NewOrderCommand",
+          "lineNumber": 139
+        },
+        {
+          "caller": "decode",
+          "callee": "Long.parseLong",
+          "lineNumber": 139
+        },
+        {
+          "caller": "decode",
+          "callee": "Instant.parse",
+          "lineNumber": 139
+        },
+        {
+          "caller": "decode",
+          "callee": "Long.parseLong",
+          "lineNumber": 139
+        },
+        {
+          "caller": "decode",
+          "callee": "requireFieldCount",
+          "lineNumber": 142
+        },
+        {
+          "caller": "decode",
+          "callee": "new CancelOrderCommand",
+          "lineNumber": 143
+        },
+        {
+          "caller": "decode",
+          "callee": "Long.parseLong",
+          "lineNumber": 143
+        },
+        {
+          "caller": "decode",
+          "callee": "Instant.parse",
+          "lineNumber": 143
+        },
+        {
+          "caller": "decode",
+          "callee": "Long.parseLong",
+          "lineNumber": 143
+        },
+        {
+          "caller": "decode",
+          "callee": "requireFieldCount",
+          "lineNumber": 146
+        },
+        {
+          "caller": "decode",
+          "callee": "new CancelAllCommand",
+          "lineNumber": 147
+        },
+        {
+          "caller": "decode",
+          "callee": "Long.parseLong",
+          "lineNumber": 147
+        },
+        {
+          "caller": "decode",
+          "callee": "Instant.parse",
+          "lineNumber": 147
+        },
+        {
+          "caller": "decode",
+          "callee": "requireFieldCount",
+          "lineNumber": 150
+        },
+        {
+          "caller": "decode",
+          "callee": "new SkipCommand",
+          "lineNumber": 151
+        },
+        {
+          "caller": "decode",
+          "callee": "Long.parseLong",
+          "lineNumber": 151
+        },
+        {
+          "caller": "decode",
+          "callee": "Instant.parse",
+          "lineNumber": 151
+        },
+        {
+          "caller": "decode",
+          "callee": "Long.parseLong",
+          "lineNumber": 151
+        },
+        {
+          "caller": "decode",
+          "callee": "requireFieldCount",
+          "lineNumber": 154
+        },
+        {
+          "caller": "decode",
+          "callee": "new CheckCommand",
+          "lineNumber": 155
+        },
+        {
+          "caller": "decode",
+          "callee": "Long.parseLong",
+          "lineNumber": 155
+        },
+        {
+          "caller": "decode",
+          "callee": "Instant.parse",
+          "lineNumber": 155
+        },
+        {
+          "caller": "decode",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 157
+        },
+        {
+          "caller": "decode",
+          "callee": "new IllegalStateException",
+          "lineNumber": 161
+        },
+        {
+          "caller": "seal",
+          "callee": "Checksums.crcHex",
+          "lineNumber": 167
+        },
+        {
+          "caller": "unseal",
+          "callee": "record.endsWith",
+          "lineNumber": 172
+        },
+        {
+          "caller": "unseal",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 174
+        },
+        {
+          "caller": "unseal",
+          "callee": "record.lastIndexOf",
+          "lineNumber": 177
+        },
+        {
+          "caller": "unseal",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 179
+        },
+        {
+          "caller": "unseal",
+          "callee": "record.substring",
+          "lineNumber": 181
+        },
+        {
+          "caller": "unseal",
+          "callee": "record.substring",
+          "lineNumber": 182
+        },
+        {
+          "caller": "unseal",
+          "callee": "Checksums.crcHex(text).equals",
+          "lineNumber": 183
+        },
+        {
+          "caller": "unseal",
+          "callee": "Checksums.crcHex",
+          "lineNumber": 183
+        },
+        {
+          "caller": "unseal",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 184
+        },
+        {
+          "caller": "unseal",
+          "callee": "Checksums.crcHex",
+          "lineNumber": 184
+        },
+        {
+          "caller": "requireFieldCount",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 191
+        }
+      ],
+      "metrics": {
+        "importCount": 9,
+        "exportCount": 0,
+        "functionCount": 8,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/test/java/exchangeserver/core/ReplayTest.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 217,
+      "nonEmptyLines": 188,
+      "functions": [
+        {
+          "name": "file",
+          "startLine": 36,
+          "endLine": 38,
+          "params": []
+        },
+        {
+          "name": "journalWith",
+          "startLine": 40,
+          "endLine": 44,
+          "params": []
+        },
+        {
+          "name": "run",
+          "startLine": 46,
+          "endLine": 48,
+          "params": [
+            "j",
+            "stopBefore",
+            "interceptor"
+          ]
+        },
+        {
+          "name": "buy",
+          "startLine": 50,
+          "endLine": 52,
+          "params": [
+            "seq",
+            "id",
+            "t"
+          ]
+        },
+        {
+          "name": "digestAfter",
+          "startLine": 55,
+          "endLine": 61,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "ReplayTest",
+          "startLine": 28,
+          "endLine": 217,
+          "methods": [
+            "file",
+            "journalWith",
+            "run",
+            "buy",
+            "digestAfter"
+          ],
+          "properties": [
+            "T",
+            "RETENTION",
+            "dir"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "file",
+          "callee": "dir.resolve",
+          "lineNumber": 37
+        },
+        {
+          "caller": "journalWith",
+          "callee": "CommandJournal.open",
+          "lineNumber": 41
+        },
+        {
+          "caller": "journalWith",
+          "callee": "file",
+          "lineNumber": 41
+        },
+        {
+          "caller": "journalWith",
+          "callee": "j.appendAll",
+          "lineNumber": 42
+        },
+        {
+          "caller": "journalWith",
+          "callee": "List.of",
+          "lineNumber": 42
+        },
+        {
+          "caller": "run",
+          "callee": "Replay.run",
+          "lineNumber": 47
+        },
+        {
+          "caller": "run",
+          "callee": "file",
+          "lineNumber": 47
+        },
+        {
+          "caller": "buy",
+          "callee": "new NewOrderCommand",
+          "lineNumber": 51
+        },
+        {
+          "caller": "buy",
+          "callee": "OrderRequest.limit",
+          "lineNumber": 51
+        },
+        {
+          "caller": "digestAfter",
+          "callee": "Ledger.from",
+          "lineNumber": 56
+        },
+        {
+          "caller": "digestAfter",
+          "callee": "Snapshot.empty",
+          "lineNumber": 56
+        },
+        {
+          "caller": "digestAfter",
+          "callee": "ledger.apply",
+          "lineNumber": 58
+        },
+        {
+          "caller": "digestAfter",
+          "callee": "ledger.digest",
+          "lineNumber": 60
+        },
+        {
+          "caller": "emptyJournal",
+          "callee": "journalWith",
+          "lineNumber": 68
+        },
+        {
+          "caller": "emptyJournal",
+          "callee": "run",
+          "lineNumber": 69
+        },
+        {
+          "caller": "emptyJournal",
+          "callee": "assertEquals",
+          "lineNumber": 70
+        },
+        {
+          "caller": "emptyJournal",
+          "callee": "r.lastSequenceNumber",
+          "lineNumber": 70
+        },
+        {
+          "caller": "emptyJournal",
+          "callee": "assertEquals",
+          "lineNumber": 71
+        },
+        {
+          "caller": "emptyJournal",
+          "callee": "r.lastOrderId",
+          "lineNumber": 71
+        },
+        {
+          "caller": "emptyJournal",
+          "callee": "assertNull",
+          "lineNumber": 72
+        },
+        {
+          "caller": "emptyJournal",
+          "callee": "r.lastTimestamp",
+          "lineNumber": 72
+        },
+        {
+          "caller": "emptyJournal",
+          "callee": "assertEquals",
+          "lineNumber": 73
+        },
+        {
+          "caller": "emptyJournal",
+          "callee": "r.fed",
+          "lineNumber": 73
+        },
+        {
+          "caller": "gapInSequenceIsRefused",
+          "callee": "journalWith",
+          "lineNumber": 79
+        },
+        {
+          "caller": "gapInSequenceIsRefused",
+          "callee": "buy",
+          "lineNumber": 79
+        },
+        {
+          "caller": "gapInSequenceIsRefused",
+          "callee": "buy",
+          "lineNumber": 79
+        },
+        {
+          "caller": "gapInSequenceIsRefused",
+          "callee": "assertThrows",
+          "lineNumber": 80
+        },
+        {
+          "caller": "gapInSequenceIsRefused",
+          "callee": "run",
+          "lineNumber": 81
+        },
+        {
+          "caller": "gapInSequenceIsRefused",
+          "callee": "assertTrue",
+          "lineNumber": 82
+        },
+        {
+          "caller": "gapInSequenceIsRefused",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 82
+        },
+        {
+          "caller": "gapInSequenceIsRefused",
+          "callee": "e.getMessage",
+          "lineNumber": 82
+        },
+        {
+          "caller": "gapInSequenceIsRefused",
+          "callee": "e.getMessage",
+          "lineNumber": 82
+        },
+        {
+          "caller": "repeatedSequenceIsRefused",
+          "callee": "journalWith",
+          "lineNumber": 88
+        },
+        {
+          "caller": "repeatedSequenceIsRefused",
+          "callee": "buy",
+          "lineNumber": 88
+        },
+        {
+          "caller": "repeatedSequenceIsRefused",
+          "callee": "buy",
+          "lineNumber": 88
+        },
+        {
+          "caller": "repeatedSequenceIsRefused",
+          "callee": "assertThrows",
+          "lineNumber": 89
+        },
+        {
+          "caller": "repeatedSequenceIsRefused",
+          "callee": "run",
+          "lineNumber": 89
+        },
+        {
+          "caller": "backwardsTimestampIsRefused",
+          "callee": "journalWith",
+          "lineNumber": 95
+        },
+        {
+          "caller": "backwardsTimestampIsRefused",
+          "callee": "buy",
+          "lineNumber": 95
+        },
+        {
+          "caller": "backwardsTimestampIsRefused",
+          "callee": "buy",
+          "lineNumber": 95
+        },
+        {
+          "caller": "backwardsTimestampIsRefused",
+          "callee": "T.minusNanos",
+          "lineNumber": 95
+        },
+        {
+          "caller": "backwardsTimestampIsRefused",
+          "callee": "assertThrows",
+          "lineNumber": 96
+        },
+        {
+          "caller": "backwardsTimestampIsRefused",
+          "callee": "run",
+          "lineNumber": 96
+        },
+        {
+          "caller": "nothingIsFedIfVerificationFails",
+          "callee": "journalWith",
+          "lineNumber": 103
+        },
+        {
+          "caller": "nothingIsFedIfVerificationFails",
+          "callee": "buy",
+          "lineNumber": 103
+        },
+        {
+          "caller": "nothingIsFedIfVerificationFails",
+          "callee": "buy",
+          "lineNumber": 103
+        },
+        {
+          "caller": "nothingIsFedIfVerificationFails",
+          "callee": "buy",
+          "lineNumber": 103
+        },
+        {
+          "caller": "nothingIsFedIfVerificationFails",
+          "callee": "new ArrayList<>",
+          "lineNumber": 104
+        },
+        {
+          "caller": "nothingIsFedIfVerificationFails",
+          "callee": "assertThrows",
+          "lineNumber": 105
+        },
+        {
+          "caller": "nothingIsFedIfVerificationFails",
+          "callee": "run",
+          "lineNumber": 105
+        },
+        {
+          "caller": "nothingIsFedIfVerificationFails",
+          "callee": "assertTrue",
+          "lineNumber": 106
+        },
+        {
+          "caller": "nothingIsFedIfVerificationFails",
+          "callee": "seen.isEmpty",
+          "lineNumber": 106
+        },
+        {
+          "caller": "aBaseSequenceNeedsItsSnapshot",
+          "callee": "CommandJournal.writeFresh",
+          "lineNumber": 113
+        },
+        {
+          "caller": "aBaseSequenceNeedsItsSnapshot",
+          "callee": "file",
+          "lineNumber": 113
+        },
+        {
+          "caller": "aBaseSequenceNeedsItsSnapshot",
+          "callee": "CommandJournal.open",
+          "lineNumber": 114
+        },
+        {
+          "caller": "aBaseSequenceNeedsItsSnapshot",
+          "callee": "file",
+          "lineNumber": 114
+        },
+        {
+          "caller": "aBaseSequenceNeedsItsSnapshot",
+          "callee": "assertThrows",
+          "lineNumber": 115
+        },
+        {
+          "caller": "aBaseSequenceNeedsItsSnapshot",
+          "callee": "run",
+          "lineNumber": 116
+        },
+        {
+          "caller": "aBaseSequenceNeedsItsSnapshot",
+          "callee": "assertTrue",
+          "lineNumber": 117
+        },
+        {
+          "caller": "aBaseSequenceNeedsItsSnapshot",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 117
+        },
+        {
+          "caller": "aBaseSequenceNeedsItsSnapshot",
+          "callee": "e.getMessage",
+          "lineNumber": 117
+        },
+        {
+          "caller": "aBaseSequenceNeedsItsSnapshot",
+          "callee": "e.getMessage",
+          "lineNumber": 117
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "journalWith",
+          "lineNumber": 127
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "buy",
+          "lineNumber": 127
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "buy",
+          "lineNumber": 127
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "T.plusSeconds",
+          "lineNumber": 127
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "new CancelOrderCommand",
+          "lineNumber": 128
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "T.plusSeconds",
+          "lineNumber": 128
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "run",
+          "lineNumber": 129
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "assertEquals",
+          "lineNumber": 130
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.lastSequenceNumber",
+          "lineNumber": 130
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "assertEquals",
+          "lineNumber": 131
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.lastOrderId",
+          "lineNumber": 131
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "assertEquals",
+          "lineNumber": 132
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "T.plusSeconds",
+          "lineNumber": 132
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.lastTimestamp",
+          "lineNumber": 132
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "assertEquals",
+          "lineNumber": 133
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.fed",
+          "lineNumber": 133
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "assertEquals",
+          "lineNumber": 134
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.ledger().engine().snapshot(10).bids().get(0).volume",
+          "lineNumber": 134
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.ledger().engine().snapshot(10).bids().get",
+          "lineNumber": 134
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.ledger().engine().snapshot(10).bids",
+          "lineNumber": 134
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.ledger().engine().snapshot",
+          "lineNumber": 134
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.ledger().engine",
+          "lineNumber": 134
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.ledger",
+          "lineNumber": 134
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "assertEquals",
+          "lineNumber": 135
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.ledger().log().lastOseq",
+          "lineNumber": 135
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.ledger().log",
+          "lineNumber": 135
+        },
+        {
+          "caller": "feedsEveryCommandAndReportsTheCounters",
+          "callee": "r.ledger",
+          "lineNumber": 135
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "journalWith",
+          "lineNumber": 141
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "buy",
+          "lineNumber": 141
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "buy",
+          "lineNumber": 141
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "new SkipCommand",
+          "lineNumber": 141
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "new ArrayList<>",
+          "lineNumber": 142
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "run",
+          "lineNumber": 143
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "assertEquals",
+          "lineNumber": 144
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "List.of",
+          "lineNumber": 144
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "buy",
+          "lineNumber": 144
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "assertEquals",
+          "lineNumber": 145
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "Set.of",
+          "lineNumber": 145
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "r.skipped",
+          "lineNumber": 145
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "assertEquals",
+          "lineNumber": 146
+        },
+        {
+          "caller": "skippedCommandsAreNotFedButTheirIdsCount",
+          "callee": "r.lastOrderId",
+          "lineNumber": 146
+        },
+        {
+          "caller": "stopsBeforeTheGivenSequence",
+          "callee": "journalWith",
+          "lineNumber": 152
+        },
+        {
+          "caller": "stopsBeforeTheGivenSequence",
+          "callee": "buy",
+          "lineNumber": 152
+        },
+        {
+          "caller": "stopsBeforeTheGivenSequence",
+          "callee": "buy",
+          "lineNumber": 152
+        },
+        {
+          "caller": "stopsBeforeTheGivenSequence",
+          "callee": "buy",
+          "lineNumber": 152
+        },
+        {
+          "caller": "stopsBeforeTheGivenSequence",
+          "callee": "new ArrayList<>",
+          "lineNumber": 153
+        },
+        {
+          "caller": "stopsBeforeTheGivenSequence",
+          "callee": "run",
+          "lineNumber": 154
+        },
+        {
+          "caller": "stopsBeforeTheGivenSequence",
+          "callee": "assertEquals",
+          "lineNumber": 155
+        },
+        {
+          "caller": "stopsBeforeTheGivenSequence",
+          "callee": "seen.size",
+          "lineNumber": 155
+        },
+        {
+          "caller": "stopsBeforeTheGivenSequence",
+          "callee": "assertEquals",
+          "lineNumber": 156
+        },
+        {
+          "caller": "stopsBeforeTheGivenSequence",
+          "callee": "r.lastSequenceNumber",
+          "lineNumber": 156
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "journalWith",
+          "lineNumber": 163
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "buy",
+          "lineNumber": 163
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "buy",
+          "lineNumber": 163
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "buy",
+          "lineNumber": 163
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "new ArrayList<>",
+          "lineNumber": 164
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "Replay.rebuild",
+          "lineNumber": 165
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "file",
+          "lineNumber": 165
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "Set.of",
+          "lineNumber": 165
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "assertEquals",
+          "lineNumber": 166
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "List.of",
+          "lineNumber": 166
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "buy",
+          "lineNumber": 166
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "assertEquals",
+          "lineNumber": 167
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "ledger.engine().snapshot(1).bids().get(0).volume",
+          "lineNumber": 167
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "ledger.engine().snapshot(1).bids().get",
+          "lineNumber": 167
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "ledger.engine().snapshot(1).bids",
+          "lineNumber": 167
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "ledger.engine().snapshot",
+          "lineNumber": 167
+        },
+        {
+          "caller": "rebuildUsesTheGivenSkipSetAndDoesNotVerify",
+          "callee": "ledger.engine",
+          "lineNumber": 167
+        },
+        {
+          "caller": "reusedOrderIdIsCaughtByTheEngine",
+          "callee": "journalWith",
+          "lineNumber": 173
+        },
+        {
+          "caller": "reusedOrderIdIsCaughtByTheEngine",
+          "callee": "buy",
+          "lineNumber": 173
+        },
+        {
+          "caller": "reusedOrderIdIsCaughtByTheEngine",
+          "callee": "buy",
+          "lineNumber": 173
+        },
+        {
+          "caller": "reusedOrderIdIsCaughtByTheEngine",
+          "callee": "assertThrows",
+          "lineNumber": 174
+        },
+        {
+          "caller": "reusedOrderIdIsCaughtByTheEngine",
+          "callee": "run",
+          "lineNumber": 174
+        },
+        {
+          "caller": "reusedOrderIdIsCaughtByTheEngine",
+          "callee": "assertEquals",
+          "lineNumber": 175
+        },
+        {
+          "caller": "reusedOrderIdIsCaughtByTheEngine",
+          "callee": "e.kind",
+          "lineNumber": 175
+        },
+        {
+          "caller": "reusedOrderIdIsCaughtByTheEngine",
+          "callee": "assertEquals",
+          "lineNumber": 176
+        },
+        {
+          "caller": "reusedOrderIdIsCaughtByTheEngine",
+          "callee": "e.sequenceNumber",
+          "lineNumber": 176
+        },
+        {
+          "caller": "aMatchingDigestPasses",
+          "callee": "digestAfter",
+          "lineNumber": 187
+        },
+        {
+          "caller": "aMatchingDigestPasses",
+          "callee": "buy",
+          "lineNumber": 187
+        },
+        {
+          "caller": "aMatchingDigestPasses",
+          "callee": "buy",
+          "lineNumber": 187
+        },
+        {
+          "caller": "aMatchingDigestPasses",
+          "callee": "journalWith",
+          "lineNumber": 188
+        },
+        {
+          "caller": "aMatchingDigestPasses",
+          "callee": "buy",
+          "lineNumber": 188
+        },
+        {
+          "caller": "aMatchingDigestPasses",
+          "callee": "buy",
+          "lineNumber": 188
+        },
+        {
+          "caller": "aMatchingDigestPasses",
+          "callee": "new CheckCommand",
+          "lineNumber": 188
+        },
+        {
+          "caller": "aMatchingDigestPasses",
+          "callee": "buy",
+          "lineNumber": 188
+        },
+        {
+          "caller": "aMatchingDigestPasses",
+          "callee": "run",
+          "lineNumber": 189
+        },
+        {
+          "caller": "aMatchingDigestPasses",
+          "callee": "assertEquals",
+          "lineNumber": 190
+        },
+        {
+          "caller": "aMatchingDigestPasses",
+          "callee": "r.fed",
+          "lineNumber": 190
+        },
+        {
+          "caller": "aDifferentDigestStopsReplayAsDivergence",
+          "callee": "journalWith",
+          "lineNumber": 196
+        },
+        {
+          "caller": "aDifferentDigestStopsReplayAsDivergence",
+          "callee": "buy",
+          "lineNumber": 196
+        },
+        {
+          "caller": "aDifferentDigestStopsReplayAsDivergence",
+          "callee": "new CheckCommand",
+          "lineNumber": 196
+        },
+        {
+          "caller": "aDifferentDigestStopsReplayAsDivergence",
+          "callee": "assertThrows",
+          "lineNumber": 197
+        },
+        {
+          "caller": "aDifferentDigestStopsReplayAsDivergence",
+          "callee": "run",
+          "lineNumber": 197
+        },
+        {
+          "caller": "aDifferentDigestStopsReplayAsDivergence",
+          "callee": "assertEquals",
+          "lineNumber": 198
+        },
+        {
+          "caller": "aDifferentDigestStopsReplayAsDivergence",
+          "callee": "e.kind",
+          "lineNumber": 198
+        },
+        {
+          "caller": "aDifferentDigestStopsReplayAsDivergence",
+          "callee": "assertEquals",
+          "lineNumber": 199
+        },
+        {
+          "caller": "aDifferentDigestStopsReplayAsDivergence",
+          "callee": "e.sequenceNumber",
+          "lineNumber": 199
+        },
+        {
+          "caller": "aDifferentOutputChangesTheDigest",
+          "callee": "new NewOrderCommand",
+          "lineNumber": 206
+        },
+        {
+          "caller": "aDifferentOutputChangesTheDigest",
+          "callee": "OrderRequest.limit",
+          "lineNumber": 206
+        },
+        {
+          "caller": "aDifferentOutputChangesTheDigest",
+          "callee": "assertTrue",
+          "lineNumber": 207
+        },
+        {
+          "caller": "aDifferentOutputChangesTheDigest",
+          "callee": "digestAfter(buy(1, 1, T), buy(2, 2, T)).equals",
+          "lineNumber": 207
+        },
+        {
+          "caller": "aDifferentOutputChangesTheDigest",
+          "callee": "digestAfter",
+          "lineNumber": 207
+        },
+        {
+          "caller": "aDifferentOutputChangesTheDigest",
+          "callee": "buy",
+          "lineNumber": 207
+        },
+        {
+          "caller": "aDifferentOutputChangesTheDigest",
+          "callee": "buy",
+          "lineNumber": 207
+        },
+        {
+          "caller": "aDifferentOutputChangesTheDigest",
+          "callee": "digestAfter",
+          "lineNumber": 207
+        },
+        {
+          "caller": "aDifferentOutputChangesTheDigest",
+          "callee": "buy",
+          "lineNumber": 207
+        },
+        {
+          "caller": "aCheckAtOrAfterStopBeforeIsNotCompared",
+          "callee": "journalWith",
+          "lineNumber": 212
+        },
+        {
+          "caller": "aCheckAtOrAfterStopBeforeIsNotCompared",
+          "callee": "buy",
+          "lineNumber": 212
+        },
+        {
+          "caller": "aCheckAtOrAfterStopBeforeIsNotCompared",
+          "callee": "new CheckCommand",
+          "lineNumber": 212
+        },
+        {
+          "caller": "aCheckAtOrAfterStopBeforeIsNotCompared",
+          "callee": "assertEquals",
+          "lineNumber": 213
+        },
+        {
+          "caller": "aCheckAtOrAfterStopBeforeIsNotCompared",
+          "callee": "run(j, 2, CommandInterceptor.NONE).fed",
+          "lineNumber": 213
+        },
+        {
+          "caller": "aCheckAtOrAfterStopBeforeIsNotCompared",
+          "callee": "run",
+          "lineNumber": 213
+        }
+      ],
+      "metrics": {
+        "importCount": 9,
+        "exportCount": 0,
+        "functionCount": 5,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/test/java/exchangeserver/journal/CommandJournalTest.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 343,
+      "nonEmptyLines": 302,
+      "functions": [
+        {
+          "name": "file",
+          "startLine": 35,
+          "endLine": 37,
+          "params": []
+        },
+        {
+          "name": "order",
+          "startLine": 39,
+          "endLine": 41,
+          "params": [
+            "seq",
+            "id"
+          ]
+        },
+        {
+          "name": "readAll",
+          "startLine": 43,
+          "endLine": 47,
+          "params": [
+            "journal"
+          ]
+        },
+        {
+          "name": "text",
+          "startLine": 49,
+          "endLine": 51,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "CommandJournalTest",
+          "startLine": 27,
+          "endLine": 343,
+          "methods": [
+            "file",
+            "order",
+            "readAll",
+            "text"
+          ],
+          "properties": [
+            "T",
+            "RULES",
+            "dir"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "file",
+          "callee": "dir.resolve",
+          "lineNumber": 36
+        },
+        {
+          "caller": "order",
+          "callee": "new NewOrderCommand",
+          "lineNumber": 40
+        },
+        {
+          "caller": "order",
+          "callee": "OrderRequest.limit",
+          "lineNumber": 40
+        },
+        {
+          "caller": "readAll",
+          "callee": "new ArrayList<>",
+          "lineNumber": 44
+        },
+        {
+          "caller": "readAll",
+          "callee": "journal.read",
+          "lineNumber": 45
+        },
+        {
+          "caller": "text",
+          "callee": "Files.readString",
+          "lineNumber": 50
+        },
+        {
+          "caller": "text",
+          "callee": "file",
+          "lineNumber": 50
+        },
+        {
+          "caller": "newJournalStartsWithAHeader",
+          "callee": "CommandJournal.open",
+          "lineNumber": 58
+        },
+        {
+          "caller": "newJournalStartsWithAHeader",
+          "callee": "file",
+          "lineNumber": 58
+        },
+        {
+          "caller": "newJournalStartsWithAHeader",
+          "callee": "assertEquals",
+          "lineNumber": 59
+        },
+        {
+          "caller": "newJournalStartsWithAHeader",
+          "callee": "JournalCodec.encodeHeader",
+          "lineNumber": 59
+        },
+        {
+          "caller": "newJournalStartsWithAHeader",
+          "callee": "text",
+          "lineNumber": 59
+        },
+        {
+          "caller": "newJournalStartsWithAHeader",
+          "callee": "assertTrue",
+          "lineNumber": 60
+        },
+        {
+          "caller": "newJournalStartsWithAHeader",
+          "callee": "readAll(j).isEmpty",
+          "lineNumber": 60
+        },
+        {
+          "caller": "newJournalStartsWithAHeader",
+          "callee": "readAll",
+          "lineNumber": 60
+        },
+        {
+          "caller": "reopeningDoesNotWriteASecondHeader",
+          "callee": "CommandJournal.open(file(), RULES).close",
+          "lineNumber": 66
+        },
+        {
+          "caller": "reopeningDoesNotWriteASecondHeader",
+          "callee": "CommandJournal.open",
+          "lineNumber": 66
+        },
+        {
+          "caller": "reopeningDoesNotWriteASecondHeader",
+          "callee": "file",
+          "lineNumber": 66
+        },
+        {
+          "caller": "reopeningDoesNotWriteASecondHeader",
+          "callee": "CommandJournal.open(file(), RULES).close",
+          "lineNumber": 67
+        },
+        {
+          "caller": "reopeningDoesNotWriteASecondHeader",
+          "callee": "CommandJournal.open",
+          "lineNumber": 67
+        },
+        {
+          "caller": "reopeningDoesNotWriteASecondHeader",
+          "callee": "file",
+          "lineNumber": 67
+        },
+        {
+          "caller": "reopeningDoesNotWriteASecondHeader",
+          "callee": "assertEquals",
+          "lineNumber": 68
+        },
+        {
+          "caller": "reopeningDoesNotWriteASecondHeader",
+          "callee": "JournalCodec.encodeHeader",
+          "lineNumber": 68
+        },
+        {
+          "caller": "reopeningDoesNotWriteASecondHeader",
+          "callee": "text",
+          "lineNumber": 68
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "CommandJournal.open",
+          "lineNumber": 73
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "file",
+          "lineNumber": 73
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "j.append",
+          "lineNumber": 74
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "order",
+          "lineNumber": 74
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "CommandJournal.openJournals",
+          "lineNumber": 76
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "assertThrows",
+          "lineNumber": 77
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "CommandJournal.open",
+          "lineNumber": 77
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "file",
+          "lineNumber": 77
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "assertTrue",
+          "lineNumber": 78
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 78
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "e.getMessage",
+          "lineNumber": 78
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "e.getMessage",
+          "lineNumber": 78
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "assertEquals",
+          "lineNumber": 79
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "CommandJournal.openJournals",
+          "lineNumber": 79
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "CommandJournal.open(file(), RULES).close",
+          "lineNumber": 80
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "CommandJournal.open",
+          "lineNumber": 80
+        },
+        {
+          "caller": "otherRulesVersionIsRefusedAndTheFileIsReleased",
+          "callee": "file",
+          "lineNumber": 80
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "CommandJournal.writeFresh",
+          "lineNumber": 86
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "file",
+          "lineNumber": 86
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "CommandJournal.open",
+          "lineNumber": 87
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "file",
+          "lineNumber": 87
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "assertEquals",
+          "lineNumber": 88
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "j.adoptedRulesFrom",
+          "lineNumber": 88
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "assertEquals",
+          "lineNumber": 89
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "j.baseSequence",
+          "lineNumber": 89
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "assertEquals",
+          "lineNumber": 91
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "JournalCodec.encodeHeader",
+          "lineNumber": 91
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "text",
+          "lineNumber": 91
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "CommandJournal.open",
+          "lineNumber": 92
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "file",
+          "lineNumber": 92
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "assertEquals",
+          "lineNumber": 93
+        },
+        {
+          "caller": "anEmptyJournalAdoptsANewRulesVersionAndKeepsItsBase",
+          "callee": "j.adoptedRulesFrom",
+          "lineNumber": 93
+        },
+        {
+          "caller": "fileWithoutAHeaderIsRefused",
+          "callee": "Files.writeString",
+          "lineNumber": 99
+        },
+        {
+          "caller": "fileWithoutAHeaderIsRefused",
+          "callee": "file",
+          "lineNumber": 99
+        },
+        {
+          "caller": "fileWithoutAHeaderIsRefused",
+          "callee": "CommandJournal.openJournals",
+          "lineNumber": 100
+        },
+        {
+          "caller": "fileWithoutAHeaderIsRefused",
+          "callee": "assertThrows",
+          "lineNumber": 101
+        },
+        {
+          "caller": "fileWithoutAHeaderIsRefused",
+          "callee": "CommandJournal.open",
+          "lineNumber": 101
+        },
+        {
+          "caller": "fileWithoutAHeaderIsRefused",
+          "callee": "file",
+          "lineNumber": 101
+        },
+        {
+          "caller": "fileWithoutAHeaderIsRefused",
+          "callee": "assertEquals",
+          "lineNumber": 102
+        },
+        {
+          "caller": "fileWithoutAHeaderIsRefused",
+          "callee": "CommandJournal.openJournals",
+          "lineNumber": 102
+        },
+        {
+          "caller": "fileThatIsNotAJournalIsRefusedUnchanged",
+          "callee": "Files.writeString",
+          "lineNumber": 108
+        },
+        {
+          "caller": "fileThatIsNotAJournalIsRefusedUnchanged",
+          "callee": "file",
+          "lineNumber": 108
+        },
+        {
+          "caller": "fileThatIsNotAJournalIsRefusedUnchanged",
+          "callee": "CommandJournal.openJournals",
+          "lineNumber": 109
+        },
+        {
+          "caller": "fileThatIsNotAJournalIsRefusedUnchanged",
+          "callee": "assertThrows",
+          "lineNumber": 110
+        },
+        {
+          "caller": "fileThatIsNotAJournalIsRefusedUnchanged",
+          "callee": "CommandJournal.open",
+          "lineNumber": 110
+        },
+        {
+          "caller": "fileThatIsNotAJournalIsRefusedUnchanged",
+          "callee": "file",
+          "lineNumber": 110
+        },
+        {
+          "caller": "fileThatIsNotAJournalIsRefusedUnchanged",
+          "callee": "assertEquals",
+          "lineNumber": 111
+        },
+        {
+          "caller": "fileThatIsNotAJournalIsRefusedUnchanged",
+          "callee": "text",
+          "lineNumber": 111
+        },
+        {
+          "caller": "fileThatIsNotAJournalIsRefusedUnchanged",
+          "callee": "assertEquals",
+          "lineNumber": 112
+        },
+        {
+          "caller": "fileThatIsNotAJournalIsRefusedUnchanged",
+          "callee": "CommandJournal.openJournals",
+          "lineNumber": 112
+        },
+        {
+          "caller": "textWithoutAnyRecordIsRefusedUnlessItStartsAHeader",
+          "callee": "Files.writeString",
+          "lineNumber": 117
+        },
+        {
+          "caller": "textWithoutAnyRecordIsRefusedUnlessItStartsAHeader",
+          "callee": "file",
+          "lineNumber": 117
+        },
+        {
+          "caller": "textWithoutAnyRecordIsRefusedUnlessItStartsAHeader",
+          "callee": "assertThrows",
+          "lineNumber": 118
+        },
+        {
+          "caller": "textWithoutAnyRecordIsRefusedUnlessItStartsAHeader",
+          "callee": "CommandJournal.open",
+          "lineNumber": 118
+        },
+        {
+          "caller": "textWithoutAnyRecordIsRefusedUnlessItStartsAHeader",
+          "callee": "file",
+          "lineNumber": 118
+        },
+        {
+          "caller": "textWithoutAnyRecordIsRefusedUnlessItStartsAHeader",
+          "callee": "assertTrue",
+          "lineNumber": 119
+        },
+        {
+          "caller": "textWithoutAnyRecordIsRefusedUnlessItStartsAHeader",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 119
+        },
+        {
+          "caller": "textWithoutAnyRecordIsRefusedUnlessItStartsAHeader",
+          "callee": "e.getMessage",
+          "lineNumber": 119
+        },
+        {
+          "caller": "textWithoutAnyRecordIsRefusedUnlessItStartsAHeader",
+          "callee": "e.getMessage",
+          "lineNumber": 119
+        },
+        {
+          "caller": "textWithoutAnyRecordIsRefusedUnlessItStartsAHeader",
+          "callee": "assertEquals",
+          "lineNumber": 120
+        },
+        {
+          "caller": "textWithoutAnyRecordIsRefusedUnlessItStartsAHeader",
+          "callee": "text",
+          "lineNumber": 120
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "CommandJournal.open",
+          "lineNumber": 125
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "file",
+          "lineNumber": 125
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "j.append",
+          "lineNumber": 126
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "order",
+          "lineNumber": 126
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "Files.writeString",
+          "lineNumber": 128
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "file",
+          "lineNumber": 128
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "text",
+          "lineNumber": 129
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "assertThrows",
+          "lineNumber": 130
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "CommandJournal.open",
+          "lineNumber": 130
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "file",
+          "lineNumber": 130
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "assertEquals",
+          "lineNumber": 131
+        },
+        {
+          "caller": "otherRulesVersionWithATornTailIsRefusedUnchanged",
+          "callee": "text",
+          "lineNumber": 131
+        },
+        {
+          "caller": "openAndCloseAreCountedAndCloseIsIdempotent",
+          "callee": "CommandJournal.openJournals",
+          "lineNumber": 136
+        },
+        {
+          "caller": "openAndCloseAreCountedAndCloseIsIdempotent",
+          "callee": "CommandJournal.open",
+          "lineNumber": 137
+        },
+        {
+          "caller": "openAndCloseAreCountedAndCloseIsIdempotent",
+          "callee": "file",
+          "lineNumber": 137
+        },
+        {
+          "caller": "openAndCloseAreCountedAndCloseIsIdempotent",
+          "callee": "assertEquals",
+          "lineNumber": 138
+        },
+        {
+          "caller": "openAndCloseAreCountedAndCloseIsIdempotent",
+          "callee": "CommandJournal.openJournals",
+          "lineNumber": 138
+        },
+        {
+          "caller": "openAndCloseAreCountedAndCloseIsIdempotent",
+          "callee": "assertTrue",
+          "lineNumber": 139
+        },
+        {
+          "caller": "openAndCloseAreCountedAndCloseIsIdempotent",
+          "callee": "j.hasFailed",
+          "lineNumber": 139
+        },
+        {
+          "caller": "openAndCloseAreCountedAndCloseIsIdempotent",
+          "callee": "j.close",
+          "lineNumber": 140
+        },
+        {
+          "caller": "openAndCloseAreCountedAndCloseIsIdempotent",
+          "callee": "j.close",
+          "lineNumber": 141
+        },
+        {
+          "caller": "openAndCloseAreCountedAndCloseIsIdempotent",
+          "callee": "assertEquals",
+          "lineNumber": 142
+        },
+        {
+          "caller": "openAndCloseAreCountedAndCloseIsIdempotent",
+          "callee": "CommandJournal.openJournals",
+          "lineNumber": 142
+        },
+        {
+          "caller": "readsBackInOrder",
+          "callee": "List.of",
+          "lineNumber": 151
+        },
+        {
+          "caller": "readsBackInOrder",
+          "callee": "order",
+          "lineNumber": 151
+        },
+        {
+          "caller": "readsBackInOrder",
+          "callee": "new CancelOrderCommand",
+          "lineNumber": 151
+        },
+        {
+          "caller": "readsBackInOrder",
+          "callee": "new SkipCommand",
+          "lineNumber": 151
+        },
+        {
+          "caller": "readsBackInOrder",
+          "callee": "CommandJournal.open",
+          "lineNumber": 152
+        },
+        {
+          "caller": "readsBackInOrder",
+          "callee": "file",
+          "lineNumber": 152
+        },
+        {
+          "caller": "readsBackInOrder",
+          "callee": "j.append",
+          "lineNumber": 154
+        },
+        {
+          "caller": "readsBackInOrder",
+          "callee": "assertEquals",
+          "lineNumber": 156
+        },
+        {
+          "caller": "readsBackInOrder",
+          "callee": "readAll",
+          "lineNumber": 156
+        },
+        {
+          "caller": "appendAllWritesTheWholeBatch",
+          "callee": "CommandJournal.open",
+          "lineNumber": 162
+        },
+        {
+          "caller": "appendAllWritesTheWholeBatch",
+          "callee": "file",
+          "lineNumber": 162
+        },
+        {
+          "caller": "appendAllWritesTheWholeBatch",
+          "callee": "j.appendAll",
+          "lineNumber": 163
+        },
+        {
+          "caller": "appendAllWritesTheWholeBatch",
+          "callee": "List.of",
+          "lineNumber": 163
+        },
+        {
+          "caller": "appendAllWritesTheWholeBatch",
+          "callee": "order",
+          "lineNumber": 163
+        },
+        {
+          "caller": "appendAllWritesTheWholeBatch",
+          "callee": "order",
+          "lineNumber": 163
+        },
+        {
+          "caller": "appendAllWritesTheWholeBatch",
+          "callee": "order",
+          "lineNumber": 163
+        },
+        {
+          "caller": "appendAllWritesTheWholeBatch",
+          "callee": "assertEquals",
+          "lineNumber": 164
+        },
+        {
+          "caller": "appendAllWritesTheWholeBatch",
+          "callee": "readAll(j).size",
+          "lineNumber": 164
+        },
+        {
+          "caller": "appendAllWritesTheWholeBatch",
+          "callee": "readAll",
+          "lineNumber": 164
+        },
+        {
+          "caller": "emptyBatchWritesNothing",
+          "callee": "CommandJournal.open",
+          "lineNumber": 170
+        },
+        {
+          "caller": "emptyBatchWritesNothing",
+          "callee": "file",
+          "lineNumber": 170
+        },
+        {
+          "caller": "emptyBatchWritesNothing",
+          "callee": "j.appendAll",
+          "lineNumber": 171
+        },
+        {
+          "caller": "emptyBatchWritesNothing",
+          "callee": "List.of",
+          "lineNumber": 171
+        },
+        {
+          "caller": "emptyBatchWritesNothing",
+          "callee": "assertEquals",
+          "lineNumber": 173
+        },
+        {
+          "caller": "emptyBatchWritesNothing",
+          "callee": "JournalCodec.encodeHeader",
+          "lineNumber": 173
+        },
+        {
+          "caller": "emptyBatchWritesNothing",
+          "callee": "text",
+          "lineNumber": 173
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "CommandJournal.open",
+          "lineNumber": 178
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "file",
+          "lineNumber": 178
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "j.append",
+          "lineNumber": 179
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "order",
+          "lineNumber": 179
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "CommandJournal.open",
+          "lineNumber": 181
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "file",
+          "lineNumber": 181
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "j.append",
+          "lineNumber": 182
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "order",
+          "lineNumber": 182
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "assertEquals",
+          "lineNumber": 183
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "List.of",
+          "lineNumber": 183
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "order",
+          "lineNumber": 183
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "order",
+          "lineNumber": 183
+        },
+        {
+          "caller": "reopeningAppendsAfterExistingRecords",
+          "callee": "readAll",
+          "lineNumber": 183
+        },
+        {
+          "caller": "recordsUseLfOnly",
+          "callee": "CommandJournal.open",
+          "lineNumber": 189
+        },
+        {
+          "caller": "recordsUseLfOnly",
+          "callee": "file",
+          "lineNumber": 189
+        },
+        {
+          "caller": "recordsUseLfOnly",
+          "callee": "j.append",
+          "lineNumber": 190
+        },
+        {
+          "caller": "recordsUseLfOnly",
+          "callee": "order",
+          "lineNumber": 190
+        },
+        {
+          "caller": "recordsUseLfOnly",
+          "callee": "assertTrue",
+          "lineNumber": 192
+        },
+        {
+          "caller": "recordsUseLfOnly",
+          "callee": "text().contains",
+          "lineNumber": 192
+        },
+        {
+          "caller": "recordsUseLfOnly",
+          "callee": "text",
+          "lineNumber": 192
+        },
+        {
+          "caller": "readHandlesRecordsSpanningBufferBoundaries",
+          "callee": "new ArrayList<>",
+          "lineNumber": 197
+        },
+        {
+          "caller": "readHandlesRecordsSpanningBufferBoundaries",
+          "callee": "CommandJournal.open",
+          "lineNumber": 198
+        },
+        {
+          "caller": "readHandlesRecordsSpanningBufferBoundaries",
+          "callee": "file",
+          "lineNumber": 198
+        },
+        {
+          "caller": "readHandlesRecordsSpanningBufferBoundaries",
+          "callee": "written.add",
+          "lineNumber": 200
+        },
+        {
+          "caller": "readHandlesRecordsSpanningBufferBoundaries",
+          "callee": "order",
+          "lineNumber": 200
+        },
+        {
+          "caller": "readHandlesRecordsSpanningBufferBoundaries",
+          "callee": "j.appendAll",
+          "lineNumber": 202
+        },
+        {
+          "caller": "readHandlesRecordsSpanningBufferBoundaries",
+          "callee": "assertEquals",
+          "lineNumber": 203
+        },
+        {
+          "caller": "readHandlesRecordsSpanningBufferBoundaries",
+          "callee": "readAll",
+          "lineNumber": 203
+        },
+        {
+          "caller": "encodeFailureWritesNothing",
+          "callee": "CommandJournal.open",
+          "lineNumber": 209
+        },
+        {
+          "caller": "encodeFailureWritesNothing",
+          "callee": "file",
+          "lineNumber": 209
+        },
+        {
+          "caller": "encodeFailureWritesNothing",
+          "callee": "new ArrayList<>",
+          "lineNumber": 210
+        },
+        {
+          "caller": "encodeFailureWritesNothing",
+          "callee": "withNull.add",
+          "lineNumber": 211
+        },
+        {
+          "caller": "encodeFailureWritesNothing",
+          "callee": "order",
+          "lineNumber": 211
+        },
+        {
+          "caller": "encodeFailureWritesNothing",
+          "callee": "withNull.add",
+          "lineNumber": 212
+        },
+        {
+          "caller": "encodeFailureWritesNothing",
+          "callee": "assertThrows",
+          "lineNumber": 213
+        },
+        {
+          "caller": "encodeFailureWritesNothing",
+          "callee": "j.appendAll",
+          "lineNumber": 213
+        },
+        {
+          "caller": "encodeFailureWritesNothing",
+          "callee": "assertEquals",
+          "lineNumber": 215
+        },
+        {
+          "caller": "encodeFailureWritesNothing",
+          "callee": "JournalCodec.encodeHeader",
+          "lineNumber": 215
+        },
+        {
+          "caller": "encodeFailureWritesNothing",
+          "callee": "text",
+          "lineNumber": 215
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "CommandJournal.open",
+          "lineNumber": 224
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "file",
+          "lineNumber": 224
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "j.append",
+          "lineNumber": 225
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "order",
+          "lineNumber": 225
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "Files.writeString",
+          "lineNumber": 227
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "file",
+          "lineNumber": 227
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "CommandJournal.open",
+          "lineNumber": 228
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "file",
+          "lineNumber": 228
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "assertEquals",
+          "lineNumber": 229
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "j.getTruncatedBytesOnOpen",
+          "lineNumber": 229
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "assertEquals",
+          "lineNumber": 230
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "List.of",
+          "lineNumber": 230
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "order",
+          "lineNumber": 230
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "readAll",
+          "lineNumber": 230
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "j.append",
+          "lineNumber": 231
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "order",
+          "lineNumber": 231
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "assertEquals",
+          "lineNumber": 232
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "readAll(j).size",
+          "lineNumber": 232
+        },
+        {
+          "caller": "tornLastRecordIsCutOnOpen",
+          "callee": "readAll",
+          "lineNumber": 232
+        },
+        {
+          "caller": "tornHeaderIsCutAndRewritten",
+          "callee": "Files.writeString",
+          "lineNumber": 238
+        },
+        {
+          "caller": "tornHeaderIsCutAndRewritten",
+          "callee": "file",
+          "lineNumber": 238
+        },
+        {
+          "caller": "tornHeaderIsCutAndRewritten",
+          "callee": "CommandJournal.open",
+          "lineNumber": 239
+        },
+        {
+          "caller": "tornHeaderIsCutAndRewritten",
+          "callee": "file",
+          "lineNumber": 239
+        },
+        {
+          "caller": "tornHeaderIsCutAndRewritten",
+          "callee": "assertEquals",
+          "lineNumber": 240
+        },
+        {
+          "caller": "tornHeaderIsCutAndRewritten",
+          "callee": "j.getTruncatedBytesOnOpen",
+          "lineNumber": 240
+        },
+        {
+          "caller": "tornHeaderIsCutAndRewritten",
+          "callee": "assertEquals",
+          "lineNumber": 242
+        },
+        {
+          "caller": "tornHeaderIsCutAndRewritten",
+          "callee": "JournalCodec.encodeHeader",
+          "lineNumber": 242
+        },
+        {
+          "caller": "tornHeaderIsCutAndRewritten",
+          "callee": "text",
+          "lineNumber": 242
+        },
+        {
+          "caller": "cleanFileCutsNothing",
+          "callee": "CommandJournal.open(file(), RULES).close",
+          "lineNumber": 247
+        },
+        {
+          "caller": "cleanFileCutsNothing",
+          "callee": "CommandJournal.open",
+          "lineNumber": 247
+        },
+        {
+          "caller": "cleanFileCutsNothing",
+          "callee": "file",
+          "lineNumber": 247
+        },
+        {
+          "caller": "cleanFileCutsNothing",
+          "callee": "CommandJournal.open",
+          "lineNumber": 248
+        },
+        {
+          "caller": "cleanFileCutsNothing",
+          "callee": "file",
+          "lineNumber": 248
+        },
+        {
+          "caller": "cleanFileCutsNothing",
+          "callee": "assertEquals",
+          "lineNumber": 249
+        },
+        {
+          "caller": "cleanFileCutsNothing",
+          "callee": "j.getTruncatedBytesOnOpen",
+          "lineNumber": 249
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "CommandJournal.open",
+          "lineNumber": 255
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "file",
+          "lineNumber": 255
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "j.append",
+          "lineNumber": 256
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "order",
+          "lineNumber": 256
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "Files.writeString",
+          "lineNumber": 258
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "file",
+          "lineNumber": 258
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "CommandJournal.open",
+          "lineNumber": 259
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "file",
+          "lineNumber": 259
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "assertEquals",
+          "lineNumber": 260
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "j.getTruncatedBytesOnOpen",
+          "lineNumber": 260
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "assertThrows",
+          "lineNumber": 261
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "readAll",
+          "lineNumber": 261
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "assertTrue",
+          "lineNumber": 262
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 262
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "e.getMessage",
+          "lineNumber": 262
+        },
+        {
+          "caller": "completeCorruptRecordIsNeverDropped",
+          "callee": "e.getMessage",
+          "lineNumber": 262
+        },
+        {
+          "caller": "unterminatedRecordFoundByReadIsAnError",
+          "callee": "CommandJournal.open",
+          "lineNumber": 268
+        },
+        {
+          "caller": "unterminatedRecordFoundByReadIsAnError",
+          "callee": "file",
+          "lineNumber": 268
+        },
+        {
+          "caller": "unterminatedRecordFoundByReadIsAnError",
+          "callee": "Files.writeString",
+          "lineNumber": 270
+        },
+        {
+          "caller": "unterminatedRecordFoundByReadIsAnError",
+          "callee": "file",
+          "lineNumber": 270
+        },
+        {
+          "caller": "unterminatedRecordFoundByReadIsAnError",
+          "callee": "assertThrows",
+          "lineNumber": 271
+        },
+        {
+          "caller": "unterminatedRecordFoundByReadIsAnError",
+          "callee": "readAll",
+          "lineNumber": 271
+        },
+        {
+          "caller": "unterminatedRecordFoundByReadIsAnError",
+          "callee": "assertTrue",
+          "lineNumber": 272
+        },
+        {
+          "caller": "unterminatedRecordFoundByReadIsAnError",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 272
+        },
+        {
+          "caller": "unterminatedRecordFoundByReadIsAnError",
+          "callee": "e.getMessage",
+          "lineNumber": 272
+        },
+        {
+          "caller": "unterminatedRecordFoundByReadIsAnError",
+          "callee": "e.getMessage",
+          "lineNumber": 272
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "CommandJournal.open",
+          "lineNumber": 278
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "file",
+          "lineNumber": 278
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "j.append",
+          "lineNumber": 279
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "order",
+          "lineNumber": 279
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "Files.writeString",
+          "lineNumber": 281
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "file",
+          "lineNumber": 281
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "\"x\".repeat",
+          "lineNumber": 281
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "CommandJournal.open",
+          "lineNumber": 282
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "file",
+          "lineNumber": 282
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "assertEquals",
+          "lineNumber": 283
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "j.getTruncatedBytesOnOpen",
+          "lineNumber": 283
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "assertEquals",
+          "lineNumber": 284
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "readAll(j).size",
+          "lineNumber": 284
+        },
+        {
+          "caller": "longTornTailAcrossScanBlocksIsCut",
+          "callee": "readAll",
+          "lineNumber": 284
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "CommandJournal.open",
+          "lineNumber": 295
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "file",
+          "lineNumber": 295
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "CommandJournal.openJournals",
+          "lineNumber": 296
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "assertThrows",
+          "lineNumber": 297
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "CommandJournal.open",
+          "lineNumber": 297
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "file",
+          "lineNumber": 297
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "assertTrue",
+          "lineNumber": 298
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 298
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "e.getMessage",
+          "lineNumber": 298
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "e.getMessage",
+          "lineNumber": 298
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "assertEquals",
+          "lineNumber": 299
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "CommandJournal.openJournals",
+          "lineNumber": 299
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "first.append",
+          "lineNumber": 301
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "order",
+          "lineNumber": 301
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "assertEquals",
+          "lineNumber": 302
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "List.of",
+          "lineNumber": 302
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "order",
+          "lineNumber": 302
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "readAll",
+          "lineNumber": 302
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "CommandJournal.open",
+          "lineNumber": 304
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "file",
+          "lineNumber": 304
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "assertEquals",
+          "lineNumber": 305
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "readAll(again).size",
+          "lineNumber": 305
+        },
+        {
+          "caller": "aSecondOpenIsRefusedUntilTheFirstCloses",
+          "callee": "readAll",
+          "lineNumber": 305
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "CommandJournal.open",
+          "lineNumber": 313
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "file",
+          "lineNumber": 313
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "held.append",
+          "lineNumber": 314
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "order",
+          "lineNumber": 314
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "readAll",
+          "lineNumber": 315
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "ProcessHandle.current().info().command().orElse",
+          "lineNumber": 316
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "ProcessHandle.current().info().command",
+          "lineNumber": 316
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "ProcessHandle.current().info",
+          "lineNumber": 316
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "ProcessHandle.current",
+          "lineNumber": 316
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "new ProcessBuilder(java, \"-cp\", System.getProperty(\"java.class.path\"),\r\n                        \"exchangeserver.Main\", \"--journal\", file().toString(), \"--quarantine\", \"1\")\r\n                        .redirectErrorStream(true).start",
+          "lineNumber": 317
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "new ProcessBuilder(java, \"-cp\", System.getProperty(\"java.class.path\"),\r\n                        \"exchangeserver.Main\", \"--journal\", file().toString(), \"--quarantine\", \"1\").redirectErrorStream",
+          "lineNumber": 317
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "new ProcessBuilder",
+          "lineNumber": 317
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "System.getProperty",
+          "lineNumber": 317
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "file().toString",
+          "lineNumber": 318
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "file",
+          "lineNumber": 318
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "assertTrue",
+          "lineNumber": 321
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "child.waitFor",
+          "lineNumber": 321
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "new String",
+          "lineNumber": 322
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "child.getInputStream().readAllBytes",
+          "lineNumber": 322
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "child.getInputStream",
+          "lineNumber": 322
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "assertEquals",
+          "lineNumber": 323
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "child.exitValue",
+          "lineNumber": 323
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "assertTrue",
+          "lineNumber": 324
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "output.contains",
+          "lineNumber": 324
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "assertEquals",
+          "lineNumber": 326
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "Files.readAllLines(file(), UTF_8).size",
+          "lineNumber": 326
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "Files.readAllLines",
+          "lineNumber": 326
+        },
+        {
+          "caller": "anotherProcessIsRefusedWhileTheJournalIsOpen",
+          "callee": "file",
+          "lineNumber": 326
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "CommandJournal.open",
+          "lineNumber": 335
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "file",
+          "lineNumber": 335
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "j.close",
+          "lineNumber": 336
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "assertThrows",
+          "lineNumber": 337
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "j.append",
+          "lineNumber": 337
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "order",
+          "lineNumber": 337
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "assertTrue",
+          "lineNumber": 338
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "j.hasFailed",
+          "lineNumber": 338
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "assertThrows",
+          "lineNumber": 339
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "j.append",
+          "lineNumber": 339
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "order",
+          "lineNumber": 339
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "assertTrue",
+          "lineNumber": 340
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 340
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "e.getMessage",
+          "lineNumber": 340
+        },
+        {
+          "caller": "afterAFailedWriteEveryAppendIsRefused",
+          "callee": "e.getMessage",
+          "lineNumber": 340
+        }
+      ],
+      "metrics": {
+        "importCount": 6,
+        "exportCount": 0,
+        "functionCount": 4,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/test/java/exchangeserver/journal/JournalCodecTest.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 195,
+      "nonEmptyLines": 168,
+      "functions": [
+        {
+          "name": "roundTrip",
+          "startLine": 26,
+          "endLine": 31,
+          "params": [
+            "c"
+          ]
+        },
+        {
+          "name": "sealed",
+          "startLine": 34,
+          "endLine": 36,
+          "params": [
+            "text"
+          ]
+        },
+        {
+          "name": "record",
+          "startLine": 39,
+          "endLine": 42,
+          "params": [
+            "text"
+          ]
+        },
+        {
+          "name": "encodeRejectsNull",
+          "startLine": 191,
+          "endLine": 194,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "JournalCodecTest",
+          "startLine": 22,
+          "endLine": 195,
+          "methods": [
+            "roundTrip",
+            "sealed",
+            "record",
+            "encodeRejectsNull"
+          ],
+          "properties": [
+            "T"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "roundTrip",
+          "callee": "JournalCodec.encode",
+          "lineNumber": 27
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "assertTrue",
+          "lineNumber": 28
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "record.endsWith",
+          "lineNumber": 28
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "assertEquals",
+          "lineNumber": 29
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "record.chars().filter(ch -> ch == '\\n').count",
+          "lineNumber": 29
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "record.chars().filter",
+          "lineNumber": 29
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "record.chars",
+          "lineNumber": 29
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "JournalCodec.decode",
+          "lineNumber": 30
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "record.substring",
+          "lineNumber": 30
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "record.length",
+          "lineNumber": 30
+        },
+        {
+          "caller": "sealed",
+          "callee": "Checksums.crcHex",
+          "lineNumber": 35
+        },
+        {
+          "caller": "record",
+          "callee": "sealed",
+          "lineNumber": 40
+        },
+        {
+          "caller": "record",
+          "callee": "s.substring",
+          "lineNumber": 41
+        },
+        {
+          "caller": "record",
+          "callee": "s.length",
+          "lineNumber": 41
+        },
+        {
+          "caller": "newLimitOrder",
+          "callee": "new NewOrderCommand",
+          "lineNumber": 49
+        },
+        {
+          "caller": "newLimitOrder",
+          "callee": "OrderRequest.limit",
+          "lineNumber": 49
+        },
+        {
+          "caller": "newLimitOrder",
+          "callee": "assertEquals",
+          "lineNumber": 50
+        },
+        {
+          "caller": "newLimitOrder",
+          "callee": "sealed",
+          "lineNumber": 50
+        },
+        {
+          "caller": "newLimitOrder",
+          "callee": "JournalCodec.encode",
+          "lineNumber": 50
+        },
+        {
+          "caller": "newLimitOrder",
+          "callee": "assertEquals",
+          "lineNumber": 51
+        },
+        {
+          "caller": "newLimitOrder",
+          "callee": "roundTrip",
+          "lineNumber": 51
+        },
+        {
+          "caller": "marketOrderPriceIsADash",
+          "callee": "new NewOrderCommand",
+          "lineNumber": 56
+        },
+        {
+          "caller": "marketOrderPriceIsADash",
+          "callee": "OrderRequest.market",
+          "lineNumber": 56
+        },
+        {
+          "caller": "marketOrderPriceIsADash",
+          "callee": "assertEquals",
+          "lineNumber": 57
+        },
+        {
+          "caller": "marketOrderPriceIsADash",
+          "callee": "sealed",
+          "lineNumber": 57
+        },
+        {
+          "caller": "marketOrderPriceIsADash",
+          "callee": "JournalCodec.encode",
+          "lineNumber": 57
+        },
+        {
+          "caller": "marketOrderPriceIsADash",
+          "callee": "assertEquals",
+          "lineNumber": 58
+        },
+        {
+          "caller": "marketOrderPriceIsADash",
+          "callee": "roundTrip",
+          "lineNumber": 58
+        },
+        {
+          "caller": "everyPricedType",
+          "callee": "OrderRequest.ioc",
+          "lineNumber": 63
+        },
+        {
+          "caller": "everyPricedType",
+          "callee": "OrderRequest.fok",
+          "lineNumber": 64
+        },
+        {
+          "caller": "everyPricedType",
+          "callee": "OrderRequest.postOnly",
+          "lineNumber": 64
+        },
+        {
+          "caller": "everyPricedType",
+          "callee": "new NewOrderCommand",
+          "lineNumber": 65
+        },
+        {
+          "caller": "everyPricedType",
+          "callee": "assertEquals",
+          "lineNumber": 66
+        },
+        {
+          "caller": "everyPricedType",
+          "callee": "roundTrip",
+          "lineNumber": 66
+        },
+        {
+          "caller": "cancel",
+          "callee": "new CancelOrderCommand",
+          "lineNumber": 72
+        },
+        {
+          "caller": "cancel",
+          "callee": "assertEquals",
+          "lineNumber": 73
+        },
+        {
+          "caller": "cancel",
+          "callee": "sealed",
+          "lineNumber": 73
+        },
+        {
+          "caller": "cancel",
+          "callee": "JournalCodec.encode",
+          "lineNumber": 73
+        },
+        {
+          "caller": "cancel",
+          "callee": "assertEquals",
+          "lineNumber": 74
+        },
+        {
+          "caller": "cancel",
+          "callee": "roundTrip",
+          "lineNumber": 74
+        },
+        {
+          "caller": "cancelAll",
+          "callee": "new CancelAllCommand",
+          "lineNumber": 79
+        },
+        {
+          "caller": "cancelAll",
+          "callee": "assertEquals",
+          "lineNumber": 80
+        },
+        {
+          "caller": "cancelAll",
+          "callee": "sealed",
+          "lineNumber": 80
+        },
+        {
+          "caller": "cancelAll",
+          "callee": "JournalCodec.encode",
+          "lineNumber": 80
+        },
+        {
+          "caller": "cancelAll",
+          "callee": "assertEquals",
+          "lineNumber": 81
+        },
+        {
+          "caller": "cancelAll",
+          "callee": "roundTrip",
+          "lineNumber": 81
+        },
+        {
+          "caller": "skip",
+          "callee": "new SkipCommand",
+          "lineNumber": 86
+        },
+        {
+          "caller": "skip",
+          "callee": "assertEquals",
+          "lineNumber": 87
+        },
+        {
+          "caller": "skip",
+          "callee": "sealed",
+          "lineNumber": 87
+        },
+        {
+          "caller": "skip",
+          "callee": "JournalCodec.encode",
+          "lineNumber": 87
+        },
+        {
+          "caller": "skip",
+          "callee": "assertEquals",
+          "lineNumber": 88
+        },
+        {
+          "caller": "skip",
+          "callee": "roundTrip",
+          "lineNumber": 88
+        },
+        {
+          "caller": "check",
+          "callee": "new CheckCommand",
+          "lineNumber": 93
+        },
+        {
+          "caller": "check",
+          "callee": "assertEquals",
+          "lineNumber": 94
+        },
+        {
+          "caller": "check",
+          "callee": "sealed",
+          "lineNumber": 94
+        },
+        {
+          "caller": "check",
+          "callee": "JournalCodec.encode",
+          "lineNumber": 94
+        },
+        {
+          "caller": "check",
+          "callee": "assertEquals",
+          "lineNumber": 95
+        },
+        {
+          "caller": "check",
+          "callee": "roundTrip",
+          "lineNumber": 95
+        },
+        {
+          "caller": "roundTripWithTheBaseSequence",
+          "callee": "JournalCodec.encodeHeader",
+          "lineNumber": 104
+        },
+        {
+          "caller": "roundTripWithTheBaseSequence",
+          "callee": "assertEquals",
+          "lineNumber": 105
+        },
+        {
+          "caller": "roundTripWithTheBaseSequence",
+          "callee": "sealed",
+          "lineNumber": 105
+        },
+        {
+          "caller": "roundTripWithTheBaseSequence",
+          "callee": "assertEquals",
+          "lineNumber": 106
+        },
+        {
+          "caller": "roundTripWithTheBaseSequence",
+          "callee": "new JournalCodec.Header",
+          "lineNumber": 106
+        },
+        {
+          "caller": "roundTripWithTheBaseSequence",
+          "callee": "JournalCodec.decodeHeader",
+          "lineNumber": 106
+        },
+        {
+          "caller": "roundTripWithTheBaseSequence",
+          "callee": "h.strip",
+          "lineNumber": 106
+        },
+        {
+          "caller": "otherFormatVersionIsRefused",
+          "callee": "assertThrows",
+          "lineNumber": 111
+        },
+        {
+          "caller": "otherFormatVersionIsRefused",
+          "callee": "JournalCodec.decodeHeader",
+          "lineNumber": 112
+        },
+        {
+          "caller": "otherFormatVersionIsRefused",
+          "callee": "record",
+          "lineNumber": 112
+        },
+        {
+          "caller": "otherFormatVersionIsRefused",
+          "callee": "assertTrue",
+          "lineNumber": 113
+        },
+        {
+          "caller": "otherFormatVersionIsRefused",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 113
+        },
+        {
+          "caller": "otherFormatVersionIsRefused",
+          "callee": "e.getMessage",
+          "lineNumber": 113
+        },
+        {
+          "caller": "otherFormatVersionIsRefused",
+          "callee": "e.getMessage",
+          "lineNumber": 113
+        },
+        {
+          "caller": "malformedHeaderIsRefused",
+          "callee": "assertThrows",
+          "lineNumber": 119
+        },
+        {
+          "caller": "malformedHeaderIsRefused",
+          "callee": "JournalCodec.decodeHeader",
+          "lineNumber": 119
+        },
+        {
+          "caller": "malformedHeaderIsRefused",
+          "callee": "record",
+          "lineNumber": 119
+        },
+        {
+          "caller": "unsealedHeaderIsRefused",
+          "callee": "assertThrows",
+          "lineNumber": 124
+        },
+        {
+          "caller": "unsealedHeaderIsRefused",
+          "callee": "JournalCodec.decodeHeader",
+          "lineNumber": 124
+        },
+        {
+          "caller": "isAnIllegalStateWithTheRecordNumber",
+          "callee": "assertThrows",
+          "lineNumber": 160
+        },
+        {
+          "caller": "isAnIllegalStateWithTheRecordNumber",
+          "callee": "JournalCodec.decode",
+          "lineNumber": 160
+        },
+        {
+          "caller": "isAnIllegalStateWithTheRecordNumber",
+          "callee": "record",
+          "lineNumber": 160
+        },
+        {
+          "caller": "isAnIllegalStateWithTheRecordNumber",
+          "callee": "assertTrue",
+          "lineNumber": 161
+        },
+        {
+          "caller": "isAnIllegalStateWithTheRecordNumber",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 161
+        },
+        {
+          "caller": "isAnIllegalStateWithTheRecordNumber",
+          "callee": "e.getMessage",
+          "lineNumber": 161
+        },
+        {
+          "caller": "isAnIllegalStateWithTheRecordNumber",
+          "callee": "e.getMessage",
+          "lineNumber": 161
+        },
+        {
+          "caller": "aChangedCharacterFailsTheChecksum",
+          "callee": "record",
+          "lineNumber": 167
+        },
+        {
+          "caller": "aChangedCharacterFailsTheChecksum",
+          "callee": "good.replace",
+          "lineNumber": 168
+        },
+        {
+          "caller": "aChangedCharacterFailsTheChecksum",
+          "callee": "assertThrows",
+          "lineNumber": 169
+        },
+        {
+          "caller": "aChangedCharacterFailsTheChecksum",
+          "callee": "JournalCodec.decode",
+          "lineNumber": 169
+        },
+        {
+          "caller": "aChangedCharacterFailsTheChecksum",
+          "callee": "assertTrue",
+          "lineNumber": 170
+        },
+        {
+          "caller": "aChangedCharacterFailsTheChecksum",
+          "callee": "e.getCause().getMessage().contains",
+          "lineNumber": 170
+        },
+        {
+          "caller": "aChangedCharacterFailsTheChecksum",
+          "callee": "e.getCause().getMessage",
+          "lineNumber": 170
+        },
+        {
+          "caller": "aChangedCharacterFailsTheChecksum",
+          "callee": "e.getCause",
+          "lineNumber": 170
+        },
+        {
+          "caller": "aChangedCharacterFailsTheChecksum",
+          "callee": "e.getCause().getMessage",
+          "lineNumber": 170
+        },
+        {
+          "caller": "aChangedCharacterFailsTheChecksum",
+          "callee": "e.getCause",
+          "lineNumber": 170
+        },
+        {
+          "caller": "aRecordWithoutChecksumIsCorrupt",
+          "callee": "assertThrows",
+          "lineNumber": 175
+        },
+        {
+          "caller": "aRecordWithoutChecksumIsCorrupt",
+          "callee": "JournalCodec.decode",
+          "lineNumber": 176
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "assertThrows",
+          "lineNumber": 182
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "JournalCodec.decode",
+          "lineNumber": 183
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "record",
+          "lineNumber": 183
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "assertTrue",
+          "lineNumber": 184
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "e.getCause().getMessage().contains",
+          "lineNumber": 184
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "e.getCause().getMessage",
+          "lineNumber": 184
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "e.getCause",
+          "lineNumber": 184
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "e.getCause().getMessage",
+          "lineNumber": 184
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "e.getCause",
+          "lineNumber": 184
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "assertThrows",
+          "lineNumber": 185
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "JournalCodec.decodeHeader",
+          "lineNumber": 186
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "record",
+          "lineNumber": 186
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "assertTrue",
+          "lineNumber": 187
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "h.getMessage().contains",
+          "lineNumber": 187
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "h.getMessage",
+          "lineNumber": 187
+        },
+        {
+          "caller": "aCarriageReturnIsReportedAsALineEndingConversion",
+          "callee": "h.getMessage",
+          "lineNumber": 187
+        },
+        {
+          "caller": "encodeRejectsNull",
+          "callee": "assertThrows",
+          "lineNumber": 193
+        },
+        {
+          "caller": "encodeRejectsNull",
+          "callee": "JournalCodec.encode",
+          "lineNumber": 193
+        }
+      ],
+      "metrics": {
+        "importCount": 8,
+        "exportCount": 0,
+        "functionCount": 4,
+        "classCount": 1
+      }
+    }
+  ]
+}

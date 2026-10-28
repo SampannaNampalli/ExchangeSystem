@@ -1,0 +1,1055 @@
+{
+ "nodes": [
+  {
+   "id": "document:docs/understanding/00-START-HERE.md",
+   "type": "document",
+   "name": "00-START-HERE.md",
+   "filePath": "docs/understanding/00-START-HERE.md",
+   "summary": "Entry point to the study-guide series: explains what ExchangeServer2 is (a single-instrument exchange with write-ahead journal, replay, single writer and TCP/TLS gateway), the reading order and study time, how to use the guides with an AI assistant, the Verified/Inferred labelling convention and which code state the guides describe.",
+   "tags": [
+    "documentation",
+    "entry-point",
+    "study-guide",
+    "onboarding"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:docs/understanding/01-big-picture.md",
+   "type": "document",
+   "name": "01-big-picture.md",
+   "filePath": "docs/understanding/01-big-picture.md",
+   "summary": "Big-picture guide explaining the exchange problem domain, the feature set (order types, price band, self-trade prevention, caps, cancel-on-disconnect) and the end-to-end architecture from gateway through the writer thread, journal and ledger, plus the ten things to know first.",
+   "tags": [
+    "documentation",
+    "architecture",
+    "overview",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/02-tech-stack.md",
+   "type": "document",
+   "name": "02-tech-stack.md",
+   "filePath": "docs/understanding/02-tech-stack.md",
+   "summary": "Tech-stack guide covering the Java 17 features, java.util.concurrent and the memory model, NIO file durability and CRC32C, sockets and TLS, Clock injection, System.Logger, the Maven wrapper, JUnit 5, JMH, PIT and Docker as used in this codebase, with pointers into the source.",
+   "tags": [
+    "documentation",
+    "tech-stack",
+    "java",
+    "build-system",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/03-codebase-map.md",
+   "type": "document",
+   "name": "03-codebase-map.md",
+   "filePath": "docs/understanding/03-codebase-map.md",
+   "summary": "Codebase map listing the entry points, how the packages (domain, book, engine, command, journal, core, gateway, client) layer, the conventions used everywhere, and a one-line purpose for every production and test file.",
+   "tags": [
+    "documentation",
+    "codebase-map",
+    "architecture",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/04-running-and-tooling.md",
+   "type": "document",
+   "name": "04-running-and-tooling.md",
+   "filePath": "docs/understanding/04-running-and-tooling.md",
+   "summary": "Operational guide to installing, configuring, building, running the server and client, running tests, mutation testing with PIT, JMH benchmarks, debugging, Windows-specific pitfalls and deployment, including every CLI flag and setting.",
+   "tags": [
+    "documentation",
+    "tooling",
+    "build-system",
+    "deployment",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/05-core-flows.md",
+   "type": "document",
+   "name": "05-core-flows.md",
+   "filePath": "docs/understanding/05-core-flows.md",
+   "summary": "Index for the core-flows guides: summarises the path every request takes through the gateway, queue, writer thread, journal and ledger, and lists the six flows detailed in parts 05a and 05b.",
+   "tags": [
+    "documentation",
+    "index",
+    "request-flow",
+    "study-guide"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:docs/understanding/05a-core-flows-trading.md",
+   "type": "document",
+   "name": "05a-core-flows-trading.md",
+   "filePath": "docs/understanding/05a-core-flows-trading.md",
+   "summary": "Core flows part 1: step-by-step traces with line citations of login and a NEW order that trades, CANCEL/CANCEL_ALL and cancel-on-disconnect, and SUBSCRIBE/UNSUBSCRIBE/RESEND reads that go through the writer queue.",
+   "tags": [
+    "documentation",
+    "request-flow",
+    "matching",
+    "gateway",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/05b-core-flows-lifecycle.md",
+   "type": "document",
+   "name": "05b-core-flows-lifecycle.md",
+   "filePath": "docs/understanding/05b-core-flows-lifecycle.md",
+   "summary": "Core flows part 2: traces startup, crash recovery from snapshot plus journal, offline compaction, poison-pill handling live and at startup, and shutdown, halt, backpressure, timeouts and connection close.",
+   "tags": [
+    "documentation",
+    "recovery",
+    "lifecycle",
+    "journal",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/06-data-and-state.md",
+   "type": "document",
+   "name": "06-data-and-state.md",
+   "filePath": "docs/understanding/06-data-and-state.md",
+   "summary": "Data and state guide describing the data models, the journal format v3 with CRC-32C records, the snapshot file, the users file, the wire protocol, who owns which state, validation layers, what persists versus is rebuilt, and versioning instead of migrations.",
+   "tags": [
+    "documentation",
+    "data-model",
+    "journal-format",
+    "persistence",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/08-cross-cutting.md",
+   "type": "document",
+   "name": "08-cross-cutting.md",
+   "filePath": "docs/understanding/08-cross-cutting.md",
+   "summary": "Cross-cutting concerns guide covering error handling, logging and observability, gateway security, configuration, concurrency, performance and determinism as a rule that spans every package.",
+   "tags": [
+    "documentation",
+    "cross-cutting",
+    "security",
+    "concurrency",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/09-design-decisions.md",
+   "type": "document",
+   "name": "09-design-decisions.md",
+   "filePath": "docs/understanding/09-design-decisions.md",
+   "summary": "Index of the design-decision records, mapping the 38 study-guide records to the Spec's D-numbered decisions and pointing to the foundations (09a) and risk-fix (09b) parts.",
+   "tags": [
+    "documentation",
+    "design-decisions",
+    "index",
+    "study-guide"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:docs/understanding/09a-design-decisions-foundations.md",
+   "type": "document",
+   "name": "09a-design-decisions-foundations.md",
+   "filePath": "docs/understanding/09a-design-decisions-foundations.md",
+   "summary": "Design decisions part 1 (records 1-26): foundational choices such as the single writer thread, journalling inputs in plain text, write-ahead with one fsync per batch, deterministic replay, the Sequencer, package-enforced book ownership and the TreeMap/linked-list book structure, each with its reasoning and trade-offs.",
+   "tags": [
+    "documentation",
+    "design-decisions",
+    "architecture",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+   "type": "document",
+   "name": "09b-design-decisions-risk-fixes.md",
+   "filePath": "docs/understanding/09b-design-decisions-risk-fixes.md",
+   "summary": "Design decisions part 2 (records 27-38, D66-D77): the risk fixes including the market collar, self-trade prevention, resting caps, journal format v3, the output digest and CHECK records, snapshots and compaction, CANCEL_ALL, numbered private streams with RESEND, authentication, session limits and listener-before-future ordering.",
+   "tags": [
+    "documentation",
+    "design-decisions",
+    "risk-fixes",
+    "security",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/10-testing.md",
+   "type": "document",
+   "name": "10-testing.md",
+   "filePath": "docs/understanding/10-testing.md",
+   "summary": "Testing guide explaining the test strategy, test seams (CommandInterceptor, checkInvariants, MutableClock), how to run and write tests, PIT mutation testing, a fixed flaky test, a coverage map and untested paths.",
+   "tags": [
+    "documentation",
+    "testing",
+    "mutation-testing",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/11-risks-and-smells.md",
+   "type": "document",
+   "name": "11-risks-and-smells.md",
+   "filePath": "docs/understanding/11-risks-and-smells.md",
+   "summary": "Risk review listing the issues resolved on 2026-10-27, the risks that remain, justified code smells, things that only look risky, and the top five remaining risks.",
+   "tags": [
+    "documentation",
+    "risk-analysis",
+    "code-smells",
+    "study-guide"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:docs/understanding/12-change-recipes.md",
+   "type": "document",
+   "name": "12-change-recipes.md",
+   "filePath": "docs/understanding/12-change-recipes.md",
+   "summary": "Change recipes giving step-by-step instructions for common modifications: adding an order type, reason or risk check, changing rule constants, journal record types, protocol messages, queued queries, private events, settings and CLI flags, secrets, TLS, dependencies and tests.",
+   "tags": [
+    "documentation",
+    "how-to",
+    "change-recipes",
+    "study-guide"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/understanding/13-glossary.md",
+   "type": "document",
+   "name": "13-glossary.md",
+   "filePath": "docs/understanding/13-glossary.md",
+   "summary": "Alphabetical glossary of exchange and codebase terms (order types, oseq, digest, Sequencer, poison pill, snapshot and more), each linked to the source file and line where it lives.",
+   "tags": [
+    "documentation",
+    "glossary",
+    "reference",
+    "study-guide"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:docs/understanding/14-exercises.md",
+   "type": "document",
+   "name": "14-exercises.md",
+   "filePath": "docs/understanding/14-exercises.md",
+   "summary": "Exercise set for self-study: self-check questions, predict-then-verify tasks, debugger tracing walkthroughs, small hands-on changes and break-it experiments against the codebase.",
+   "tags": [
+    "documentation",
+    "exercises",
+    "learning",
+    "study-guide"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:docs/understanding/15-open-questions.md",
+   "type": "document",
+   "name": "15-open-questions.md",
+   "filePath": "docs/understanding/15-open-questions.md",
+   "summary": "Open questions guide recording questions resolved on 2026-10-27, questions still for the user, claims that were not verified, and questions a reader should be able to answer after studying.",
+   "tags": [
+    "documentation",
+    "open-questions",
+    "study-guide"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:docs/understanding/AI-TUTOR-PROMPT.md",
+   "type": "document",
+   "name": "AI-TUTOR-PROMPT.md",
+   "filePath": "docs/understanding/AI-TUTOR-PROMPT.md",
+   "summary": "Prompt document meant to be pasted into an AI assistant before attaching the study guides; it describes the project in one dense paragraph and sets rules for how the tutor should teach from the guides as the source of truth.",
+   "tags": [
+    "documentation",
+    "ai-prompt",
+    "learning",
+    "study-guide"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "file:docs/understanding/build-full-context.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/01-big-picture.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/01-big-picture.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/01-big-picture.md",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/01-big-picture.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/01-big-picture.md",
+   "target": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/02-tech-stack.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/02-tech-stack.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/02-tech-stack.md",
+   "target": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/02-tech-stack.md",
+   "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/02-tech-stack.md",
+   "target": "file:src/main/java/exchangeserver/journal/JournalLock.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/03-codebase-map.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/03-codebase-map.md",
+   "target": "file:src/main/java/exchangeserver/client/ClientMain.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/03-codebase-map.md",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/03-codebase-map.md",
+   "target": "file:docs/understanding/build-full-context.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/03-codebase-map.md",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/04-running-and-tooling.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/04-running-and-tooling.md",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/04-running-and-tooling.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/04-running-and-tooling.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/04-running-and-tooling.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05-core-flows.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05-core-flows.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05a-core-flows-trading.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05a-core-flows-trading.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05a-core-flows-trading.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05a-core-flows-trading.md",
+   "target": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05a-core-flows-trading.md",
+   "target": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05b-core-flows-lifecycle.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05b-core-flows-lifecycle.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05b-core-flows-lifecycle.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05b-core-flows-lifecycle.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05b-core-flows-lifecycle.md",
+   "target": "file:src/main/java/exchangeserver/core/Replay.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/06-data-and-state.md",
+   "target": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/06-data-and-state.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/06-data-and-state.md",
+   "target": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/06-data-and-state.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/06-data-and-state.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/08-cross-cutting.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/08-cross-cutting.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/08-cross-cutting.md",
+   "target": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/08-cross-cutting.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/08-cross-cutting.md",
+   "target": "file:src/main/java/exchangeserver/core/Replay.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09a-design-decisions-foundations.md",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09a-design-decisions-foundations.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09a-design-decisions-foundations.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09a-design-decisions-foundations.md",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09a-design-decisions-foundations.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+   "target": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/10-testing.md",
+   "target": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/10-testing.md",
+   "target": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/10-testing.md",
+   "target": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/10-testing.md",
+   "target": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/10-testing.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/11-risks-and-smells.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/11-risks-and-smells.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/11-risks-and-smells.md",
+   "target": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/11-risks-and-smells.md",
+   "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/11-risks-and-smells.md",
+   "target": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/12-change-recipes.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/12-change-recipes.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/12-change-recipes.md",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/12-change-recipes.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/12-change-recipes.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/13-glossary.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/13-glossary.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/13-glossary.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/13-glossary.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/13-glossary.md",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/14-exercises.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/14-exercises.md",
+   "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/14-exercises.md",
+   "target": "file:src/main/java/exchangeserver/core/Replay.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/14-exercises.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/14-exercises.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/15-open-questions.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/15-open-questions.md",
+   "target": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/15-open-questions.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/15-open-questions.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/15-open-questions.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/01-big-picture.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/02-tech-stack.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/03-codebase-map.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/04-running-and-tooling.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/05-core-flows.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/05a-core-flows-trading.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/05b-core-flows-lifecycle.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/06-data-and-state.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/08-cross-cutting.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/09-design-decisions.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/09a-design-decisions-foundations.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/10-testing.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/11-risks-and-smells.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/12-change-recipes.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/13-glossary.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/14-exercises.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/15-open-questions.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/00-START-HERE.md",
+   "target": "document:docs/understanding/AI-TUTOR-PROMPT.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05-core-flows.md",
+   "target": "document:docs/understanding/05a-core-flows-trading.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/05-core-flows.md",
+   "target": "document:docs/understanding/05b-core-flows-lifecycle.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09-design-decisions.md",
+   "target": "document:docs/understanding/09a-design-decisions-foundations.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/09-design-decisions.md",
+   "target": "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/11-risks-and-smells.md",
+   "target": "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/14-exercises.md",
+   "target": "document:docs/understanding/15-open-questions.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

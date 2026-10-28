@@ -1,0 +1,2239 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 20,
+  "filesSkipped": [],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 20,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 20
+    }
+  },
+  "results": [
+    {
+      "path": "docs/understanding/00-START-HERE.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 200,
+      "nonEmptyLines": 165,
+      "sections": [
+        {
+          "heading": "00 — Start Here",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Who these guides are for",
+          "level": 2,
+          "line": 36
+        },
+        {
+          "heading": "Reading order and study time",
+          "level": 2,
+          "line": 48
+        },
+        {
+          "heading": "How to use these guides with an AI assistant",
+          "level": 2,
+          "line": 88
+        },
+        {
+          "heading": "The labelling convention",
+          "level": 2,
+          "line": 108
+        },
+        {
+          "heading": "What state of the code these guides describe",
+          "level": 2,
+          "line": 125
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 154
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 166
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 180
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 10
+      }
+    },
+    {
+      "path": "docs/understanding/01-big-picture.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 396,
+      "nonEmptyLines": 349,
+      "sections": [
+        {
+          "heading": "01 — The Big Picture",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "The problem, in exchange terms",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "Features",
+          "level": 2,
+          "line": 90
+        },
+        {
+          "heading": "Architecture",
+          "level": 2,
+          "line": 109
+        },
+        {
+          "heading": "Components and threads",
+          "level": 3,
+          "line": 111
+        },
+        {
+          "heading": "The one live path",
+          "level": 3,
+          "line": 152
+        },
+        {
+          "heading": "Restart",
+          "level": 3,
+          "line": 212
+        },
+        {
+          "heading": "Packages and their dependencies",
+          "level": 3,
+          "line": 229
+        },
+        {
+          "heading": "The 10 things you must know first",
+          "level": 2,
+          "line": 261
+        },
+        {
+          "heading": "Where to go next",
+          "level": 2,
+          "line": 328
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 336
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 350
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 369
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 14
+      }
+    },
+    {
+      "path": "docs/understanding/02-tech-stack.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 720,
+      "nonEmptyLines": 585,
+      "sections": [
+        {
+          "heading": "02 — Tech Stack",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "1. Java 17 language features",
+          "level": 2,
+          "line": 38
+        },
+        {
+          "heading": "1.1 Records, with compact constructors",
+          "level": 3,
+          "line": 40
+        },
+        {
+          "heading": "1.2 Sealed interfaces",
+          "level": 3,
+          "line": 87
+        },
+        {
+          "heading": "1.3 Pattern matching for `instanceof`",
+          "level": 3,
+          "line": 115
+        },
+        {
+          "heading": "1.4 Switch expressions, arrows and `yield`",
+          "level": 3,
+          "line": 139
+        },
+        {
+          "heading": "1.5 Other small features",
+          "level": 3,
+          "line": 181
+        },
+        {
+          "heading": "2. Concurrency (`java.util.concurrent` and the memory model)",
+          "level": 2,
+          "line": 194
+        },
+        {
+          "heading": "2.1 Happens-before, `volatile`, `synchronized` (the minimum)",
+          "level": 3,
+          "line": 199
+        },
+        {
+          "heading": "2.2 `BlockingQueue`: `LinkedBlockingQueue`, `ArrayBlockingQueue`, `drainTo`",
+          "level": 3,
+          "line": 218
+        },
+        {
+          "heading": "2.3 `CompletableFuture`",
+          "level": 3,
+          "line": 241
+        },
+        {
+          "heading": "2.4 Concurrent collections and atomics",
+          "level": 3,
+          "line": 294
+        },
+        {
+          "heading": "2.5 Threads",
+          "level": 3,
+          "line": 309
+        },
+        {
+          "heading": "2.6 `Runtime.halt` in a shutdown hook",
+          "level": 3,
+          "line": 317
+        },
+        {
+          "heading": "3. Files and durability (`java.nio`, `java.util.zip`)",
+          "level": 2,
+          "line": 332
+        },
+        {
+          "heading": "3.1 `FileChannel`, `force`, `truncate`, atomic moves",
+          "level": 3,
+          "line": 334
+        },
+        {
+          "heading": "3.2 `CRC32C` checksums",
+          "level": 3,
+          "line": 359
+        },
+        {
+          "heading": "3.3 `FileLock` and the `<journal>.lock` file (D65)",
+          "level": 3,
+          "line": 383
+        },
+        {
+          "heading": "3.4 Charsets",
+          "level": 3,
+          "line": 447
+        },
+        {
+          "heading": "4. Networking (`java.net`, `javax.net.ssl`)",
+          "level": 2,
+          "line": 457
+        },
+        {
+          "heading": "4.1 Sockets and timeouts",
+          "level": 3,
+          "line": 459
+        },
+        {
+          "heading": "4.2 TLS with JSSE",
+          "level": 3,
+          "line": 481
+        },
+        {
+          "heading": "4.3 Password hashing: PBKDF2 with `SecretKeyFactory`",
+          "level": 3,
+          "line": 504
+        },
+        {
+          "heading": "4.4 The token bucket (rate limiting)",
+          "level": 3,
+          "line": 531
+        },
+        {
+          "heading": "5. Time: `java.time.Clock` injection",
+          "level": 2,
+          "line": 542
+        },
+        {
+          "heading": "6. Logging: `System.Logger`",
+          "level": 2,
+          "line": 553
+        },
+        {
+          "heading": "7. Build: Maven and the Maven Wrapper",
+          "level": 2,
+          "line": 567
+        },
+        {
+          "heading": "8. Testing: JUnit 5 (Jupiter)",
+          "level": 2,
+          "line": 592
+        },
+        {
+          "heading": "9. JMH (benchmarks)",
+          "level": 2,
+          "line": 611
+        },
+        {
+          "heading": "10. PIT (mutation testing)",
+          "level": 2,
+          "line": 626
+        },
+        {
+          "heading": "11. Docker (the Linux run)",
+          "level": 2,
+          "line": 638
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 649
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 669
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 688
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 35
+      }
+    },
+    {
+      "path": "docs/understanding/03-codebase-map.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 313,
+      "nonEmptyLines": 283,
+      "sections": [
+        {
+          "heading": "03 — Codebase Map",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Entry points",
+          "level": 2,
+          "line": 45
+        },
+        {
+          "heading": "How the packages layer",
+          "level": 2,
+          "line": 61
+        },
+        {
+          "heading": "Conventions you will see everywhere",
+          "level": 2,
+          "line": 88
+        },
+        {
+          "heading": "Every file, with its purpose",
+          "level": 2,
+          "line": 123
+        },
+        {
+          "heading": "Root and docs",
+          "level": 3,
+          "line": 125
+        },
+        {
+          "heading": "`src/main/java/exchangeserver/` (production)",
+          "level": 3,
+          "line": 140
+        },
+        {
+          "heading": "`src/test/java/exchangeserver/` (tests and tools)",
+          "level": 3,
+          "line": 215
+        },
+        {
+          "heading": "Generated vs hand-written",
+          "level": 2,
+          "line": 253
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 263
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 277
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 295
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 13
+      }
+    },
+    {
+      "path": "docs/understanding/04-running-and-tooling.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 646,
+      "nonEmptyLines": 520,
+      "sections": [
+        {
+          "heading": "04 — Running and Tooling",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "1. Install",
+          "level": 2,
+          "line": 22
+        },
+        {
+          "heading": "2. Settings: everything that can be configured",
+          "level": 2,
+          "line": 35
+        },
+        {
+          "heading": "2.1 Command-line flags (`Main`)",
+          "level": 3,
+          "line": 37
+        },
+        {
+          "heading": "2.2 Environment variables",
+          "level": 3,
+          "line": 71
+        },
+        {
+          "heading": "2.3 Constants in the code",
+          "level": 3,
+          "line": 83
+        },
+        {
+          "heading": "3. Build",
+          "level": 2,
+          "line": 112
+        },
+        {
+          "heading": "4. Run the server and a client",
+          "level": 2,
+          "line": 133
+        },
+        {
+          "heading": "4.1 Create users",
+          "level": 3,
+          "line": 135
+        },
+        {
+          "heading": "4.2 Start the server",
+          "level": 3,
+          "line": 162
+        },
+        {
+          "heading": "4.3 Files next to the journal",
+          "level": 3,
+          "line": 190
+        },
+        {
+          "heading": "4.4 Connect a client",
+          "level": 3,
+          "line": 204
+        },
+        {
+          "heading": "4.5 A real session",
+          "level": 3,
+          "line": 242
+        },
+        {
+          "heading": "4.6 Compaction (snapshot + fresh journal)",
+          "level": 3,
+          "line": 309
+        },
+        {
+          "heading": "4.7 Restart and crash recovery",
+          "level": 3,
+          "line": 348
+        },
+        {
+          "heading": "4.8 Startup failures (exit code 1)",
+          "level": 3,
+          "line": 355
+        },
+        {
+          "heading": "4.9 Quarantining a poison pill",
+          "level": 3,
+          "line": 377
+        },
+        {
+          "heading": "4.10 Stopping, and exit codes",
+          "level": 3,
+          "line": 395
+        },
+        {
+          "heading": "5. Tests",
+          "level": 2,
+          "line": 410
+        },
+        {
+          "heading": "5.1 Running the suite on Linux (Docker)",
+          "level": 3,
+          "line": 441
+        },
+        {
+          "heading": "6. Mutation testing (PIT)",
+          "level": 2,
+          "line": 454
+        },
+        {
+          "heading": "7. Benchmarks (JMH)",
+          "level": 2,
+          "line": 467
+        },
+        {
+          "heading": "8. Debugging",
+          "level": 2,
+          "line": 481
+        },
+        {
+          "heading": "8.1 Threads you will see (names are set in code)",
+          "level": 3,
+          "line": 483
+        },
+        {
+          "heading": "8.2 Good breakpoints",
+          "level": 3,
+          "line": 499
+        },
+        {
+          "heading": "8.3 Logs",
+          "level": 3,
+          "line": 523
+        },
+        {
+          "heading": "8.4 Inspecting state",
+          "level": 3,
+          "line": 543
+        },
+        {
+          "heading": "9. Windows-specific notes",
+          "level": 2,
+          "line": 554
+        },
+        {
+          "heading": "10. Deployment",
+          "level": 2,
+          "line": 576
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 585
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 600
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 620
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 33
+      }
+    },
+    {
+      "path": "docs/understanding/05-core-flows.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 70,
+      "nonEmptyLines": 51,
+      "sections": [
+        {
+          "heading": "05 — Core flows (index)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "The path every request takes",
+          "level": 2,
+          "line": 16
+        },
+        {
+          "heading": "The six flows",
+          "level": 2,
+          "line": 34
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 45
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 55
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 61
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 7
+      }
+    },
+    {
+      "path": "docs/understanding/05a-core-flows-trading.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 485,
+      "nonEmptyLines": 385,
+      "sections": [
+        {
+          "heading": "05a — Core flows, part 1: trading, cancels, market data, resend",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "The three threads a request crosses",
+          "level": 3,
+          "line": 17
+        },
+        {
+          "heading": "The running example (seen live, 2026-10-27, Windows)",
+          "level": 3,
+          "line": 33
+        },
+        {
+          "heading": "Flow 1 — Login, then a NEW order that trades",
+          "level": 2,
+          "line": 82
+        },
+        {
+          "heading": "Sequence diagram",
+          "level": 3,
+          "line": 86
+        },
+        {
+          "heading": "Step by step",
+          "level": 3,
+          "line": 118
+        },
+        {
+          "heading": "Why the taker's lines come before the maker's and before market data",
+          "level": 3,
+          "line": 314
+        },
+        {
+          "heading": "Variations of flow 1 (same path, different exit)",
+          "level": 3,
+          "line": 318
+        },
+        {
+          "heading": "Flow 2 — CANCEL, CANCEL_ALL and cancel-on-disconnect",
+          "level": 2,
+          "line": 337
+        },
+        {
+          "heading": "2a. CANCEL",
+          "level": 3,
+          "line": 339
+        },
+        {
+          "heading": "2b. CANCEL_ALL and cancel-on-disconnect (D72)",
+          "level": 3,
+          "line": 362
+        },
+        {
+          "heading": "Flow 3 — SUBSCRIBE, UNSUBSCRIBE and RESEND (reads through the queue)",
+          "level": 2,
+          "line": 395
+        },
+        {
+          "heading": "3a. SUBSCRIBE and UNSUBSCRIBE",
+          "level": 3,
+          "line": 399
+        },
+        {
+          "heading": "3b. RESEND (D73)",
+          "level": 3,
+          "line": 421
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 452
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 462
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 470
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 18
+      }
+    },
+    {
+      "path": "docs/understanding/05b-core-flows-lifecycle.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 426,
+      "nonEmptyLines": 333,
+      "sections": [
+        {
+          "heading": "05b — Core flows, part 2: startup, recovery, compaction, poison pills, shutdown",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Flow 4 — Startup, crash recovery, compaction",
+          "level": 2,
+          "line": 21
+        },
+        {
+          "heading": "Sequence diagram",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "Step by step",
+          "level": 3,
+          "line": 50
+        },
+        {
+          "heading": "Startup failures",
+          "level": 3,
+          "line": 147
+        },
+        {
+          "heading": "Crash recovery, seen running",
+          "level": 3,
+          "line": 151
+        },
+        {
+          "heading": "What a crash can and cannot lose",
+          "level": 3,
+          "line": 155
+        },
+        {
+          "heading": "4b. Compaction (`--compact`, D71)",
+          "level": 3,
+          "line": 165
+        },
+        {
+          "heading": "4c. Crossing a rules change",
+          "level": 3,
+          "line": 215
+        },
+        {
+          "heading": "Flow 5 — Poison pills, live and at startup",
+          "level": 2,
+          "line": 221
+        },
+        {
+          "heading": "5a. Live: quarantine, rebuild from the snapshot, carry on",
+          "level": 3,
+          "line": 223
+        },
+        {
+          "heading": "5b. At startup: stop, then the operator decides",
+          "level": 3,
+          "line": 260
+        },
+        {
+          "heading": "Flow 6 — Shutdown, halt, backpressure, timeouts, closing a connection",
+          "level": 2,
+          "line": 270
+        },
+        {
+          "heading": "6a. The service state machine",
+          "level": 3,
+          "line": 272
+        },
+        {
+          "heading": "6b. Clean shutdown (Ctrl+C, SIGTERM)",
+          "level": 3,
+          "line": 287
+        },
+        {
+          "heading": "6c. Halt",
+          "level": 3,
+          "line": 316
+        },
+        {
+          "heading": "6d. Backpressure and limits",
+          "level": 3,
+          "line": 344
+        },
+        {
+          "heading": "6e. Timeouts (D75)",
+          "level": 3,
+          "line": 356
+        },
+        {
+          "heading": "6f. Closing a connection only after its requests complete (D76)",
+          "level": 3,
+          "line": 360
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 393
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 403
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 411
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 23
+      }
+    },
+    {
+      "path": "docs/understanding/06-data-and-state.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 396,
+      "nonEmptyLines": 303,
+      "sections": [
+        {
+          "heading": "06 — Data and state",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "1. Data models",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "1.1 Domain (`exchangeserver.domain`)",
+          "level": 3,
+          "line": 17
+        },
+        {
+          "heading": "1.2 Commands (`exchangeserver.command`): what the journal stores",
+          "level": 3,
+          "line": 29
+        },
+        {
+          "heading": "1.3 Book (`exchangeserver.book`)",
+          "level": 3,
+          "line": 46
+        },
+        {
+          "heading": "1.4 Engine outputs (`exchangeserver.engine`)",
+          "level": 3,
+          "line": 52
+        },
+        {
+          "heading": "1.5 Core (`exchangeserver.core`)",
+          "level": 3,
+          "line": 66
+        },
+        {
+          "heading": "1.6 Gateway (`exchangeserver.gateway`)",
+          "level": 3,
+          "line": 80
+        },
+        {
+          "heading": "1.7 Class diagram (the main relations)",
+          "level": 3,
+          "line": 88
+        },
+        {
+          "heading": "2. The journal file (format v3, D69)",
+          "level": 2,
+          "line": 139
+        },
+        {
+          "heading": "3. The snapshot file (D71)",
+          "level": 2,
+          "line": 169
+        },
+        {
+          "heading": "4. The users file (D74)",
+          "level": 2,
+          "line": 194
+        },
+        {
+          "heading": "5. The wire protocol",
+          "level": 2,
+          "line": 206
+        },
+        {
+          "heading": "Client → server",
+          "level": 3,
+          "line": 210
+        },
+        {
+          "heading": "Server → client",
+          "level": 3,
+          "line": 221
+        },
+        {
+          "heading": "6. Where state lives and who may touch it",
+          "level": 2,
+          "line": 238
+        },
+        {
+          "heading": "7. How state changes over time",
+          "level": 2,
+          "line": 260
+        },
+        {
+          "heading": "7.1 An order's lifecycle",
+          "level": 3,
+          "line": 262
+        },
+        {
+          "heading": "7.2 The service",
+          "level": 3,
+          "line": 282
+        },
+        {
+          "heading": "7.3 A connection (session)",
+          "level": 3,
+          "line": 286
+        },
+        {
+          "heading": "7.4 The journal and its snapshots over time",
+          "level": 3,
+          "line": 304
+        },
+        {
+          "heading": "8. Validation layers",
+          "level": 2,
+          "line": 321
+        },
+        {
+          "heading": "9. What persists, what is rebuilt, what is lost",
+          "level": 2,
+          "line": 340
+        },
+        {
+          "heading": "10. \"Migrations\": versions instead of schema changes",
+          "level": 2,
+          "line": 350
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 366
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 376
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 384
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 28
+      }
+    },
+    {
+      "path": "docs/understanding/08-cross-cutting.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 463,
+      "nonEmptyLines": 357,
+      "sections": [
+        {
+          "heading": "08 — Cross-cutting concerns",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "1. Error handling",
+          "level": 2,
+          "line": 23
+        },
+        {
+          "heading": "1.1 The exception vocabulary",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "1.2 Validation layers: who refuses what",
+          "level": 3,
+          "line": 66
+        },
+        {
+          "heading": "1.3 What the client sees, case by case",
+          "level": 3,
+          "line": 89
+        },
+        {
+          "heading": "1.4 The poison-pill policy: RuntimeException vs Error",
+          "level": 3,
+          "line": 111
+        },
+        {
+          "heading": "1.5 Fail-stop",
+          "level": 3,
+          "line": 141
+        },
+        {
+          "heading": "1.6 Corrupt or unexpected persistent data",
+          "level": 3,
+          "line": 151
+        },
+        {
+          "heading": "2. Logging and observability",
+          "level": 2,
+          "line": 167
+        },
+        {
+          "heading": "2.1 What is logged and printed",
+          "level": 3,
+          "line": 169
+        },
+        {
+          "heading": "2.2 What is still not reported",
+          "level": 3,
+          "line": 191
+        },
+        {
+          "heading": "3. Security",
+          "level": 2,
+          "line": 201
+        },
+        {
+          "heading": "3.1 History in one paragraph",
+          "level": 3,
+          "line": 203
+        },
+        {
+          "heading": "3.2 Authentication (D74)",
+          "level": 3,
+          "line": 207
+        },
+        {
+          "heading": "3.3 Transport (D74)",
+          "level": 3,
+          "line": 227
+        },
+        {
+          "heading": "3.4 Limits that stop one client hurting the others (D68, D75)",
+          "level": 3,
+          "line": 231
+        },
+        {
+          "heading": "3.5 What security still does not cover",
+          "level": 3,
+          "line": 262
+        },
+        {
+          "heading": "4. Configuration",
+          "level": 2,
+          "line": 272
+        },
+        {
+          "heading": "5. Concurrency",
+          "level": 2,
+          "line": 300
+        },
+        {
+          "heading": "5.1 Thread inventory",
+          "level": 3,
+          "line": 302
+        },
+        {
+          "heading": "5.2 The single-writer rule",
+          "level": 3,
+          "line": 314
+        },
+        {
+          "heading": "5.3 Every synchronisation point and the guarantee it gives",
+          "level": 3,
+          "line": 318
+        },
+        {
+          "heading": "5.4 Ordering guarantees worth memorising",
+          "level": 3,
+          "line": 367
+        },
+        {
+          "heading": "5.5 Test seams for concurrency",
+          "level": 3,
+          "line": 373
+        },
+        {
+          "heading": "6. Performance",
+          "level": 2,
+          "line": 379
+        },
+        {
+          "heading": "7. Determinism as a cross-cutting rule",
+          "level": 2,
+          "line": 398
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 417
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 429
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 439
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 30
+      }
+    },
+    {
+      "path": "docs/understanding/09-design-decisions.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 89,
+      "nonEmptyLines": 74,
+      "sections": [
+        {
+          "heading": "09 — Design decisions (index)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Index of records",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 69
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 77
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 83
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "docs/understanding/09a-design-decisions-foundations.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 502,
+      "nonEmptyLines": 320,
+      "sections": [
+        {
+          "heading": "09a — Design decisions, part 1: the foundations (records 1–26)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Index",
+          "level": 3,
+          "line": 21
+        },
+        {
+          "heading": "1. One writer thread owns all exchange state",
+          "level": 2,
+          "line": 56
+        },
+        {
+          "heading": "2. Journal the inputs, not the state",
+          "level": 2,
+          "line": 75
+        },
+        {
+          "heading": "3. Plain-text journal",
+          "level": 2,
+          "line": 93
+        },
+        {
+          "heading": "4. Write-ahead, one fsync per batch, smart batching",
+          "level": 2,
+          "line": 119
+        },
+        {
+          "heading": "5. Replay through the same engine; determinism rules",
+          "level": 2,
+          "line": 142
+        },
+        {
+          "heading": "6. The Sequencer is the only clock reader and counter",
+          "level": 2,
+          "line": 156
+        },
+        {
+          "heading": "7. Packages enforce book ownership",
+          "level": 2,
+          "line": 171
+        },
+        {
+          "heading": "8. TreeMap of levels + linked list per level + id map; no cached best pointer",
+          "level": 2,
+          "line": 186
+        },
+        {
+          "heading": "9. Eager removal of empty levels",
+          "level": 2,
+          "line": 203
+        },
+        {
+          "heading": "10. Validation layers; state-dependent rejects are journalled",
+          "level": 2,
+          "line": 215
+        },
+        {
+          "heading": "11. Client order id unique per participant, forever (revised by D71: per journal)",
+          "level": 2,
+          "line": 227
+        },
+        {
+          "heading": "12. Price band and market collar fixed at arrival",
+          "level": 2,
+          "line": 244
+        },
+        {
+          "heading": "13. Poison pills: quarantine live, stop at startup",
+          "level": 2,
+          "line": 259
+        },
+        {
+          "heading": "14. Rules version in the journal header",
+          "level": 2,
+          "line": 275
+        },
+        {
+          "heading": "15. Two-pass streaming replay",
+          "level": 2,
+          "line": 289
+        },
+        {
+          "heading": "16. Reads go through the queue",
+          "level": 2,
+          "line": 301
+        },
+        {
+          "heading": "17. Bounded session queues; slow consumers disconnected",
+          "level": 2,
+          "line": 313
+        },
+        {
+          "heading": "18. Unbounded queue, capacity checked under the hand-in lock",
+          "level": 2,
+          "line": 325
+        },
+        {
+          "heading": "19. Callers get their own future (D61)",
+          "level": 2,
+          "line": 337
+        },
+        {
+          "heading": "20. Bounded SUBSCRIBE snapshot (D62)",
+          "level": 2,
+          "line": 349
+        },
+        {
+          "heading": "21. Fail-stop; only the writer closes the journal",
+          "level": 2,
+          "line": 359
+        },
+        {
+          "heading": "22. Text line protocol, thread-per-connection",
+          "level": 2,
+          "line": 371
+        },
+        {
+          "heading": "23. Close a session only after its requests are answered (D63, revised by D76)",
+          "level": 2,
+          "line": 383
+        },
+        {
+          "heading": "24. Check the journal header before changing the file (D64)",
+          "level": 2,
+          "line": 397
+        },
+        {
+          "heading": "25. One process per journal: a lock file (D65)",
+          "level": 2,
+          "line": 407
+        },
+        {
+          "heading": "26. Build and dependencies",
+          "level": 2,
+          "line": 448
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 458
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 471
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 481
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 32
+      }
+    },
+    {
+      "path": "docs/understanding/09b-design-decisions-risk-fixes.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 312,
+      "nonEmptyLines": 218,
+      "sections": [
+        {
+          "heading": "09b — Design decisions, part 2: the risk fixes (records 27–38, D66–D77)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Index",
+          "level": 3,
+          "line": 37
+        },
+        {
+          "heading": "27. Market collar before the first trade (D66)",
+          "level": 2,
+          "line": 56
+        },
+        {
+          "heading": "28. Self-trade prevention: cancel the incoming remainder (D67)",
+          "level": 2,
+          "line": 88
+        },
+        {
+          "heading": "29. Caps only for orders that would rest; a global cap (D68)",
+          "level": 2,
+          "line": 115
+        },
+        {
+          "heading": "30. Journal format v3: checksums, directory fsync, a clear CRLF error (D69)",
+          "level": 2,
+          "line": 127
+        },
+        {
+          "heading": "31. An output digest checked by CHECK records (D70)",
+          "level": 2,
+          "line": 142
+        },
+        {
+          "heading": "32. Snapshots and offline compaction (D71)",
+          "level": 2,
+          "line": 158
+        },
+        {
+          "heading": "33. CANCEL_ALL and opt-in cancel-on-disconnect (D72)",
+          "level": 2,
+          "line": 189
+        },
+        {
+          "heading": "34. A numbered private stream per participant, with RESEND (D73)",
+          "level": 2,
+          "line": 203
+        },
+        {
+          "heading": "35. Authentication and transport (D74)",
+          "level": 2,
+          "line": 218
+        },
+        {
+          "heading": "36. Per-session limits (D75)",
+          "level": 2,
+          "line": 234
+        },
+        {
+          "heading": "37. Listener first, then the future; close when nothing is in flight (D76, revises D63)",
+          "level": 2,
+          "line": 246
+        },
+        {
+          "heading": "38. Operations: say what happened, advise what fits (D77)",
+          "level": 2,
+          "line": 260
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 278
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 288
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 297
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 18
+      }
+    },
+    {
+      "path": "docs/understanding/10-testing.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 299,
+      "nonEmptyLines": 231,
+      "sections": [
+        {
+          "heading": "10 — Testing",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "1. Strategy",
+          "level": 2,
+          "line": 25
+        },
+        {
+          "heading": "1.1 Layers of tests",
+          "level": 3,
+          "line": 27
+        },
+        {
+          "heading": "1.2 Test classes",
+          "level": 3,
+          "line": 51
+        },
+        {
+          "heading": "2. Test seams",
+          "level": 2,
+          "line": 80
+        },
+        {
+          "heading": "3. Running tests",
+          "level": 2,
+          "line": 133
+        },
+        {
+          "heading": "4. Writing a new test",
+          "level": 2,
+          "line": 152
+        },
+        {
+          "heading": "5. Mutation testing (PIT)",
+          "level": 2,
+          "line": 184
+        },
+        {
+          "heading": "6. The flaky test and its fix (survey, 2026-10-27)",
+          "level": 2,
+          "line": 210
+        },
+        {
+          "heading": "7. Coverage map",
+          "level": 2,
+          "line": 220
+        },
+        {
+          "heading": "8. Untested or only hand-checked paths",
+          "level": 2,
+          "line": 241
+        },
+        {
+          "heading": "9. Test-side smells",
+          "level": 2,
+          "line": 259
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 268
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 277
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 284
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 16
+      }
+    },
+    {
+      "path": "docs/understanding/11-risks-and-smells.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 208,
+      "nonEmptyLines": 157,
+      "sections": [
+        {
+          "heading": "11 — Risks and smells",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "1. Resolved on 2026-10-27",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "1.1 Round one: survey fixes (D63–D65)",
+          "level": 3,
+          "line": 28
+        },
+        {
+          "heading": "1.2 Round two: every risk in the first review (D66–D77)",
+          "level": 3,
+          "line": 39
+        },
+        {
+          "heading": "2. What remains",
+          "level": 2,
+          "line": 68
+        },
+        {
+          "heading": "2.1 Medium",
+          "level": 3,
+          "line": 72
+        },
+        {
+          "heading": "R1. Durable ⇒ visible still does not hold (by design)",
+          "level": 4,
+          "line": 74
+        },
+        {
+          "heading": "R2. Replay correctness still relies on discipline at upgrade time",
+          "level": 4,
+          "line": 80
+        },
+        {
+          "heading": "R3. Security is basic",
+          "level": 4,
+          "line": 86
+        },
+        {
+          "heading": "R4. Paths and platforms never exercised",
+          "level": 4,
+          "line": 97
+        },
+        {
+          "heading": "R5. Performance after the fixes is unknown",
+          "level": 4,
+          "line": 102
+        },
+        {
+          "heading": "R6. Recovery features have limits clients must know",
+          "level": 4,
+          "line": 107
+        },
+        {
+          "heading": "R7. A much larger, more interlocking codebase",
+          "level": 4,
+          "line": 112
+        },
+        {
+          "heading": "2.2 Low",
+          "level": 3,
+          "line": 117
+        },
+        {
+          "heading": "3. Smells still present (each justified)",
+          "level": 2,
+          "line": 131
+        },
+        {
+          "heading": "Traits typical of AI-written code, as observed here",
+          "level": 3,
+          "line": 145
+        },
+        {
+          "heading": "4. Things that look like risks but are fine",
+          "level": 2,
+          "line": 156
+        },
+        {
+          "heading": "5. Top 5 remaining risks",
+          "level": 2,
+          "line": 167
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 177
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 185
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 193
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 22
+      }
+    },
+    {
+      "path": "docs/understanding/12-change-recipes.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 302,
+      "nonEmptyLines": 223,
+      "sections": [
+        {
+          "heading": "12 — Change Recipes",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Recipe 1 — Add an order type (e.g. STOP, or a good-till-time LIMIT)",
+          "level": 2,
+          "line": 40
+        },
+        {
+          "heading": "Recipe 2 — Add a reason or a risk check",
+          "level": 2,
+          "line": 74
+        },
+        {
+          "heading": "Recipe 3 — Change a business-rule constant",
+          "level": 2,
+          "line": 107
+        },
+        {
+          "heading": "Recipe 4 — Add a journal record type or a field",
+          "level": 2,
+          "line": 126
+        },
+        {
+          "heading": "Recipe 5 — Add a protocol message (e.g. `STATUS <orderId>`)",
+          "level": 2,
+          "line": 155
+        },
+        {
+          "heading": "Recipe 6 — Add a read-only query through the queue",
+          "level": 2,
+          "line": 170
+        },
+        {
+          "heading": "Recipe 7 — Add a private event type",
+          "level": 2,
+          "line": 182
+        },
+        {
+          "heading": "Recipe 8 — Change settings, limits or CLI flags",
+          "level": 2,
+          "line": 194
+        },
+        {
+          "heading": "Recipe 9 — Add or rotate a participant's secret",
+          "level": 2,
+          "line": 218
+        },
+        {
+          "heading": "Recipe 10 — Enable TLS",
+          "level": 2,
+          "line": 229
+        },
+        {
+          "heading": "Recipe 11 — Add a dependency",
+          "level": 2,
+          "line": 238
+        },
+        {
+          "heading": "Recipe 12 — Add a test",
+          "level": 2,
+          "line": 244
+        },
+        {
+          "heading": "Recipe 13 — Run the suite on Linux",
+          "level": 2,
+          "line": 256
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 270
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 279
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 287
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 18
+      }
+    },
+    {
+      "path": "docs/understanding/13-glossary.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 248,
+      "nonEmptyLines": 193,
+      "sections": [
+        {
+          "heading": "13 — Glossary",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "A",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "B",
+          "level": 2,
+          "line": 25
+        },
+        {
+          "heading": "C",
+          "level": 2,
+          "line": 35
+        },
+        {
+          "heading": "D",
+          "level": 2,
+          "line": 57
+        },
+        {
+          "heading": "E",
+          "level": 2,
+          "line": 68
+        },
+        {
+          "heading": "F",
+          "level": 2,
+          "line": 78
+        },
+        {
+          "heading": "G",
+          "level": 2,
+          "line": 89
+        },
+        {
+          "heading": "H",
+          "level": 2,
+          "line": 95
+        },
+        {
+          "heading": "I",
+          "level": 2,
+          "line": 103
+        },
+        {
+          "heading": "J",
+          "level": 2,
+          "line": 111
+        },
+        {
+          "heading": "L",
+          "level": 2,
+          "line": 118
+        },
+        {
+          "heading": "M",
+          "level": 2,
+          "line": 132
+        },
+        {
+          "heading": "O",
+          "level": 2,
+          "line": 140
+        },
+        {
+          "heading": "P",
+          "level": 2,
+          "line": 149
+        },
+        {
+          "heading": "Q",
+          "level": 2,
+          "line": 160
+        },
+        {
+          "heading": "R",
+          "level": 2,
+          "line": 165
+        },
+        {
+          "heading": "S",
+          "level": 2,
+          "line": 179
+        },
+        {
+          "heading": "T",
+          "level": 2,
+          "line": 196
+        },
+        {
+          "heading": "U",
+          "level": 2,
+          "line": 205
+        },
+        {
+          "heading": "W",
+          "level": 2,
+          "line": 210
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 218
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 227
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 236
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 25
+      }
+    },
+    {
+      "path": "docs/understanding/14-exercises.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 292,
+      "nonEmptyLines": 206,
+      "sections": [
+        {
+          "heading": "14 — Exercises",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "(a) Self-check questions",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "(b) Predict, then verify",
+          "level": 2,
+          "line": 60
+        },
+        {
+          "heading": "b1. The README session `[05, 06, 07-gateway]`",
+          "level": 3,
+          "line": 64
+        },
+        {
+          "heading": "b2. Wrong secret `[07-gateway, 09 D74]`",
+          "level": 3,
+          "line": 82
+        },
+        {
+          "heading": "b3. Duplicate, band, protocol error `[07-engine, 07-gateway]`",
+          "level": 3,
+          "line": 86
+        },
+        {
+          "heading": "b4. Cancels and the journal `[05 flow 2, 07-journal]`",
+          "level": 3,
+          "line": 97
+        },
+        {
+          "heading": "b5. Self-trade prevention `[07-engine, 09 D67]`",
+          "level": 3,
+          "line": 108
+        },
+        {
+          "heading": "b6. QUIT right after NEW `[07-gateway, 09 D76]`",
+          "level": 3,
+          "line": 112
+        },
+        {
+          "heading": "b7. RESEND after a disconnect `[07-gateway, 09 D73]`",
+          "level": 3,
+          "line": 124
+        },
+        {
+          "heading": "b8. Crash and replay `[05 flow 4, 07-journal]`",
+          "level": 3,
+          "line": 138
+        },
+        {
+          "heading": "b9. Editing the header by hand `[07-journal, 09 D69]`",
+          "level": 3,
+          "line": 151
+        },
+        {
+          "heading": "b10. Tools against a running server `[07-exchange-and-replay, 09 D65]`",
+          "level": 3,
+          "line": 155
+        },
+        {
+          "heading": "b11. Compaction and restart `[05 flow 4, 09 D71]`",
+          "level": 3,
+          "line": 159
+        },
+        {
+          "heading": "b12. A JUnit prediction: the collar `[07-engine]`",
+          "level": 3,
+          "line": 163
+        },
+        {
+          "heading": "(c) Tracing with a debugger",
+          "level": 2,
+          "line": 180
+        },
+        {
+          "heading": "(d) Small hands-on changes",
+          "level": 2,
+          "line": 201
+        },
+        {
+          "heading": "(e) \"Break it\" experiments",
+          "level": 2,
+          "line": 221
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 269
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 276
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 283
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 22
+      }
+    },
+    {
+      "path": "docs/understanding/15-open-questions.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 142,
+      "nonEmptyLines": 100,
+      "sections": [
+        {
+          "heading": "15 — Open Questions",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "1. Resolved (2026-10-27)",
+          "level": 2,
+          "line": 18
+        },
+        {
+          "heading": "2. Questions for the user",
+          "level": 2,
+          "line": 47
+        },
+        {
+          "heading": "3. Not verified",
+          "level": 2,
+          "line": 75
+        },
+        {
+          "heading": "4. Questions you should be able to answer after studying",
+          "level": 2,
+          "line": 86
+        },
+        {
+          "heading": "Key takeaways",
+          "level": 2,
+          "line": 119
+        },
+        {
+          "heading": "Common confusions",
+          "level": 2,
+          "line": 126
+        },
+        {
+          "heading": "Questions to test yourself",
+          "level": 2,
+          "line": 133
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 9
+      }
+    },
+    {
+      "path": "docs/understanding/AI-TUTOR-PROMPT.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 89,
+      "nonEmptyLines": 80,
+      "sections": [
+        {
+          "heading": "AI tutor prompt for ExchangeServer2",
+          "level": 1,
+          "line": 1
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    }
+  ]
+}

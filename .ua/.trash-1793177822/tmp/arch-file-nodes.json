@@ -1,0 +1,1728 @@
+[
+ {
+  "id": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "file",
+  "name": "CancelResult.java",
+  "filePath": "src/main/java/exchangeserver/book/CancelResult.java",
+  "summary": "Immutable record describing the outcome of a cancel (status, order id, cancelled quantity), with validation and factory methods; an unknown order is a normal return value, not an exception (D17).",
+  "tags": [
+   "data-model",
+   "value-object",
+   "order-book",
+   "cancel"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/book/CancelStatus.java",
+  "type": "file",
+  "name": "CancelStatus.java",
+  "filePath": "src/main/java/exchangeserver/book/CancelStatus.java",
+  "summary": "Enum of cancel outcomes: CANCELLED or UNKNOWN_ORDER, where not owning an order deliberately maps to UNKNOWN_ORDER (D48).",
+  "tags": [
+   "type-definition",
+   "enum",
+   "order-book",
+   "cancel"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "file",
+  "name": "LevelUpdate.java",
+  "filePath": "src/main/java/exchangeserver/book/LevelUpdate.java",
+  "summary": "Record for level-2 market data: the side, price, total volume and order count of one price level after a command; volume 0 means the level is gone.",
+  "tags": [
+   "data-model",
+   "market-data",
+   "order-book",
+   "value-object"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+  "type": "file",
+  "name": "ExchangeClient.java",
+  "filePath": "src/main/java/exchangeserver/client/ExchangeClient.java",
+  "summary": "Minimal blocking client for the line protocol used by ClientMain and the gateway tests; a background reader thread queues lines and await() finds matching lines while keeping skipped ones for later lookups.",
+  "tags": [
+   "client",
+   "networking",
+   "line-protocol",
+   "test-support",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+  "type": "file",
+  "name": "OutputDigest.java",
+  "filePath": "src/main/java/exchangeserver/core/OutputDigest.java",
+  "summary": "Running FNV-1a 64 digest over a canonical, field-by-field text encoding of every engine output (D70), written into journal CHECK records so replay divergence after a behaviour change is detected.",
+  "tags": [
+   "determinism",
+   "checksum",
+   "replay",
+   "serialization",
+   "core",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/OutputListener.java",
+  "type": "file",
+  "name": "OutputListener.java",
+  "filePath": "src/main/java/exchangeserver/core/OutputListener.java",
+  "summary": "Functional interface invoked on the writer thread with each command's engine output and numbered private events, before the request future completes (D76); implemented by the gateway and never called during replay.",
+  "tags": [
+   "interface",
+   "event-handler",
+   "callback",
+   "core"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/OutputLog.java",
+  "type": "file",
+  "name": "OutputLog.java",
+  "filePath": "src/main/java/exchangeserver/core/OutputLog.java",
+  "summary": "Numbers each participant's private events (oseq) deterministically from engine outputs and retains the most recent ones per participant to serve RESEND requests (D73); can resume numbering from a snapshot.",
+  "tags": [
+   "core",
+   "event-sourcing",
+   "determinism",
+   "resend",
+   "service",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+  "type": "file",
+  "name": "PrivateEvent.java",
+  "filePath": "src/main/java/exchangeserver/core/PrivateEvent.java",
+  "summary": "Sealed interface for a participant's private stream messages (D73): OrderReply, CancelReply and MakerFill records, each numbered per participant so replay rebuilds identical oseq numbering.",
+  "tags": [
+   "type-definition",
+   "sealed-interface",
+   "event",
+   "data-model"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+  "type": "file",
+  "name": "CancelAllOutput.java",
+  "filePath": "src/main/java/exchangeserver/engine/CancelAllOutput.java",
+  "summary": "Engine output record for a CANCEL_ALL (D72): one CANCELLED result per removed order in book priority order plus the resulting level updates; never contains trades or fills.",
+  "tags": [
+   "data-model",
+   "engine-output",
+   "cancel",
+   "value-object"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+  "type": "file",
+  "name": "CancelOutput.java",
+  "filePath": "src/main/java/exchangeserver/engine/CancelOutput.java",
+  "summary": "Engine output record for a single cancel command: the CancelResult and level updates, with empty trade and passive-fill lists.",
+  "tags": [
+   "data-model",
+   "engine-output",
+   "cancel",
+   "value-object"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+  "type": "file",
+  "name": "EngineOutput.java",
+  "filePath": "src/main/java/exchangeserver/engine/EngineOutput.java",
+  "summary": "Sealed interface for everything one command produced: sequence number, timestamp, trades, passive fills and level updates, separating private results from public market data.",
+  "tags": [
+   "type-definition",
+   "sealed-interface",
+   "engine-output",
+   "market-data"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/Execution.java",
+  "type": "file",
+  "name": "Execution.java",
+  "filePath": "src/main/java/exchangeserver/engine/Execution.java",
+  "summary": "Record for a fill on a resting (passive) order addressed to its owner, the only way the maker learns about its fills.",
+  "tags": [
+   "data-model",
+   "fill",
+   "value-object",
+   "engine"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+  "type": "file",
+  "name": "OrderOutput.java",
+  "filePath": "src/main/java/exchangeserver/engine/OrderOutput.java",
+  "summary": "Engine output record for a new order: the Response (whose trades are exposed as the output's trades), passive fills and level updates.",
+  "tags": [
+   "data-model",
+   "engine-output",
+   "order",
+   "value-object"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/Reason.java",
+  "type": "file",
+  "name": "Reason.java",
+  "filePath": "src/main/java/exchangeserver/engine/Reason.java",
+  "summary": "Enum of state-dependent reasons a new order did not simply trade and rest (duplicate client order id, price band, open-order and book caps, post-only cross, self-trade prevention), with isReject() distinguishing rejects from SELF_TRADE_PREVENTED cancels.",
+  "tags": [
+   "type-definition",
+   "enum",
+   "validation",
+   "engine",
+   "rules"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/Trade.java",
+  "type": "file",
+  "name": "Trade.java",
+  "filePath": "src/main/java/exchangeserver/engine/Trade.java",
+  "summary": "Validated record of one trade: resting-level price, quantity, both order ids, aggressor side and the incoming command's timestamp (D34, keeps replay deterministic).",
+  "tags": [
+   "data-model",
+   "trade",
+   "value-object",
+   "determinism"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+  "type": "file",
+  "name": "Protocol.java",
+  "filePath": "src/main/java/exchangeserver/gateway/Protocol.java",
+  "summary": "Defines and implements the ASCII line wire protocol (D53): parses client messages (LOGIN, NEW, CANCEL, RESEND, SUBSCRIBE, ...) and formats server lines (FILL, ORDER, CANCELLED, BOOK, TRADE, LEVEL, ERROR); its header comment is the protocol reference.",
+  "tags": [
+   "serialization",
+   "parser",
+   "line-protocol",
+   "gateway",
+   "api-schema",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+  "type": "file",
+  "name": "TcpGateway.java",
+  "filePath": "src/main/java/exchangeserver/gateway/TcpGateway.java",
+  "summary": "Thread-per-connection TCP/TLS gateway that accepts sessions, authenticates logins, enforces session limits (D74, D75) and, as the exchange's OutputListener, routes private events to the participant's sessions and market data to subscribers; triggers cancel-on-disconnect.",
+  "tags": [
+   "gateway",
+   "networking",
+   "event-handler",
+   "security",
+   "entry-point",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "type": "file",
+  "name": "OutputDigestTest.java",
+  "filePath": "src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "summary": "Unit tests for OutputDigest: identical outputs give identical digests, every output kind and every field contributes, cancel results are included, and the digest resumes from its hex form.",
+  "tags": [
+   "test",
+   "determinism",
+   "checksum",
+   "unit-test"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "type": "file",
+  "name": "OutputLogTest.java",
+  "filePath": "src/test/java/exchangeserver/core/OutputLogTest.java",
+  "summary": "Unit tests for OutputLog: per-participant oseq numbering with requester first, CANCEL_ALL numbering, retention limits, resume after snapshot, and rejecting a mismatched command/output pair.",
+  "tags": [
+   "test",
+   "event-sourcing",
+   "resend",
+   "unit-test"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "type": "file",
+  "name": "ProtocolTest.java",
+  "filePath": "src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "summary": "Unit tests for Protocol grouped into Parse and Format: parsing valid and malformed client lines and formatting every server line type.",
+  "tags": [
+   "test",
+   "parser",
+   "line-protocol",
+   "unit-test"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+  "type": "file",
+  "name": "TcpGatewayTest.java",
+  "filePath": "src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+  "summary": "End-to-end gateway tests over real sockets using ExchangeClient and a journalled ExchangeService, grouped into Session, Security, Limits, Trading, Resend, CancelOnDisconnect and MarketData behaviours, including restart persistence.",
+  "tags": [
+   "test",
+   "integration-test",
+   "networking",
+   "gateway",
+   "security"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/ExchangeException.java",
+  "type": "file",
+  "name": "ExchangeException.java",
+  "filePath": "src/main/java/exchangeserver/core/ExchangeException.java",
+  "summary": "Defines the runtime exception callers receive when a request gets no business result, with a Reason enum (BUSY, STOPPED, HALTED, INTERNAL_ERROR) that tells them whether to retry, resend, or give up.",
+  "tags": [
+   "error-handling",
+   "exception",
+   "core",
+   "backpressure"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+  "type": "file",
+  "name": "ExchangeService.java",
+  "filePath": "src/main/java/exchangeserver/core/ExchangeService.java",
+  "summary": "Implements the single-writer thread model: any caller thread hands requests into one queue, and the dedicated 'exchange-writer' thread drains them in smart batches (or linger group-commit) and calls Exchange.process, journalling with one fsync per batch. Manages the RUNNING/STOPPING/STOPPED/HALTED lifecycle under one lock so no accepted request is ever lost.",
+  "tags": [
+   "service",
+   "concurrency",
+   "single-writer",
+   "batching",
+   "lifecycle",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/Request.java",
+  "type": "file",
+  "name": "Request.java",
+  "filePath": "src/main/java/exchangeserver/core/Request.java",
+  "summary": "Sealed interface of records describing what a caller hands to the writer queue before stamping: Submit, Cancel, CancelAll (journalled commands) and Snapshot, Attach, Resend (unjournalled reads), each typed by its result.",
+  "tags": [
+   "data-model",
+   "sealed-interface",
+   "command",
+   "type-definition"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/ResendResult.java",
+  "type": "file",
+  "name": "ResendResult.java",
+  "filePath": "src/main/java/exchangeserver/core/ResendResult.java",
+  "summary": "Record answering a RESEND request with retained private events, the first still-retained output sequence number, and the participant's latest one (D73).",
+  "tags": [
+   "data-model",
+   "record",
+   "recovery"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "file",
+  "name": "OrderRequest.java",
+  "filePath": "src/main/java/exchangeserver/domain/OrderRequest.java",
+  "summary": "Immutable client order before stamping and the only stateless validation layer (D19): checks participant and client order id patterns, quantity and price limits from Rules, and that market orders carry no price. Reused by the gateway and the journal decoder.",
+  "tags": [
+   "data-model",
+   "validation",
+   "domain",
+   "factory",
+   "immutable",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+  "type": "file",
+  "name": "BookSnapshot.java",
+  "filePath": "src/main/java/exchangeserver/engine/BookSnapshot.java",
+  "summary": "Record of the book as of a command: last processed sequence number, last trade price, and best-first bid/ask level lists that a market-data subscriber starts from.",
+  "tags": [
+   "data-model",
+   "record",
+   "market-data",
+   "snapshot"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+  "type": "file",
+  "name": "OrderStatus.java",
+  "filePath": "src/main/java/exchangeserver/engine/OrderStatus.java",
+  "summary": "Enum of the four outcomes of a new order (FILLED, RESTED, CANCELLED, REJECTED), each implying a different next action for the client (D23).",
+  "tags": [
+   "enum",
+   "type-definition",
+   "domain"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "file",
+  "name": "Response.java",
+  "filePath": "src/main/java/exchangeserver/engine/Response.java",
+  "summary": "Record telling a submitter the result of a new order (D22): order id, status, reason, filled/remaining quantities and own trades, with a constructor that enforces consistency invariants so engine bugs fail before reaching a client.",
+  "tags": [
+   "data-model",
+   "record",
+   "validation",
+   "invariants",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+  "type": "file",
+  "name": "ClientSession.java",
+  "filePath": "src/main/java/exchangeserver/gateway/ClientSession.java",
+  "summary": "One TCP client connection with a reader thread (parse, LOGIN authentication, stateless checks, in-flight cap and token-bucket rate limit) and a sender thread draining a bounded outbound queue; closes only after every handed-in request completes (D74-D76).",
+  "tags": [
+   "gateway",
+   "networking",
+   "session",
+   "concurrency",
+   "security",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/MainTest.java",
+  "type": "file",
+  "name": "MainTest.java",
+  "filePath": "src/test/java/exchangeserver/MainTest.java",
+  "summary": "Tests Main's startup failure hints: a corrupt journal gets no poison-pill advice, and a replay CHECK divergence gets the --compact advice.",
+  "tags": [
+   "test",
+   "startup",
+   "recovery",
+   "cli"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/bench/BatchingBenchmark.java",
+  "type": "file",
+  "name": "BatchingBenchmark.java",
+  "filePath": "src/test/java/exchangeserver/bench/BatchingBenchmark.java",
+  "summary": "JMH benchmark comparing fsync-per-command, linger-1ms group commit and smart batching of ExchangeService under closed-loop clients (D37, D52).",
+  "tags": [
+   "benchmark",
+   "jmh",
+   "batching",
+   "performance"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/command/SequencerTest.java",
+  "type": "file",
+  "name": "SequencerTest.java",
+  "filePath": "src/test/java/exchangeserver/command/SequencerTest.java",
+  "summary": "Tests Sequencer stamping, that invalid input consumes no ids or sequence numbers, clock handling (including backwards clocks), resume after replay, and command validation.",
+  "tags": [
+   "test",
+   "sequencer",
+   "determinism",
+   "junit"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+  "type": "file",
+  "name": "ExchangeServiceTest.java",
+  "filePath": "src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+  "summary": "Concurrent tests of ExchangeService: hand-in, stop semantics, backpressure, writer failures, batching and robustness, using a Gate CommandInterceptor to block the writer deterministically.",
+  "tags": [
+   "test",
+   "concurrency",
+   "single-writer",
+   "junit"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "type": "file",
+  "name": "ExchangeTest.java",
+  "filePath": "src/test/java/exchangeserver/core/ExchangeTest.java",
+  "summary": "Tests the Exchange facade: live path, restart and recovery, poison-pill quarantine, CHECK checkpoints, compaction to snapshots, and operations.",
+  "tags": [
+   "test",
+   "recovery",
+   "journal",
+   "replay",
+   "junit"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/testing/MutableClock.java",
+  "type": "file",
+  "name": "MutableClock.java",
+  "filePath": "src/test/java/exchangeserver/testing/MutableClock.java",
+  "summary": "Thread-safe test Clock that can be set or advanced (including backwards), shared by sequencer, exchange and service tests to control timestamps deterministically.",
+  "tags": [
+   "test-utility",
+   "clock",
+   "determinism",
+   "fixture"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/book/OrderBook.java",
+  "type": "file",
+  "name": "OrderBook.java",
+  "filePath": "src/main/java/exchangeserver/book/OrderBook.java",
+  "summary": "Owns the lifecycle of every resting order: bid/ask TreeMaps of PriceLevels plus an id map and per-participant open counts, with all mutations funneled through add, fillBest and cancel so the book invariants hold in one place.",
+  "tags": [
+   "data-structure",
+   "order-book",
+   "invariants",
+   "single-writer",
+   "core-domain",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/book/OrderNode.java",
+  "type": "file",
+  "name": "OrderNode.java",
+  "filePath": "src/main/java/exchangeserver/book/OrderNode.java",
+  "summary": "Package-private doubly linked list node holding an Order inside a PriceLevel; a null order marks a sentinel, enforced by construction.",
+  "tags": [
+   "data-structure",
+   "linked-list",
+   "order-book",
+   "encapsulation"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+  "type": "file",
+  "name": "PriceLevel.java",
+  "filePath": "src/main/java/exchangeserver/book/PriceLevel.java",
+  "summary": "Time-priority queue of orders at one price on one side, implemented as a sentinel-bounded doubly linked list; public read-only state, package-private mutators so only OrderBook can change it.",
+  "tags": [
+   "data-structure",
+   "linked-list",
+   "order-book",
+   "encapsulation",
+   "invariants",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+  "type": "file",
+  "name": "CancelAllCommand.java",
+  "filePath": "src/main/java/exchangeserver/command/CancelAllCommand.java",
+  "summary": "Journalled command record that cancels every resting order of one participant (cancel-on-disconnect, D72), validating sequence number and participant in its compact constructor.",
+  "tags": [
+   "command",
+   "data-model",
+   "record",
+   "validation",
+   "cancel-on-disconnect"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "file",
+  "name": "CancelOrderCommand.java",
+  "filePath": "src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "summary": "Journalled command record that cancels one resting order by its exchange order id, validating sequence number, participant and target id.",
+  "tags": [
+   "command",
+   "data-model",
+   "record",
+   "validation"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/Ledger.java",
+  "type": "file",
+  "name": "Ledger.java",
+  "filePath": "src/main/java/exchangeserver/core/Ledger.java",
+  "summary": "Writer-thread-owned bundle of everything derived from commands (matching engine, output digest, per-participant output log), built from a snapshot and rebuilt as one unit on poison-pill recovery.",
+  "tags": [
+   "service",
+   "state-management",
+   "replay",
+   "determinism",
+   "single-writer"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/domain/Order.java",
+  "type": "file",
+  "name": "Order.java",
+  "filePath": "src/main/java/exchangeserver/domain/Order.java",
+  "summary": "Accepted order domain object: a validated OrderRequest plus sequencer-issued id and timestamp, tracking filled and remaining quantity with no knowledge of where it is stored.",
+  "tags": [
+   "data-model",
+   "domain",
+   "order",
+   "validation",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/domain/Rules.java",
+  "type": "file",
+  "name": "Rules.java",
+  "filePath": "src/main/java/exchangeserver/domain/Rules.java",
+  "summary": "Central registry of every rule replay depends on (rules VERSION, quantity/price limits, id patterns, price band, open-order and book caps) plus the exact-integer price band check.",
+  "tags": [
+   "configuration",
+   "domain-rules",
+   "replay",
+   "validation",
+   "constants",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "type": "file",
+  "name": "MatchingEngine.java",
+  "filePath": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "summary": "Deterministic price-time-priority matching engine for one instrument: runs side-effect-free pre-checks (duplicate id, price band, caps, FOK fillability, post-only), the shared matching loop with self-trade prevention, and per-OrderType outcomes, delegating book mutations to OrderBook.",
+  "tags": [
+   "matching-engine",
+   "core-domain",
+   "determinism",
+   "service",
+   "risk-checks",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+  "type": "file",
+  "name": "MatchingBenchmark.java",
+  "filePath": "src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+  "summary": "JMH benchmark measuring best-level lookup, rest-and-take and add-and-cancel costs of the engine at 10, 1000 and 100000 price levels per side.",
+  "tags": [
+   "benchmark",
+   "performance",
+   "jmh",
+   "test"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+  "type": "file",
+  "name": "OrderBookTest.java",
+  "filePath": "src/test/java/exchangeserver/book/OrderBookTest.java",
+  "summary": "JUnit tests for OrderBook organised in @Nested groups (add, fillBest, cancel, open orders, level updates, walk) plus an invariant check under randomized traffic.",
+  "tags": [
+   "test",
+   "order-book",
+   "invariants",
+   "property-testing"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+  "type": "file",
+  "name": "MatchingEngineTest.java",
+  "filePath": "src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+  "summary": "Extensive JUnit suite for MatchingEngine covering limit, IOC, FOK, market and post-only orders, cancels, risk bands, self-trade prevention, caps, cancel-all, snapshots, outputs, guards and determinism.",
+  "tags": [
+   "test",
+   "matching-engine",
+   "determinism",
+   "risk-checks"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+  "type": "file",
+  "name": "CheckCommand.java",
+  "filePath": "src/main/java/exchangeserver/command/CheckCommand.java",
+  "summary": "Immutable CHECK checkpoint record (D70) carrying the 16-hex-digit output digest of all prior commands; replay compares it against its own digest instead of feeding it to the engine.",
+  "tags": [
+   "data-model",
+   "command",
+   "replay-verification",
+   "validation"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "file",
+  "name": "Command.java",
+  "filePath": "src/main/java/exchangeserver/command/Command.java",
+  "summary": "Sealed interface for every stamped, journalled input command (NEW, CANCEL, CANCEL_ALL, SKIP, CHECK), exposing sequence number and timestamp as the source of truth for replay.",
+  "tags": [
+   "type-definition",
+   "command",
+   "sealed-interface",
+   "event-sourcing"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "file",
+  "name": "NewOrderCommand.java",
+  "filePath": "src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "summary": "Immutable NEW command record binding a validated OrderRequest to its sequencer-issued sequence number, timestamp and order id.",
+  "tags": [
+   "data-model",
+   "command",
+   "order",
+   "validation"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+  "type": "file",
+  "name": "SkipCommand.java",
+  "filePath": "src/main/java/exchangeserver/command/SkipCommand.java",
+  "summary": "Immutable SKIP command record that quarantines an earlier poison-pill command (D51) so replay does not feed it, annotating rather than editing history.",
+  "tags": [
+   "data-model",
+   "command",
+   "poison-pill",
+   "validation"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/CommandInterceptor.java",
+  "type": "file",
+  "name": "CommandInterceptor.java",
+  "filePath": "src/main/java/exchangeserver/core/CommandInterceptor.java",
+  "summary": "Package-private functional-interface test seam invoked just before the engine processes each command, live and in replay; production uses the no-op NONE.",
+  "tags": [
+   "test-seam",
+   "interface",
+   "hook",
+   "core"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/Pending.java",
+  "type": "file",
+  "name": "Pending.java",
+  "filePath": "src/main/java/exchangeserver/core/Pending.java",
+  "summary": "Package-private in-flight request holder pairing a Request with its own CompletableFuture result slot, plus the stamped command and a refused flag set by the writer thread.",
+  "tags": [
+   "concurrency",
+   "future",
+   "service",
+   "core"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/Replay.java",
+  "type": "file",
+  "name": "Replay.java",
+  "filePath": "src/main/java/exchangeserver/core/Replay.java",
+  "summary": "Rebuilds the Ledger from a snapshot plus the journal in two passes: verifies sequence/timestamp continuity and collects skips, then feeds non-skipped commands and checks every CHECK digest for divergence.",
+  "tags": [
+   "replay",
+   "recovery",
+   "determinism",
+   "core",
+   "service",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+  "type": "file",
+  "name": "CommandJournal.java",
+  "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+  "summary": "The write-ahead command journal: locks the file, validates the header and rules version, cuts torn tails, appends batches with one write and one fsync, reads records back, and fail-stops after any I/O error.",
+  "tags": [
+   "journal",
+   "persistence",
+   "durability",
+   "write-ahead-log",
+   "recovery",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+  "type": "file",
+  "name": "JournalCodec.java",
+  "filePath": "src/main/java/exchangeserver/journal/JournalCodec.java",
+  "summary": "Text codec for journal format v3: encodes and decodes HEADER, NEW, CANCEL, CANCEL_ALL, SKIP and CHECK records, each sealed with a CRC-32C checksum, rebuilding requests through OrderRequest factories.",
+  "tags": [
+   "serialization",
+   "journal",
+   "codec",
+   "checksum",
+   "validation",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+  "type": "file",
+  "name": "ReplayTest.java",
+  "filePath": "src/test/java/exchangeserver/core/ReplayTest.java",
+  "summary": "Tests Replay's verification pass (gaps, repeats, backwards timestamps, missing snapshot), feeding pass (skips, stopBefore, rebuild) and CHECK digest comparison.",
+  "tags": [
+   "test",
+   "replay",
+   "recovery",
+   "junit"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+  "type": "file",
+  "name": "CommandJournalTest.java",
+  "filePath": "src/test/java/exchangeserver/journal/CommandJournalTest.java",
+  "summary": "Tests CommandJournal header handling, append/read round trips, torn-tail recovery, corrupt-record refusal, cross-process exclusivity and fail-stop behaviour.",
+  "tags": [
+   "test",
+   "journal",
+   "durability",
+   "junit"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+  "type": "file",
+  "name": "JournalCodecTest.java",
+  "filePath": "src/test/java/exchangeserver/journal/JournalCodecTest.java",
+  "summary": "Tests JournalCodec round trips for every record kind and header, exact sealed wire text, and rejection of corrupt, CRLF or checksum-failing records.",
+  "tags": [
+   "test",
+   "serialization",
+   "journal",
+   "junit"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/book/Fill.java",
+  "type": "file",
+  "name": "Fill.java",
+  "filePath": "src/main/java/exchangeserver/book/Fill.java",
+  "summary": "Immutable record describing what OrderBook.fillBest did to one resting order, so the matching engine learns fill details without holding the live Order object from the book.",
+  "tags": [
+   "data-model",
+   "value-object",
+   "order-book",
+   "immutability"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+  "type": "file",
+  "name": "RestingOrderView.java",
+  "filePath": "src/main/java/exchangeserver/book/RestingOrderView.java",
+  "summary": "Immutable snapshot of one resting order used to read the book without exposing the mutable Order; serves the engine's fillability walk, cancel-all and snapshot persistence (D67, D71, D72).",
+  "tags": [
+   "data-model",
+   "value-object",
+   "order-book",
+   "read-model"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/Snapshot.java",
+  "type": "file",
+  "name": "Snapshot.java",
+  "filePath": "src/main/java/exchangeserver/core/Snapshot.java",
+  "summary": "Persistent exchange state after a given sequence number (D71): writes and reads the checksummed '<journal>.snapshot-<seq>' file of SNAPSHOT/ORDER/OSEQ/END records so recovery can start mid-history instead of replaying from sequence 1.",
+  "tags": [
+   "persistence",
+   "serialization",
+   "recovery",
+   "snapshot",
+   "validation",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/domain/OrderType.java",
+  "type": "file",
+  "name": "OrderType.java",
+  "filePath": "src/main/java/exchangeserver/domain/OrderType.java",
+  "summary": "Enumeration of supported order types (LIMIT, IOC, FOK, MARKET, POST_ONLY) with documented matching semantics, and the rule for which types may rest on the book.",
+  "tags": [
+   "type-definition",
+   "enum",
+   "domain",
+   "order-type"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "file",
+  "name": "Side.java",
+  "filePath": "src/main/java/exchangeserver/domain/Side.java",
+  "summary": "Enumeration of order sides (BUY, SELL) with an opposite() helper used throughout matching and book code.",
+  "tags": [
+   "type-definition",
+   "enum",
+   "domain",
+   "side"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/engine/EngineState.java",
+  "type": "file",
+  "name": "EngineState.java",
+  "filePath": "src/main/java/exchangeserver/engine/EngineState.java",
+  "summary": "Immutable record of everything the matching engine needs to continue after a snapshot (D71): last sequence number, last order id, price-band reference price, and resting orders in book priority.",
+  "tags": [
+   "data-model",
+   "value-object",
+   "snapshot",
+   "engine-state"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+  "type": "file",
+  "name": "ClientMessage.java",
+  "filePath": "src/main/java/exchangeserver/gateway/ClientMessage.java",
+  "summary": "Sealed interface of parsed client protocol messages (Login, NewOrder, Cancel, Resend, Subscribe, Unsubscribe, Ping, Quit); syntax only, the session later adds the participant and builds the OrderRequest.",
+  "tags": [
+   "type-definition",
+   "protocol",
+   "gateway",
+   "sealed-hierarchy",
+   "security"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/journal/Checksums.java",
+  "type": "file",
+  "name": "Checksums.java",
+  "filePath": "src/main/java/exchangeserver/journal/Checksums.java",
+  "summary": "Shared CRC-32C checksum helper (D69) used to seal every journal and snapshot record as 8 lowercase hex digits of the record's UTF-8 text.",
+  "tags": [
+   "utility",
+   "checksum",
+   "integrity",
+   "journal"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+  "type": "file",
+  "name": "PriceLevelTest.java",
+  "filePath": "src/test/java/exchangeserver/book/PriceLevelTest.java",
+  "summary": "Unit tests for PriceLevel's intrusive doubly-linked order queue: add ordering, head fills, unlinking (including foreign and sentinel nodes) and node walking, checking forward and backward walks agree.",
+  "tags": [
+   "test",
+   "order-book",
+   "linked-list",
+   "invariants"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+  "type": "file",
+  "name": "SnapshotTest.java",
+  "filePath": "src/test/java/exchangeserver/core/SnapshotTest.java",
+  "summary": "Unit tests for Snapshot file round-tripping and corruption detection: changed characters, truncation, inconsistent END records, missing files and the empty starting snapshot.",
+  "tags": [
+   "test",
+   "snapshot",
+   "recovery",
+   "integrity"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/engine/ResponseTest.java",
+  "type": "file",
+  "name": "ResponseTest.java",
+  "filePath": "src/test/java/exchangeserver/engine/ResponseTest.java",
+  "summary": "Unit tests for Response constructor consistency checks (D22): status vs. filled/remaining quantities, reason and self-trade-prevention pairing, defensive copy of trades, and Trade field validation.",
+  "tags": [
+   "test",
+   "validation",
+   "engine",
+   "response"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/Main.java",
+  "type": "file",
+  "name": "Main.java",
+  "filePath": "src/main/java/exchangeserver/Main.java",
+  "summary": "Command-line entry point that parses options, runs operator tools (--add-user, --quarantine, --compact), or loads credentials, binds the TCP/TLS gateway and starts the ExchangeService writer; maps failures to exit codes 0/1/2 with fail-stop on halt.",
+  "tags": [
+   "entry-point",
+   "cli",
+   "bootstrap",
+   "operator-tools",
+   "lifecycle",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/client/ClientMain.java",
+  "type": "file",
+  "name": "ClientMain.java",
+  "filePath": "src/main/java/exchangeserver/client/ClientMain.java",
+  "summary": "Interactive console client that connects to the gateway (optionally over TLS with a truststore), forwards typed protocol lines and prints every server line as it arrives.",
+  "tags": [
+   "entry-point",
+   "cli",
+   "client",
+   "tls",
+   "networking"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/command/Sequencer.java",
+  "type": "file",
+  "name": "Sequencer.java",
+  "filePath": "src/main/java/exchangeserver/command/Sequencer.java",
+  "summary": "The only component that reads the clock and counts: stamps new orders, cancels, cancel-alls, CHECK and SKIP records with sequence numbers, order ids and non-decreasing timestamps so everything downstream stays deterministic.",
+  "tags": [
+   "sequencer",
+   "determinism",
+   "factory",
+   "command-stamping",
+   "single-writer",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "type": "file",
+  "name": "Exchange.java",
+  "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+  "summary": "Core single-writer pipeline: stamps each batch with the Sequencer, appends it to the CommandJournal with one fsync, applies it to the Ledger, notifies the OutputListener and completes futures; also handles recovery/replay with CHECK digests, poison-pill quarantine and offline compaction.",
+  "tags": [
+   "core",
+   "write-ahead-log",
+   "replay",
+   "recovery",
+   "single-writer",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/core/ReplayException.java",
+  "type": "file",
+  "name": "ReplayException.java",
+  "filePath": "src/main/java/exchangeserver/core/ReplayException.java",
+  "summary": "Exception raised when replay cannot rebuild state at a known record, distinguishing an ENGINE_FAILURE poison pill from a DIVERGED CHECK digest so the operator gets the right advice.",
+  "tags": [
+   "exception",
+   "replay",
+   "recovery",
+   "error-handling"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+  "type": "file",
+  "name": "Credentials.java",
+  "filePath": "src/main/java/exchangeserver/gateway/Credentials.java",
+  "summary": "Immutable participant credential store backed by a users file of salted PBKDF2-HMAC-SHA256 hashes; verifies secrets in constant time and rewrites the file atomically when adding users.",
+  "tags": [
+   "security",
+   "authentication",
+   "pbkdf2",
+   "credentials",
+   "persistence",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/gateway/Tls.java",
+  "type": "file",
+  "name": "Tls.java",
+  "filePath": "src/main/java/exchangeserver/gateway/Tls.java",
+  "summary": "Builds optional TLS SSLContexts for the gateway server (PKCS#12 keystore) and client (truststore), reading passwords only from environment variables.",
+  "tags": [
+   "security",
+   "tls",
+   "networking",
+   "utility"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/journal/Durable.java",
+  "type": "file",
+  "name": "Durable.java",
+  "filePath": "src/main/java/exchangeserver/journal/Durable.java",
+  "summary": "Crash-safe file helpers: atomic write via temp file, fsync and rename, durable copy, and directory fsync so new directory entries survive a crash.",
+  "tags": [
+   "utility",
+   "durability",
+   "fsync",
+   "file-io",
+   "crash-safety",
+   "tested"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/journal/JournalLock.java",
+  "type": "file",
+  "name": "JournalLock.java",
+  "filePath": "src/main/java/exchangeserver/journal/JournalLock.java",
+  "summary": "Per-journal exclusive ownership lock on a separate <journal>.lock file, guarding against both other processes (OS file lock) and a second acquire in the same JVM.",
+  "tags": [
+   "concurrency",
+   "file-lock",
+   "journal",
+   "resource-management"
+  ]
+ },
+ {
+  "id": "document:CLAUDE.md",
+  "type": "document",
+  "name": "CLAUDE.md",
+  "filePath": "CLAUDE.md",
+  "summary": "Guidance for Claude Code agents working in the repository: build/test/bench/run commands, the cross-file architecture (single live path from ClientSession through ExchangeService and the writer thread, determinism, package-enforced book ownership, recovery and replay rules, gateway security), test conventions and Windows environment pitfalls.",
+  "tags": [
+   "documentation",
+   "development",
+   "architecture",
+   "ai-guidance",
+   "conventions"
+  ]
+ },
+ {
+  "id": "document:README.md",
+  "type": "document",
+  "name": "README.md",
+  "filePath": "README.md",
+  "summary": "Project overview for ExchangeServer2 with an at-a-glance metrics table (latency, durable throughput, tests, mutation score), feature highlights across matching, durability, concurrency and security, build/run instructions, a sample protocol session, the package layout and links to the Vision, Spec and study guides.",
+  "tags": [
+   "documentation",
+   "entry-point",
+   "overview",
+   "getting-started"
+  ]
+ },
+ {
+  "id": "file:mvnw.cmd",
+  "type": "file",
+  "name": "mvnw.cmd",
+  "filePath": "mvnw.cmd",
+  "summary": "Apache Maven Wrapper 3.3.2 launcher for Windows: a batch/PowerShell polyglot that reads distributionUrl from .mvn/wrapper/maven-wrapper.properties, downloads and verifies the Maven distribution into ~/.m2/wrapper/dists, and runs Maven so no local install is needed.",
+  "tags": [
+   "build-system",
+   "script",
+   "maven-wrapper",
+   "windows",
+   "tooling"
+  ]
+ },
+ {
+  "id": "config:pom.xml",
+  "type": "config",
+  "name": "pom.xml",
+  "filePath": "pom.xml",
+  "summary": "Maven build for exchange-server2 2.0.0-SNAPSHOT targeting Java 17 with UTF-8 and -Xlint:all; JUnit 5 and JMH as test-only dependencies, surefire excluding benchmarks, a runnable jar with exchangeserver.Main, plus \"bench\" (JMH via exec plugin) and \"mutation\" (PIT over domain/book/engine/command/journal/core) profiles.",
+  "tags": [
+   "configuration",
+   "build-system",
+   "maven",
+   "mutation-testing",
+   "benchmarking"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/00-START-HERE.md",
+  "type": "document",
+  "name": "00-START-HERE.md",
+  "filePath": "docs/understanding/00-START-HERE.md",
+  "summary": "Entry point to the study-guide series: explains what ExchangeServer2 is (a single-instrument exchange with write-ahead journal, replay, single writer and TCP/TLS gateway), the reading order and study time, how to use the guides with an AI assistant, the Verified/Inferred labelling convention and which code state the guides describe.",
+  "tags": [
+   "documentation",
+   "entry-point",
+   "study-guide",
+   "onboarding"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/01-big-picture.md",
+  "type": "document",
+  "name": "01-big-picture.md",
+  "filePath": "docs/understanding/01-big-picture.md",
+  "summary": "Big-picture guide explaining the exchange problem domain, the feature set (order types, price band, self-trade prevention, caps, cancel-on-disconnect) and the end-to-end architecture from gateway through the writer thread, journal and ledger, plus the ten things to know first.",
+  "tags": [
+   "documentation",
+   "architecture",
+   "overview",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/02-tech-stack.md",
+  "type": "document",
+  "name": "02-tech-stack.md",
+  "filePath": "docs/understanding/02-tech-stack.md",
+  "summary": "Tech-stack guide covering the Java 17 features, java.util.concurrent and the memory model, NIO file durability and CRC32C, sockets and TLS, Clock injection, System.Logger, the Maven wrapper, JUnit 5, JMH, PIT and Docker as used in this codebase, with pointers into the source.",
+  "tags": [
+   "documentation",
+   "tech-stack",
+   "java",
+   "build-system",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/03-codebase-map.md",
+  "type": "document",
+  "name": "03-codebase-map.md",
+  "filePath": "docs/understanding/03-codebase-map.md",
+  "summary": "Codebase map listing the entry points, how the packages (domain, book, engine, command, journal, core, gateway, client) layer, the conventions used everywhere, and a one-line purpose for every production and test file.",
+  "tags": [
+   "documentation",
+   "codebase-map",
+   "architecture",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/04-running-and-tooling.md",
+  "type": "document",
+  "name": "04-running-and-tooling.md",
+  "filePath": "docs/understanding/04-running-and-tooling.md",
+  "summary": "Operational guide to installing, configuring, building, running the server and client, running tests, mutation testing with PIT, JMH benchmarks, debugging, Windows-specific pitfalls and deployment, including every CLI flag and setting.",
+  "tags": [
+   "documentation",
+   "tooling",
+   "build-system",
+   "deployment",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/05-core-flows.md",
+  "type": "document",
+  "name": "05-core-flows.md",
+  "filePath": "docs/understanding/05-core-flows.md",
+  "summary": "Index for the core-flows guides: summarises the path every request takes through the gateway, queue, writer thread, journal and ledger, and lists the six flows detailed in parts 05a and 05b.",
+  "tags": [
+   "documentation",
+   "index",
+   "request-flow",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/05a-core-flows-trading.md",
+  "type": "document",
+  "name": "05a-core-flows-trading.md",
+  "filePath": "docs/understanding/05a-core-flows-trading.md",
+  "summary": "Core flows part 1: step-by-step traces with line citations of login and a NEW order that trades, CANCEL/CANCEL_ALL and cancel-on-disconnect, and SUBSCRIBE/UNSUBSCRIBE/RESEND reads that go through the writer queue.",
+  "tags": [
+   "documentation",
+   "request-flow",
+   "matching",
+   "gateway",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/05b-core-flows-lifecycle.md",
+  "type": "document",
+  "name": "05b-core-flows-lifecycle.md",
+  "filePath": "docs/understanding/05b-core-flows-lifecycle.md",
+  "summary": "Core flows part 2: traces startup, crash recovery from snapshot plus journal, offline compaction, poison-pill handling live and at startup, and shutdown, halt, backpressure, timeouts and connection close.",
+  "tags": [
+   "documentation",
+   "recovery",
+   "lifecycle",
+   "journal",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/06-data-and-state.md",
+  "type": "document",
+  "name": "06-data-and-state.md",
+  "filePath": "docs/understanding/06-data-and-state.md",
+  "summary": "Data and state guide describing the data models, the journal format v3 with CRC-32C records, the snapshot file, the users file, the wire protocol, who owns which state, validation layers, what persists versus is rebuilt, and versioning instead of migrations.",
+  "tags": [
+   "documentation",
+   "data-model",
+   "journal-format",
+   "persistence",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/08-cross-cutting.md",
+  "type": "document",
+  "name": "08-cross-cutting.md",
+  "filePath": "docs/understanding/08-cross-cutting.md",
+  "summary": "Cross-cutting concerns guide covering error handling, logging and observability, gateway security, configuration, concurrency, performance and determinism as a rule that spans every package.",
+  "tags": [
+   "documentation",
+   "cross-cutting",
+   "security",
+   "concurrency",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/09-design-decisions.md",
+  "type": "document",
+  "name": "09-design-decisions.md",
+  "filePath": "docs/understanding/09-design-decisions.md",
+  "summary": "Index of the design-decision records, mapping the 38 study-guide records to the Spec's D-numbered decisions and pointing to the foundations (09a) and risk-fix (09b) parts.",
+  "tags": [
+   "documentation",
+   "design-decisions",
+   "index",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/09a-design-decisions-foundations.md",
+  "type": "document",
+  "name": "09a-design-decisions-foundations.md",
+  "filePath": "docs/understanding/09a-design-decisions-foundations.md",
+  "summary": "Design decisions part 1 (records 1-26): foundational choices such as the single writer thread, journalling inputs in plain text, write-ahead with one fsync per batch, deterministic replay, the Sequencer, package-enforced book ownership and the TreeMap/linked-list book structure, each with its reasoning and trade-offs.",
+  "tags": [
+   "documentation",
+   "design-decisions",
+   "architecture",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/09b-design-decisions-risk-fixes.md",
+  "type": "document",
+  "name": "09b-design-decisions-risk-fixes.md",
+  "filePath": "docs/understanding/09b-design-decisions-risk-fixes.md",
+  "summary": "Design decisions part 2 (records 27-38, D66-D77): the risk fixes including the market collar, self-trade prevention, resting caps, journal format v3, the output digest and CHECK records, snapshots and compaction, CANCEL_ALL, numbered private streams with RESEND, authentication, session limits and listener-before-future ordering.",
+  "tags": [
+   "documentation",
+   "design-decisions",
+   "risk-fixes",
+   "security",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/10-testing.md",
+  "type": "document",
+  "name": "10-testing.md",
+  "filePath": "docs/understanding/10-testing.md",
+  "summary": "Testing guide explaining the test strategy, test seams (CommandInterceptor, checkInvariants, MutableClock), how to run and write tests, PIT mutation testing, a fixed flaky test, a coverage map and untested paths.",
+  "tags": [
+   "documentation",
+   "testing",
+   "mutation-testing",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/11-risks-and-smells.md",
+  "type": "document",
+  "name": "11-risks-and-smells.md",
+  "filePath": "docs/understanding/11-risks-and-smells.md",
+  "summary": "Risk review listing the issues resolved on 2026-10-27, the risks that remain, justified code smells, things that only look risky, and the top five remaining risks.",
+  "tags": [
+   "documentation",
+   "risk-analysis",
+   "code-smells",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/12-change-recipes.md",
+  "type": "document",
+  "name": "12-change-recipes.md",
+  "filePath": "docs/understanding/12-change-recipes.md",
+  "summary": "Change recipes giving step-by-step instructions for common modifications: adding an order type, reason or risk check, changing rule constants, journal record types, protocol messages, queued queries, private events, settings and CLI flags, secrets, TLS, dependencies and tests.",
+  "tags": [
+   "documentation",
+   "how-to",
+   "change-recipes",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/13-glossary.md",
+  "type": "document",
+  "name": "13-glossary.md",
+  "filePath": "docs/understanding/13-glossary.md",
+  "summary": "Alphabetical glossary of exchange and codebase terms (order types, oseq, digest, Sequencer, poison pill, snapshot and more), each linked to the source file and line where it lives.",
+  "tags": [
+   "documentation",
+   "glossary",
+   "reference",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/14-exercises.md",
+  "type": "document",
+  "name": "14-exercises.md",
+  "filePath": "docs/understanding/14-exercises.md",
+  "summary": "Exercise set for self-study: self-check questions, predict-then-verify tasks, debugger tracing walkthroughs, small hands-on changes and break-it experiments against the codebase.",
+  "tags": [
+   "documentation",
+   "exercises",
+   "learning",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/15-open-questions.md",
+  "type": "document",
+  "name": "15-open-questions.md",
+  "filePath": "docs/understanding/15-open-questions.md",
+  "summary": "Open questions guide recording questions resolved on 2026-10-27, questions still for the user, claims that were not verified, and questions a reader should be able to answer after studying.",
+  "tags": [
+   "documentation",
+   "open-questions",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/AI-TUTOR-PROMPT.md",
+  "type": "document",
+  "name": "AI-TUTOR-PROMPT.md",
+  "filePath": "docs/understanding/AI-TUTOR-PROMPT.md",
+  "summary": "Prompt document meant to be pasted into an AI assistant before attaching the study guides; it describes the project in one dense paragraph and sets rules for how the tutor should teach from the guides as the source of truth.",
+  "tags": [
+   "documentation",
+   "ai-prompt",
+   "learning",
+   "study-guide"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/07-modules/book.md",
+  "type": "document",
+  "name": "book.md",
+  "filePath": "docs/understanding/07-modules/book.md",
+  "summary": "Study guide for the book package: PriceLevel FIFO queues and OrderBook, the book invariants (id map iff resting, no empty or crossed levels, per-participant open counts), package-private mutators, a worked example, complexity and tests.",
+  "tags": [
+   "documentation",
+   "study-guide",
+   "order-book",
+   "invariants",
+   "data-structures"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/07-modules/client-and-main.md",
+  "type": "document",
+  "name": "client-and-main.md",
+  "filePath": "docs/understanding/07-modules/client-and-main.md",
+  "summary": "Study guide for the process entry point Main (argument parsing, startup, user management, compaction, exit codes) and the ExchangeClient/ClientMain command-line client, with tests and self-check questions.",
+  "tags": [
+   "documentation",
+   "study-guide",
+   "entry-point",
+   "cli",
+   "client"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/07-modules/domain-and-commands.md",
+  "type": "document",
+  "name": "domain-and-commands.md",
+  "filePath": "docs/understanding/07-modules/domain-and-commands.md",
+  "summary": "Study guide for the domain and command packages: OrderRequest as the sole validation layer, Order, Side, OrderType and Rules (versioned replay rules), plus the sealed Command records and the Sequencer that stamps ids, sequence numbers and timestamps.",
+  "tags": [
+   "documentation",
+   "study-guide",
+   "domain-model",
+   "determinism",
+   "commands"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/07-modules/engine.md",
+  "type": "document",
+  "name": "engine.md",
+  "filePath": "docs/understanding/07-modules/engine.md",
+  "summary": "In-depth study guide for MatchingEngine: price-time matching, order types, rejects and self-trade prevention, the EngineOutput/Response/Trade result types, engine state snapshots and how determinism is achieved and tested.",
+  "tags": [
+   "documentation",
+   "study-guide",
+   "matching-engine",
+   "determinism",
+   "price-time-priority"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/07-modules/exchange-and-replay.md",
+  "type": "document",
+  "name": "exchange-and-replay.md",
+  "filePath": "docs/understanding/07-modules/exchange-and-replay.md",
+  "summary": "Study guide for core.Exchange and Replay: replay-before-open, the stamp-journal-apply-notify batch in process, poison-pill quarantine and rebuild from snapshot, operator tools, and the small helper types (Request, Pending, OutputListener, ReplayException).",
+  "tags": [
+   "documentation",
+   "study-guide",
+   "recovery",
+   "replay",
+   "poison-pill"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/07-modules/exchange-service.md",
+  "type": "document",
+  "name": "exchange-service.md",
+  "filePath": "docs/understanding/07-modules/exchange-service.md",
+  "summary": "Study guide for ExchangeService, the single-writer thread: startup, the shared lock that makes enqueue either refused or never lost, the batching writer loop, and the state machine for stop and halt, with its concurrency tests.",
+  "tags": [
+   "documentation",
+   "study-guide",
+   "concurrency",
+   "single-writer",
+   "threading"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/07-modules/gateway.md",
+  "type": "document",
+  "name": "gateway.md",
+  "filePath": "docs/understanding/07-modules/gateway.md",
+  "summary": "Study guide for the gateway package: TcpGateway accept loop and OutputListener fan-out, ClientSession reader threads with login, timeouts, in-flight cap and rate limit, the line Protocol and ClientMessage, PBKDF2 Credentials (D74) and optional TLS.",
+  "tags": [
+   "documentation",
+   "study-guide",
+   "networking",
+   "security",
+   "protocol"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/07-modules/journal.md",
+  "type": "document",
+  "name": "journal.md",
+  "filePath": "docs/understanding/07-modules/journal.md",
+  "summary": "Study guide for the journal package: the v3 text record format with CRC32C checksums in JournalCodec, CommandJournal open/lock/torn-tail handling and batched fsync, JournalLock, Durable atomic writes, and lifecycle failure states.",
+  "tags": [
+   "documentation",
+   "study-guide",
+   "write-ahead-log",
+   "durability",
+   "persistence"
+  ]
+ },
+ {
+  "id": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+  "type": "document",
+  "name": "ledger-and-snapshots.md",
+  "filePath": "docs/understanding/07-modules/ledger-and-snapshots.md",
+  "summary": "Study guide for core.Ledger and its parts: the engine plus OutputDigest (D70) checked by CHECK records, OutputLog and numbered PrivateEvent streams (D73), and Snapshot files (D71) used for compaction and recovery.",
+  "tags": [
+   "documentation",
+   "study-guide",
+   "snapshots",
+   "digest",
+   "recovery"
+  ]
+ },
+ {
+  "id": "file:.gitattributes",
+  "type": "file",
+  "name": ".gitattributes",
+  "filePath": ".gitattributes",
+  "summary": "Git attributes that mark journal and snapshot files as binary (-text) so their byte-exact, checksummed LF records are never line-ending converted, and force LF on the mvnw shell script.",
+  "tags": [
+   "configuration",
+   "git",
+   "line-endings",
+   "journal-integrity"
+  ]
+ },
+ {
+  "id": "config:.mvn/wrapper/maven-wrapper.properties",
+  "type": "config",
+  "name": "maven-wrapper.properties",
+  "filePath": ".mvn/wrapper/maven-wrapper.properties",
+  "summary": "Maven Wrapper 3.3.2 configuration (only-script distribution) pinning the Maven 3.9.16 binary distribution that mvnw/mvnw.cmd download and run.",
+  "tags": [
+   "configuration",
+   "build-system",
+   "maven",
+   "wrapper"
+  ]
+ },
+ {
+  "id": "file:mvnw",
+  "type": "file",
+  "name": "mvnw",
+  "filePath": "mvnw",
+  "summary": "Standard Apache Maven Wrapper 3.3.2 POSIX startup script that locates Java, downloads and verifies the configured Maven distribution if missing, and runs it, so the project builds without a local Maven install.",
+  "tags": [
+   "build-system",
+   "script",
+   "maven",
+   "wrapper",
+   "boilerplate"
+  ]
+ },
+ {
+  "id": "document:docs/ExchangeServer2_Spec.md",
+  "type": "document",
+  "name": "ExchangeServer2_Spec.md",
+  "filePath": "docs/ExchangeServer2_Spec.md",
+  "summary": "Spec v10 and source of truth for the code state: session rules, per-class current state, settled design decisions D1-D77, journal format v3, benchmark measurements, gateway notes, mutation-testing results, open threads, and the review and risk-fix rounds.",
+  "tags": [
+   "documentation",
+   "specification",
+   "design-decisions",
+   "journal-format",
+   "architecture"
+  ]
+ },
+ {
+  "id": "document:docs/ExchangeServer2_Vision.md",
+  "type": "document",
+  "name": "ExchangeServer2_Vision.md",
+  "filePath": "docs/ExchangeServer2_Vision.md",
+  "summary": "Vision v5 describing the project's purpose as a learning rewrite, what the system is, the collaboration working style, engineering principles, key design commitments, non-goals, the phased roadmap (its single source of truth), open decisions and a glossary.",
+  "tags": [
+   "documentation",
+   "vision",
+   "roadmap",
+   "principles",
+   "overview"
+  ]
+ },
+ {
+  "id": "file:docs/understanding/build-full-context.java",
+  "type": "file",
+  "name": "build-full-context.java",
+  "filePath": "docs/understanding/build-full-context.java",
+  "summary": "Single-file Java source-launcher script that concatenates the study guides in reading order (top-level NN*.md files with the 07-modules guides inserted after 06) into FULL-CONTEXT.md with a generated table of contents, written as UTF-8 with LF endings.",
+  "tags": [
+   "script",
+   "documentation-tooling",
+   "build-system",
+   "entry-point",
+   "utility"
+  ]
+ },
+ {
+  "id": "file:src/main/java/exchangeserver/gateway/ProtocolException.java",
+  "type": "file",
+  "name": "ProtocolException.java",
+  "filePath": "src/main/java/exchangeserver/gateway/ProtocolException.java",
+  "summary": "Package-private unchecked exception for a malformed protocol line; the gateway answers it with ERROR and the request never reaches the exchange.",
+  "tags": [
+   "exception",
+   "gateway",
+   "validation",
+   "protocol"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/client/ExchangeClientTest.java",
+  "type": "file",
+  "name": "ExchangeClientTest.java",
+  "filePath": "src/test/java/exchangeserver/client/ExchangeClientTest.java",
+  "summary": "Unit tests for ExchangeClient's line buffering: linesUntil consumes exactly the lines it returns, a timeout keeps buffered lines for the next call, and field parses key=value pairs.",
+  "tags": [
+   "test",
+   "client",
+   "buffering",
+   "unit-test"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/domain/OrderRequestTest.java",
+  "type": "file",
+  "name": "OrderRequestTest.java",
+  "filePath": "src/test/java/exchangeserver/domain/OrderRequestTest.java",
+  "summary": "Tests OrderRequest factories (typed and general, market vs priced types) and field validation: positive and inclusive-limit quantity and price, required side/type, participant and client order id patterns, and full-field equality.",
+  "tags": [
+   "test",
+   "domain",
+   "validation",
+   "parameterized-test",
+   "unit-test"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/domain/OrderTest.java",
+  "type": "file",
+  "name": "OrderTest.java",
+  "filePath": "src/test/java/exchangeserver/domain/OrderTest.java",
+  "summary": "Tests Order construction (copies the request and stamps id/timestamp, rejects bad ids and nulls), price semantics for market vs other types, and fill accounting including partial fills and overfill rejection.",
+  "tags": [
+   "test",
+   "domain",
+   "order-lifecycle",
+   "unit-test"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/domain/RulesTest.java",
+  "type": "file",
+  "name": "RulesTest.java",
+  "filePath": "src/test/java/exchangeserver/domain/RulesTest.java",
+  "summary": "Tests the replay-relevant Rules: inclusive, exact, overflow-safe price-band checks, that max price times max quantity fits in a long, opposite side, and that only LIMIT and POST_ONLY orders rest.",
+  "tags": [
+   "test",
+   "domain",
+   "rules",
+   "overflow",
+   "unit-test"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/gateway/ClientSessionTest.java",
+  "type": "file",
+  "name": "ClientSessionTest.java",
+  "filePath": "src/test/java/exchangeserver/gateway/ClientSessionTest.java",
+  "summary": "Tests ClientSession's bounded line reader: LF and CRLF both end a line, lines exactly at the limit pass, one byte over and endless lines are refused without buffering, and an unterminated last line is dropped.",
+  "tags": [
+   "test",
+   "gateway",
+   "line-reader",
+   "security",
+   "unit-test"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/gateway/CredentialsTest.java",
+  "type": "file",
+  "name": "CredentialsTest.java",
+  "filePath": "src/test/java/exchangeserver/gateway/CredentialsTest.java",
+  "summary": "Tests the Credentials store: verifies only the right secret per participant, persists salted hashes with updates replacing entries, refuses weak or malformed input, and gives operator-friendly errors for missing or corrupt files.",
+  "tags": [
+   "test",
+   "gateway",
+   "authentication",
+   "security",
+   "unit-test"
+  ]
+ },
+ {
+  "id": "file:src/test/java/exchangeserver/journal/DurableTest.java",
+  "type": "file",
+  "name": "DurableTest.java",
+  "filePath": "src/test/java/exchangeserver/journal/DurableTest.java",
+  "summary": "Tests the Durable file helpers: atomic whole-file replacement leaving no temporary file, durable copy, and that directory fsync is harmless on every platform.",
+  "tags": [
+   "test",
+   "journal",
+   "durability",
+   "file-io",
+   "unit-test"
+  ]
+ }
+]

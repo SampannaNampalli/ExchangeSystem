@@ -1,0 +1,759 @@
+{
+ "nodes": [
+  {
+   "id": "file:.gitattributes",
+   "type": "file",
+   "name": ".gitattributes",
+   "filePath": ".gitattributes",
+   "summary": "Git attributes that mark journal and snapshot files as binary (-text) so their byte-exact, checksummed LF records are never line-ending converted, and force LF on the mvnw shell script.",
+   "tags": [
+    "configuration",
+    "git",
+    "line-endings",
+    "journal-integrity"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:.mvn/wrapper/maven-wrapper.properties",
+   "type": "config",
+   "name": "maven-wrapper.properties",
+   "filePath": ".mvn/wrapper/maven-wrapper.properties",
+   "summary": "Maven Wrapper 3.3.2 configuration (only-script distribution) pinning the Maven 3.9.16 binary distribution that mvnw/mvnw.cmd download and run.",
+   "tags": [
+    "configuration",
+    "build-system",
+    "maven",
+    "wrapper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:mvnw",
+   "type": "file",
+   "name": "mvnw",
+   "filePath": "mvnw",
+   "summary": "Standard Apache Maven Wrapper 3.3.2 POSIX startup script that locates Java, downloads and verifies the configured Maven distribution if missing, and runs it, so the project builds without a local Maven install.",
+   "tags": [
+    "build-system",
+    "script",
+    "maven",
+    "wrapper",
+    "boilerplate"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Generated Apache boilerplate; must stay LF-terminated to run under sh, which .gitattributes enforces."
+  },
+  {
+   "id": "document:docs/ExchangeServer2_Spec.md",
+   "type": "document",
+   "name": "ExchangeServer2_Spec.md",
+   "filePath": "docs/ExchangeServer2_Spec.md",
+   "summary": "Spec v10 and source of truth for the code state: session rules, per-class current state, settled design decisions D1-D77, journal format v3, benchmark measurements, gateway notes, mutation-testing results, open threads, and the review and risk-fix rounds.",
+   "tags": [
+    "documentation",
+    "specification",
+    "design-decisions",
+    "journal-format",
+    "architecture"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "document:docs/ExchangeServer2_Vision.md",
+   "type": "document",
+   "name": "ExchangeServer2_Vision.md",
+   "filePath": "docs/ExchangeServer2_Vision.md",
+   "summary": "Vision v5 describing the project's purpose as a learning rewrite, what the system is, the collaboration working style, engineering principles, key design commitments, non-goals, the phased roadmap (its single source of truth), open decisions and a glossary.",
+   "tags": [
+    "documentation",
+    "vision",
+    "roadmap",
+    "principles",
+    "overview"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:docs/understanding/build-full-context.java",
+   "type": "file",
+   "name": "build-full-context.java",
+   "filePath": "docs/understanding/build-full-context.java",
+   "summary": "Single-file Java source-launcher script that concatenates the study guides in reading order (top-level NN*.md files with the 07-modules guides inserted after 06) into FULL-CONTEXT.md with a generated table of contents, written as UTF-8 with LF endings.",
+   "tags": [
+    "script",
+    "documentation-tooling",
+    "build-system",
+    "entry-point",
+    "utility"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Run directly with the java source launcher (JEP 330, no build); kept ASCII-only because the launcher reads source in the platform charset, so the em dash is built from a char code."
+  },
+  {
+   "id": "class:docs/understanding/build-full-context.java:BuildFullContext",
+   "type": "class",
+   "name": "BuildFullContext",
+   "filePath": "docs/understanding/build-full-context.java",
+   "summary": "Public launcher class holding the guide ordering rules, exclusions (FULL-CONTEXT.md, AI-TUTOR-PROMPT.md) and helpers that assemble the combined study-guide document.",
+   "tags": [
+    "entry-point",
+    "documentation-tooling",
+    "file-io"
+   ],
+   "complexity": "moderate",
+   "lineRange": [
+    26,
+    150
+   ]
+  },
+  {
+   "id": "function:docs/understanding/build-full-context.java:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "docs/understanding/build-full-context.java",
+   "summary": "Resolves the guides directory, collects guides in order, and writes FULL-CONTEXT.md with a table of contents and word counts.",
+   "tags": [
+    "entry-point",
+    "file-io",
+    "orchestration"
+   ],
+   "complexity": "moderate",
+   "lineRange": [
+    37,
+    69
+   ]
+  },
+  {
+   "id": "function:docs/understanding/build-full-context.java:locate",
+   "type": "function",
+   "name": "locate",
+   "filePath": "docs/understanding/build-full-context.java",
+   "summary": "Finds the study-guides directory from an argument, the repo root, or the current directory.",
+   "tags": [
+    "utility",
+    "path-resolution",
+    "file-io"
+   ],
+   "complexity": "simple",
+   "lineRange": [
+    71,
+    83
+   ]
+  },
+  {
+   "id": "function:docs/understanding/build-full-context.java:ordered",
+   "type": "function",
+   "name": "ordered",
+   "filePath": "docs/understanding/build-full-context.java",
+   "summary": "Lists top-level NN*.md guides sorted by name, skipping excluded files, and splices the module guides in after guide 06.",
+   "tags": [
+    "utility",
+    "ordering",
+    "file-io"
+   ],
+   "complexity": "moderate",
+   "lineRange": [
+    85,
+    108
+   ]
+  },
+  {
+   "id": "function:docs/understanding/build-full-context.java:modules",
+   "type": "function",
+   "name": "modules",
+   "filePath": "docs/understanding/build-full-context.java",
+   "summary": "Orders the 07-modules guides by MODULE_ORDER, appending any unlisted module file alphabetically.",
+   "tags": [
+    "utility",
+    "ordering",
+    "file-io"
+   ],
+   "complexity": "moderate",
+   "lineRange": [
+    110,
+    131
+   ]
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/gateway/ProtocolException.java",
+   "type": "file",
+   "name": "ProtocolException.java",
+   "filePath": "src/main/java/exchangeserver/gateway/ProtocolException.java",
+   "summary": "Package-private unchecked exception for a malformed protocol line; the gateway answers it with ERROR and the request never reaches the exchange.",
+   "tags": [
+    "exception",
+    "gateway",
+    "validation",
+    "protocol"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/gateway/ProtocolException.java:ProtocolException",
+   "type": "class",
+   "name": "ProtocolException",
+   "filePath": "src/main/java/exchangeserver/gateway/ProtocolException.java",
+   "summary": "Final RuntimeException subclass carrying the parse-failure message for a bad client line.",
+   "tags": [
+    "exception",
+    "gateway",
+    "validation"
+   ],
+   "complexity": "simple",
+   "lineRange": [
+    4,
+    11
+   ]
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/client/ExchangeClientTest.java",
+   "type": "file",
+   "name": "ExchangeClientTest.java",
+   "filePath": "src/test/java/exchangeserver/client/ExchangeClientTest.java",
+   "summary": "Unit tests for ExchangeClient's line buffering: linesUntil consumes exactly the lines it returns, a timeout keeps buffered lines for the next call, and field parses key=value pairs.",
+   "tags": [
+    "test",
+    "client",
+    "buffering",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/client/ExchangeClientTest.java:ExchangeClientTest",
+   "type": "class",
+   "name": "ExchangeClientTest",
+   "filePath": "src/test/java/exchangeserver/client/ExchangeClientTest.java",
+   "summary": "JUnit 5 test class for ExchangeClient.",
+   "tags": [
+    "test",
+    "junit5",
+    "client"
+   ],
+   "complexity": "simple",
+   "lineRange": [
+    17,
+    57
+   ]
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/domain/OrderRequestTest.java",
+   "type": "file",
+   "name": "OrderRequestTest.java",
+   "filePath": "src/test/java/exchangeserver/domain/OrderRequestTest.java",
+   "summary": "Tests OrderRequest factories (typed and general, market vs priced types) and field validation: positive and inclusive-limit quantity and price, required side/type, participant and client order id patterns, and full-field equality.",
+   "tags": [
+    "test",
+    "domain",
+    "validation",
+    "parameterized-test",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/domain/OrderRequestTest.java:OrderRequestTest",
+   "type": "class",
+   "name": "OrderRequestTest",
+   "filePath": "src/test/java/exchangeserver/domain/OrderRequestTest.java",
+   "summary": "JUnit 5 test class for OrderRequest, organised in @Nested behaviour groups.",
+   "tags": [
+    "test",
+    "junit5",
+    "domain"
+   ],
+   "complexity": "moderate",
+   "lineRange": [
+    15,
+    140
+   ]
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/domain/OrderTest.java",
+   "type": "file",
+   "name": "OrderTest.java",
+   "filePath": "src/test/java/exchangeserver/domain/OrderTest.java",
+   "summary": "Tests Order construction (copies the request and stamps id/timestamp, rejects bad ids and nulls), price semantics for market vs other types, and fill accounting including partial fills and overfill rejection.",
+   "tags": [
+    "test",
+    "domain",
+    "order-lifecycle",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/domain/OrderTest.java:OrderTest",
+   "type": "class",
+   "name": "OrderTest",
+   "filePath": "src/test/java/exchangeserver/domain/OrderTest.java",
+   "summary": "JUnit 5 test class for Order, organised in @Nested behaviour groups.",
+   "tags": [
+    "test",
+    "junit5",
+    "domain"
+   ],
+   "complexity": "moderate",
+   "lineRange": [
+    13,
+    95
+   ]
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/domain/RulesTest.java",
+   "type": "file",
+   "name": "RulesTest.java",
+   "filePath": "src/test/java/exchangeserver/domain/RulesTest.java",
+   "summary": "Tests the replay-relevant Rules: inclusive, exact, overflow-safe price-band checks, that max price times max quantity fits in a long, opposite side, and that only LIMIT and POST_ONLY orders rest.",
+   "tags": [
+    "test",
+    "domain",
+    "rules",
+    "overflow",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/domain/RulesTest.java:RulesTest",
+   "type": "class",
+   "name": "RulesTest",
+   "filePath": "src/test/java/exchangeserver/domain/RulesTest.java",
+   "summary": "JUnit 5 test class for Rules.",
+   "tags": [
+    "test",
+    "junit5",
+    "domain"
+   ],
+   "complexity": "simple",
+   "lineRange": [
+    9,
+    54
+   ]
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/gateway/ClientSessionTest.java",
+   "type": "file",
+   "name": "ClientSessionTest.java",
+   "filePath": "src/test/java/exchangeserver/gateway/ClientSessionTest.java",
+   "summary": "Tests ClientSession's bounded line reader: LF and CRLF both end a line, lines exactly at the limit pass, one byte over and endless lines are refused without buffering, and an unterminated last line is dropped.",
+   "tags": [
+    "test",
+    "gateway",
+    "line-reader",
+    "security",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/gateway/ClientSessionTest.java:ClientSessionTest",
+   "type": "class",
+   "name": "ClientSessionTest",
+   "filePath": "src/test/java/exchangeserver/gateway/ClientSessionTest.java",
+   "summary": "JUnit 5 test class for ClientSession, organised in @Nested behaviour groups.",
+   "tags": [
+    "test",
+    "junit5",
+    "gateway"
+   ],
+   "complexity": "simple",
+   "lineRange": [
+    16,
+    59
+   ]
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/gateway/CredentialsTest.java",
+   "type": "file",
+   "name": "CredentialsTest.java",
+   "filePath": "src/test/java/exchangeserver/gateway/CredentialsTest.java",
+   "summary": "Tests the Credentials store: verifies only the right secret per participant, persists salted hashes with updates replacing entries, refuses weak or malformed input, and gives operator-friendly errors for missing or corrupt files.",
+   "tags": [
+    "test",
+    "gateway",
+    "authentication",
+    "security",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/gateway/CredentialsTest.java:CredentialsTest",
+   "type": "class",
+   "name": "CredentialsTest",
+   "filePath": "src/test/java/exchangeserver/gateway/CredentialsTest.java",
+   "summary": "JUnit 5 test class for Credentials.",
+   "tags": [
+    "test",
+    "junit5",
+    "gateway"
+   ],
+   "complexity": "moderate",
+   "lineRange": [
+    17,
+    68
+   ]
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/journal/DurableTest.java",
+   "type": "file",
+   "name": "DurableTest.java",
+   "filePath": "src/test/java/exchangeserver/journal/DurableTest.java",
+   "summary": "Tests the Durable file helpers: atomic whole-file replacement leaving no temporary file, durable copy, and that directory fsync is harmless on every platform.",
+   "tags": [
+    "test",
+    "journal",
+    "durability",
+    "file-io",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/journal/DurableTest.java:DurableTest",
+   "type": "class",
+   "name": "DurableTest",
+   "filePath": "src/test/java/exchangeserver/journal/DurableTest.java",
+   "summary": "JUnit 5 test class for Durable.",
+   "tags": [
+    "test",
+    "junit5",
+    "journal"
+   ],
+   "complexity": "simple",
+   "lineRange": [
+    14,
+    40
+   ]
+  },
+  {
+   "id": "function:src/test/java/exchangeserver/domain/OrderRequestTest.java:equalityCoversEveryField",
+   "type": "function",
+   "name": "equalityCoversEveryField",
+   "filePath": "src/test/java/exchangeserver/domain/OrderRequestTest.java",
+   "summary": "Checks that OrderRequest equality and hashCode account for every field by varying each one.",
+   "tags": [
+    "test",
+    "equality",
+    "record"
+   ],
+   "complexity": "simple",
+   "lineRange": [
+    128,
+    139
+   ]
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:docs/understanding/build-full-context.java",
+   "target": "class:docs/understanding/build-full-context.java:BuildFullContext",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/understanding/build-full-context.java",
+   "target": "class:docs/understanding/build-full-context.java:BuildFullContext",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:docs/understanding/build-full-context.java",
+   "target": "function:docs/understanding/build-full-context.java:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/understanding/build-full-context.java",
+   "target": "function:docs/understanding/build-full-context.java:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:docs/understanding/build-full-context.java",
+   "target": "function:docs/understanding/build-full-context.java:locate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/understanding/build-full-context.java",
+   "target": "function:docs/understanding/build-full-context.java:ordered",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/understanding/build-full-context.java",
+   "target": "function:docs/understanding/build-full-context.java:modules",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/ProtocolException.java",
+   "target": "class:src/main/java/exchangeserver/gateway/ProtocolException.java:ProtocolException",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/ProtocolException.java",
+   "target": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/client/ExchangeClientTest.java",
+   "target": "class:src/test/java/exchangeserver/client/ExchangeClientTest.java:ExchangeClientTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "target": "file:src/test/java/exchangeserver/client/ExchangeClientTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/domain/OrderRequestTest.java",
+   "target": "class:src/test/java/exchangeserver/domain/OrderRequestTest.java:OrderRequestTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "target": "file:src/test/java/exchangeserver/domain/OrderRequestTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/domain/OrderTest.java",
+   "target": "class:src/test/java/exchangeserver/domain/OrderTest.java:OrderTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Order.java",
+   "target": "file:src/test/java/exchangeserver/domain/OrderTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/domain/RulesTest.java",
+   "target": "class:src/test/java/exchangeserver/domain/RulesTest.java:RulesTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "target": "file:src/test/java/exchangeserver/domain/RulesTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ClientSessionTest.java",
+   "target": "class:src/test/java/exchangeserver/gateway/ClientSessionTest.java:ClientSessionTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "target": "file:src/test/java/exchangeserver/gateway/ClientSessionTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/CredentialsTest.java",
+   "target": "class:src/test/java/exchangeserver/gateway/CredentialsTest.java:CredentialsTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "target": "file:src/test/java/exchangeserver/gateway/CredentialsTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/DurableTest.java",
+   "target": "class:src/test/java/exchangeserver/journal/DurableTest.java:DurableTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "target": "file:src/test/java/exchangeserver/journal/DurableTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/domain/OrderRequestTest.java",
+   "target": "function:src/test/java/exchangeserver/domain/OrderRequestTest.java:equalityCoversEveryField",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:.gitattributes",
+   "target": "file:mvnw",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.mvn/wrapper/maven-wrapper.properties",
+   "target": "file:mvnw",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:mvnw",
+   "target": "config:.mvn/wrapper/maven-wrapper.properties",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "document:docs/ExchangeServer2_Vision.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Vision.md",
+   "target": "document:docs/ExchangeServer2_Spec.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gitattributes",
+   "target": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/core/Replay.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Spec.md",
+   "target": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Vision.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ExchangeServer2_Vision.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,1948 @@
+[
+ {
+  "source": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+  "target": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+  "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+  "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputListener.java",
+  "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+  "target": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+  "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+  "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+  "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/OutputLog.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+  "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/Execution.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/Trade.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelStatus.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+  "target": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+  "target": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+  "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+  "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+  "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+  "target": "file:src/main/java/exchangeserver/core/OutputListener.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+  "target": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+  "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+  "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "target": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Reason.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+  "target": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+  "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+  "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+  "target": "file:src/main/java/exchangeserver/core/OutputListener.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+  "target": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+  "target": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Request.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Request.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Request.java",
+  "target": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Request.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+  "target": "file:src/main/java/exchangeserver/core/ExchangeException.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+  "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+  "target": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+  "target": "file:src/main/java/exchangeserver/core/ResendResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+  "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/MainTest.java",
+  "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/MainTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/MainTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/MainTest.java",
+  "target": "file:src/test/java/exchangeserver/testing/MutableClock.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/BatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/BatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/core/OutputListener.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/BatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/BatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/BatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/command/SequencerTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/command/SequencerTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/command/SequencerTest.java",
+  "target": "file:src/test/java/exchangeserver/testing/MutableClock.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+  "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+  "target": "file:src/test/java/exchangeserver/testing/MutableClock.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelStatus.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Reason.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+  "target": "file:src/test/java/exchangeserver/testing/MutableClock.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/book/OrderBook.java",
+  "target": "file:src/main/java/exchangeserver/domain/Order.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/book/OrderBook.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/book/OrderNode.java",
+  "target": "file:src/main/java/exchangeserver/domain/Order.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+  "target": "file:src/main/java/exchangeserver/domain/Order.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+  "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Ledger.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Ledger.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Ledger.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Ledger.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Ledger.java",
+  "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Ledger.java",
+  "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/book/Fill.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/domain/Order.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Order.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+  "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+  "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/CommandInterceptor.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Pending.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Replay.java",
+  "target": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Replay.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Replay.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Replay.java",
+  "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Replay.java",
+  "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+  "target": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+  "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+  "target": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+  "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+  "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+  "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+  "target": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+  "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/book/Fill.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+  "target": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+  "target": "file:src/main/java/exchangeserver/engine/EngineState.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+  "target": "file:src/main/java/exchangeserver/journal/Checksums.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Snapshot.java",
+  "target": "file:src/main/java/exchangeserver/journal/Durable.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/engine/EngineState.java",
+  "target": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Order.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/book/PriceLevelTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+  "target": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+  "target": "file:src/main/java/exchangeserver/journal/Checksums.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/test/java/exchangeserver/engine/ResponseTest.java",
+  "target": "file:src/main/java/exchangeserver/domain/Side.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/Main.java",
+  "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/Main.java",
+  "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/Main.java",
+  "target": "file:src/main/java/exchangeserver/core/ReplayException.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/Main.java",
+  "target": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/Main.java",
+  "target": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/Main.java",
+  "target": "file:src/main/java/exchangeserver/gateway/Tls.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/client/ClientMain.java",
+  "target": "file:src/main/java/exchangeserver/gateway/Tls.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/command/Sequencer.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/command/Command.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/command/Sequencer.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/engine/Response.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/journal/Durable.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+  "target": "file:src/main/java/exchangeserver/journal/JournalLock.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+  "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ },
+ {
+  "source": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+  "target": "file:src/main/java/exchangeserver/journal/Durable.java",
+  "type": "imports",
+  "direction": "forward",
+  "weight": 0.7
+ }
+]

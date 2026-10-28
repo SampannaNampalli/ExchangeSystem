@@ -1,0 +1,982 @@
+{
+ "nodes": [
+  {
+   "id": "file:src/main/java/exchangeserver/domain/Order.java",
+   "type": "file",
+   "name": "Order.java",
+   "filePath": "src/main/java/exchangeserver/domain/Order.java",
+   "summary": "Accepted order domain object: a validated OrderRequest plus sequencer-issued id and timestamp, tracking filled and remaining quantity with no knowledge of where it is stored.",
+   "tags": [
+    "data-model",
+    "domain",
+    "order",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "file",
+   "name": "Rules.java",
+   "filePath": "src/main/java/exchangeserver/domain/Rules.java",
+   "summary": "Central registry of every rule replay depends on (rules VERSION, quantity/price limits, id patterns, price band, open-order and book caps) plus the exact-integer price band check.",
+   "tags": [
+    "configuration",
+    "domain-rules",
+    "replay",
+    "validation",
+    "constants"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Price band check uses exact integer cross-multiplication rather than floating point, with overflow bounded by MAX_PRICE."
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "file",
+   "name": "MatchingEngine.java",
+   "filePath": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "summary": "Deterministic price-time-priority matching engine for one instrument: runs side-effect-free pre-checks (duplicate id, price band, caps, FOK fillability, post-only), the shared matching loop with self-trade prevention, and per-OrderType outcomes, delegating book mutations to OrderBook.",
+   "tags": [
+    "matching-engine",
+    "core-domain",
+    "determinism",
+    "service",
+    "risk-checks"
+   ],
+   "complexity": "complex",
+   "languageNotes": "The outcome is an exhaustive switch over the OrderType enum with no default, so the compiler rejects a missed type."
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "type": "file",
+   "name": "MatchingBenchmark.java",
+   "filePath": "src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "summary": "JMH benchmark measuring best-level lookup, rest-and-take and add-and-cancel costs of the engine at 10, 1000 and 100000 price levels per side.",
+   "tags": [
+    "benchmark",
+    "performance",
+    "jmh",
+    "test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "type": "file",
+   "name": "OrderBookTest.java",
+   "filePath": "src/test/java/exchangeserver/book/OrderBookTest.java",
+   "summary": "JUnit tests for OrderBook organised in @Nested groups (add, fillBest, cancel, open orders, level updates, walk) plus an invariant check under randomized traffic.",
+   "tags": [
+    "test",
+    "order-book",
+    "invariants",
+    "property-testing"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "type": "file",
+   "name": "MatchingEngineTest.java",
+   "filePath": "src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "summary": "Extensive JUnit suite for MatchingEngine covering limit, IOC, FOK, market and post-only orders, cancels, risk bands, self-trade prevention, caps, cancel-all, snapshots, outputs, guards and determinism.",
+   "tags": [
+    "test",
+    "matching-engine",
+    "determinism",
+    "risk-checks"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/domain/Order.java:Order",
+   "type": "class",
+   "name": "Order",
+   "filePath": "src/main/java/exchangeserver/domain/Order.java",
+   "lineRange": [
+    16,
+    110
+   ],
+   "summary": "Accepted order with immutable identity fields and mutable filled quantity.",
+   "tags": [
+    "data-model",
+    "domain"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/domain/Order.java:Order",
+   "type": "function",
+   "name": "Order",
+   "filePath": "src/main/java/exchangeserver/domain/Order.java",
+   "lineRange": [
+    30,
+    45
+   ],
+   "summary": "Constructor building an Order from a validated OrderRequest, checking only the id and timestamp.",
+   "tags": [
+    "constructor",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/domain/Order.java:fill",
+   "type": "function",
+   "name": "fill",
+   "filePath": "src/main/java/exchangeserver/domain/Order.java",
+   "lineRange": [
+    95,
+    103
+   ],
+   "summary": "Increases the filled quantity, rejecting non-positive or over-remaining fills.",
+   "tags": [
+    "mutation",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/domain/Rules.java:Rules",
+   "type": "class",
+   "name": "Rules",
+   "filePath": "src/main/java/exchangeserver/domain/Rules.java",
+   "lineRange": [
+    17,
+    48
+   ],
+   "summary": "Non-instantiable holder of replay-relevant rule constants and the rules version.",
+   "tags": [
+    "constants",
+    "domain-rules"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/domain/Rules.java:withinBand",
+   "type": "function",
+   "name": "withinBand",
+   "filePath": "src/main/java/exchangeserver/domain/Rules.java",
+   "lineRange": [
+    44,
+    47
+   ],
+   "summary": "Checks with exact integer arithmetic whether a price is within PRICE_BAND_PERCENT of a reference price.",
+   "tags": [
+    "validation",
+    "risk-checks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/engine/MatchingEngine.java:MatchingEngine",
+   "type": "class",
+   "name": "MatchingEngine",
+   "filePath": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "lineRange": [
+    41,
+    333
+   ],
+   "summary": "Single-instrument matching engine owning the book, client-order-id map, last order id, sequence and trade price.",
+   "tags": [
+    "matching-engine",
+    "core-domain"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:restore",
+   "type": "function",
+   "name": "restore",
+   "filePath": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "lineRange": [
+    83,
+    105
+   ],
+   "summary": "Rebuilds an engine from exported state by re-resting saved orders with their fills and restoring counters.",
+   "tags": [
+    "snapshot",
+    "recovery",
+    "factory"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onNewOrder",
+   "type": "function",
+   "name": "onNewOrder",
+   "filePath": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "lineRange": [
+    111,
+    125
+   ],
+   "summary": "Entry point for a NewOrderCommand: checks sequence, builds the Order, runs process and drains level updates into an OrderOutput.",
+   "tags": [
+    "entry-point",
+    "command-handler"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onCancel",
+   "type": "function",
+   "name": "onCancel",
+   "filePath": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "lineRange": [
+    127,
+    133
+   ],
+   "summary": "Handles a CancelOrderCommand by cancelling through the book and returning a CancelOutput with level updates.",
+   "tags": [
+    "command-handler",
+    "cancel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onCancelAll",
+   "type": "function",
+   "name": "onCancelAll",
+   "filePath": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "lineRange": [
+    136,
+    155
+   ],
+   "summary": "Handles a CancelAllCommand by walking both sides for the participant's orders and cancelling each.",
+   "tags": [
+    "command-handler",
+    "cancel-on-disconnect"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:process",
+   "type": "function",
+   "name": "process",
+   "filePath": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "lineRange": [
+    178,
+    263
+   ],
+   "summary": "Core matching routine: stateful pre-checks, the matching loop with self-trade stop, then the per-OrderType outcome (rest, cancel remainder, reject).",
+   "tags": [
+    "matching",
+    "risk-checks",
+    "core-logic"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:matchLimit",
+   "type": "function",
+   "name": "matchLimit",
+   "filePath": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "lineRange": [
+    274,
+    289
+   ],
+   "summary": "Computes the effective price limit for matching, applying the market-order collar around the last trade or opposite touch.",
+   "tags": [
+    "matching",
+    "risk-checks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:fillability",
+   "type": "function",
+   "name": "fillability",
+   "filePath": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "lineRange": [
+    299,
+    315
+   ],
+   "summary": "Walks the opposite side to compute how much an order could fill now and whether its own resting order blocks it.",
+   "tags": [
+    "matching",
+    "fok",
+    "self-trade-prevention"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:levels",
+   "type": "function",
+   "name": "levels",
+   "filePath": "src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "lineRange": [
+    323,
+    332
+   ],
+   "summary": "Builds a depth-limited list of LevelUpdate views for one side, used by snapshot.",
+   "tags": [
+    "market-data",
+    "snapshot"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/bench/MatchingBenchmark.java:MatchingBenchmark",
+   "type": "class",
+   "name": "MatchingBenchmark",
+   "filePath": "src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "lineRange": [
+    43,
+    100
+   ],
+   "summary": "JMH state class parameterised by book depth with benchmarks for lookup, rest-and-take and add-and-cancel.",
+   "tags": [
+    "benchmark",
+    "jmh"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/test/java/exchangeserver/bench/MatchingBenchmark.java:buildBook",
+   "type": "function",
+   "name": "buildBook",
+   "filePath": "src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "lineRange": [
+    61,
+    78
+   ],
+   "summary": "JMH setup that builds a fresh engine and populates the configured number of levels per side.",
+   "tags": [
+    "benchmark",
+    "setup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/book/OrderBookTest.java:OrderBookTest",
+   "type": "class",
+   "name": "OrderBookTest",
+   "filePath": "src/test/java/exchangeserver/book/OrderBookTest.java",
+   "lineRange": [
+    26,
+    337
+   ],
+   "summary": "Test class with nested groups exercising OrderBook mutations, level updates, walk and randomized invariants.",
+   "tags": [
+    "test",
+    "order-book"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:src/test/java/exchangeserver/book/OrderBookTest.java:levelViewsAreReadOnly",
+   "type": "function",
+   "name": "levelViewsAreReadOnly",
+   "filePath": "src/test/java/exchangeserver/book/OrderBookTest.java",
+   "lineRange": [
+    280,
+    289
+   ],
+   "summary": "Verifies the levels collection exposed by OrderBook cannot be modified.",
+   "tags": [
+    "test",
+    "encapsulation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/engine/MatchingEngineTest.java:MatchingEngineTest",
+   "type": "class",
+   "name": "MatchingEngineTest",
+   "filePath": "src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "lineRange": [
+    27,
+    865
+   ],
+   "summary": "Test class with nested groups for every order type and engine behaviour, using helper builders for commands.",
+   "tags": [
+    "test",
+    "matching-engine"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Order.java",
+   "target": "class:src/main/java/exchangeserver/domain/Order.java:Order",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Order.java",
+   "target": "class:src/main/java/exchangeserver/domain/Order.java:Order",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Order.java",
+   "target": "function:src/main/java/exchangeserver/domain/Order.java:Order",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Order.java",
+   "target": "function:src/main/java/exchangeserver/domain/Order.java:Order",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Order.java",
+   "target": "function:src/main/java/exchangeserver/domain/Order.java:fill",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Order.java",
+   "target": "function:src/main/java/exchangeserver/domain/Order.java:fill",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "target": "class:src/main/java/exchangeserver/domain/Rules.java:Rules",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "target": "class:src/main/java/exchangeserver/domain/Rules.java:Rules",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "target": "function:src/main/java/exchangeserver/domain/Rules.java:withinBand",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "target": "function:src/main/java/exchangeserver/domain/Rules.java:withinBand",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "class:src/main/java/exchangeserver/engine/MatchingEngine.java:MatchingEngine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "class:src/main/java/exchangeserver/engine/MatchingEngine.java:MatchingEngine",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:restore",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:restore",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onNewOrder",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onNewOrder",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onCancel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onCancel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onCancelAll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onCancelAll",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:process",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:matchLimit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:fillability",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:levels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "class:src/test/java/exchangeserver/bench/MatchingBenchmark.java:MatchingBenchmark",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "class:src/test/java/exchangeserver/bench/MatchingBenchmark.java:MatchingBenchmark",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "function:src/test/java/exchangeserver/bench/MatchingBenchmark.java:buildBook",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "function:src/test/java/exchangeserver/bench/MatchingBenchmark.java:buildBook",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "target": "class:src/test/java/exchangeserver/book/OrderBookTest.java:OrderBookTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "target": "function:src/test/java/exchangeserver/book/OrderBookTest.java:levelViewsAreReadOnly",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "target": "class:src/test/java/exchangeserver/engine/MatchingEngineTest.java:MatchingEngineTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/book/Fill.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/domain/Order.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Order.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:process",
+   "target": "function:src/main/java/exchangeserver/book/OrderBook.java:add",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:process",
+   "target": "function:src/main/java/exchangeserver/book/OrderBook.java:fillBest",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:process",
+   "target": "function:src/main/java/exchangeserver/domain/Rules.java:withinBand",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:process",
+   "target": "function:src/main/java/exchangeserver/domain/Order.java:fill",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onCancel",
+   "target": "function:src/main/java/exchangeserver/book/OrderBook.java:cancel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onCancelAll",
+   "target": "function:src/main/java/exchangeserver/book/OrderBook.java:cancel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onCancelAll",
+   "target": "function:src/main/java/exchangeserver/book/OrderBook.java:walk",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:fillability",
+   "target": "function:src/main/java/exchangeserver/book/OrderBook.java:walk",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:restore",
+   "target": "function:src/main/java/exchangeserver/book/OrderBook.java:add",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onNewOrder",
+   "target": "function:src/main/java/exchangeserver/book/OrderBook.java:drainLevelUpdates",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/test/java/exchangeserver/bench/MatchingBenchmark.java:buildBook",
+   "target": "function:src/main/java/exchangeserver/engine/MatchingEngine.java:onNewOrder",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "target": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

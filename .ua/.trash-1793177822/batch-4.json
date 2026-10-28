@@ -1,0 +1,1510 @@
+{
+ "nodes": [
+  {
+   "id": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+   "type": "file",
+   "name": "CheckCommand.java",
+   "filePath": "src/main/java/exchangeserver/command/CheckCommand.java",
+   "summary": "Immutable CHECK checkpoint record (D70) carrying the 16-hex-digit output digest of all prior commands; replay compares it against its own digest instead of feeding it to the engine.",
+   "tags": [
+    "data-model",
+    "command",
+    "replay-verification",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "file",
+   "name": "Command.java",
+   "filePath": "src/main/java/exchangeserver/command/Command.java",
+   "summary": "Sealed interface for every stamped, journalled input command (NEW, CANCEL, CANCEL_ALL, SKIP, CHECK), exposing sequence number and timestamp as the source of truth for replay.",
+   "tags": [
+    "type-definition",
+    "command",
+    "sealed-interface",
+    "event-sourcing"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Java 17 sealed interface with a permits list: the type itself is the record kind, enabling exhaustive pattern matching."
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "file",
+   "name": "NewOrderCommand.java",
+   "filePath": "src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "summary": "Immutable NEW command record binding a validated OrderRequest to its sequencer-issued sequence number, timestamp and order id.",
+   "tags": [
+    "data-model",
+    "command",
+    "order",
+    "validation"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Java record with a compact canonical constructor used for invariant checks."
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+   "type": "file",
+   "name": "SkipCommand.java",
+   "filePath": "src/main/java/exchangeserver/command/SkipCommand.java",
+   "summary": "Immutable SKIP command record that quarantines an earlier poison-pill command (D51) so replay does not feed it, annotating rather than editing history.",
+   "tags": [
+    "data-model",
+    "command",
+    "poison-pill",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/core/CommandInterceptor.java",
+   "type": "file",
+   "name": "CommandInterceptor.java",
+   "filePath": "src/main/java/exchangeserver/core/CommandInterceptor.java",
+   "summary": "Package-private functional-interface test seam invoked just before the engine processes each command, live and in replay; production uses the no-op NONE.",
+   "tags": [
+    "test-seam",
+    "interface",
+    "hook",
+    "core"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/core/Pending.java",
+   "type": "file",
+   "name": "Pending.java",
+   "filePath": "src/main/java/exchangeserver/core/Pending.java",
+   "summary": "Package-private in-flight request holder pairing a Request with its own CompletableFuture result slot, plus the stamped command and a refused flag set by the writer thread.",
+   "tags": [
+    "concurrency",
+    "future",
+    "service",
+    "core"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Relies on queue put/take and future complete/get happens-before edges instead of volatile fields."
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/core/Replay.java",
+   "type": "file",
+   "name": "Replay.java",
+   "filePath": "src/main/java/exchangeserver/core/Replay.java",
+   "summary": "Rebuilds the Ledger from a snapshot plus the journal in two passes: verifies sequence/timestamp continuity and collects skips, then feeds non-skipped commands and checks every CHECK digest for divergence.",
+   "tags": [
+    "replay",
+    "recovery",
+    "determinism",
+    "core",
+    "service"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Uses a nested record for the result and a private Consumer<Command> verifier; pattern-matching instanceof selects command kinds."
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "file",
+   "name": "CommandJournal.java",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "summary": "The write-ahead command journal: locks the file, validates the header and rules version, cuts torn tails, appends batches with one write and one fsync, reads records back, and fail-stops after any I/O error.",
+   "tags": [
+    "journal",
+    "persistence",
+    "durability",
+    "write-ahead-log",
+    "recovery"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Uses NIO FileChannel with force() for fsync and a backwards block scan to find the last complete record."
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "type": "file",
+   "name": "JournalCodec.java",
+   "filePath": "src/main/java/exchangeserver/journal/JournalCodec.java",
+   "summary": "Text codec for journal format v3: encodes and decodes HEADER, NEW, CANCEL, CANCEL_ALL, SKIP and CHECK records, each sealed with a CRC-32C checksum, rebuilding requests through OrderRequest factories.",
+   "tags": [
+    "serialization",
+    "journal",
+    "codec",
+    "checksum",
+    "validation"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Pattern matching over the sealed Command hierarchy to encode each record kind."
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "type": "file",
+   "name": "ReplayTest.java",
+   "filePath": "src/test/java/exchangeserver/core/ReplayTest.java",
+   "summary": "Tests Replay's verification pass (gaps, repeats, backwards timestamps, missing snapshot), feeding pass (skips, stopBefore, rebuild) and CHECK digest comparison.",
+   "tags": [
+    "test",
+    "replay",
+    "recovery",
+    "junit"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "type": "file",
+   "name": "CommandJournalTest.java",
+   "filePath": "src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "summary": "Tests CommandJournal header handling, append/read round trips, torn-tail recovery, corrupt-record refusal, cross-process exclusivity and fail-stop behaviour.",
+   "tags": [
+    "test",
+    "journal",
+    "durability",
+    "junit"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "type": "file",
+   "name": "JournalCodecTest.java",
+   "filePath": "src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "summary": "Tests JournalCodec round trips for every record kind and header, exact sealed wire text, and rejection of corrupt, CRLF or checksum-failing records.",
+   "tags": [
+    "test",
+    "serialization",
+    "journal",
+    "junit"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/command/CheckCommand.java:CheckCommand",
+   "type": "class",
+   "name": "CheckCommand",
+   "filePath": "src/main/java/exchangeserver/command/CheckCommand.java",
+   "lineRange": [
+    16,
+    29
+   ],
+   "summary": "Record of a checkpoint digest; its constructor enforces a positive sequence number and a 16 lower-case hex digest.",
+   "tags": [
+    "data-model",
+    "command",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/command/Command.java:Command",
+   "type": "class",
+   "name": "Command",
+   "filePath": "src/main/java/exchangeserver/command/Command.java",
+   "lineRange": [
+    11,
+    16
+   ],
+   "summary": "Sealed command interface permitting the five journalled command records.",
+   "tags": [
+    "type-definition",
+    "command",
+    "sealed-interface"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/command/NewOrderCommand.java:NewOrderCommand",
+   "type": "class",
+   "name": "NewOrderCommand",
+   "filePath": "src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "lineRange": [
+    8,
+    21
+   ],
+   "summary": "Record of a new order with positive sequence number and order id and a non-null request.",
+   "tags": [
+    "data-model",
+    "command",
+    "order"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/command/SkipCommand.java:SkipCommand",
+   "type": "class",
+   "name": "SkipCommand",
+   "filePath": "src/main/java/exchangeserver/command/SkipCommand.java",
+   "lineRange": [
+    14,
+    25
+   ],
+   "summary": "Record that skips an earlier sequence number; the constructor refuses skipping itself or a later command.",
+   "tags": [
+    "data-model",
+    "command",
+    "poison-pill"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/core/Pending.java:Pending",
+   "type": "class",
+   "name": "Pending",
+   "filePath": "src/main/java/exchangeserver/core/Pending.java",
+   "lineRange": [
+    16,
+    36
+   ],
+   "summary": "Generic in-flight request wrapper with complete/fail helpers over its private CompletableFuture.",
+   "tags": [
+    "concurrency",
+    "future",
+    "core"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/core/Replay.java:Replay",
+   "type": "class",
+   "name": "Replay",
+   "filePath": "src/main/java/exchangeserver/core/Replay.java",
+   "lineRange": [
+    30,
+    131
+   ],
+   "summary": "Static-only replay utility exposing run, rebuild, snapshotFor and feed, plus a Result record and a private Verifier.",
+   "tags": [
+    "replay",
+    "recovery",
+    "determinism"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Replay.java:run",
+   "type": "function",
+   "name": "run",
+   "filePath": "src/main/java/exchangeserver/core/Replay.java",
+   "lineRange": [
+    39,
+    48
+   ],
+   "summary": "Full replay: loads the base snapshot, verifies the journal, then feeds it into a fresh Ledger and returns counters for the sequencer.",
+   "tags": [
+    "replay",
+    "recovery",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Replay.java:snapshotFor",
+   "type": "function",
+   "name": "snapshotFor",
+   "filePath": "src/main/java/exchangeserver/core/Replay.java",
+   "lineRange": [
+    59,
+    69
+   ],
+   "summary": "Returns the empty snapshot for base 0, otherwise reads the snapshot file the header names and checks its last sequence matches.",
+   "tags": [
+    "snapshot",
+    "recovery",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Replay.java:feed",
+   "type": "function",
+   "name": "feed",
+   "filePath": "src/main/java/exchangeserver/core/Replay.java",
+   "lineRange": [
+    72,
+    99
+   ],
+   "summary": "Feeds every non-skipped command below stopBefore to the ledger, raising DIVERGED on a CHECK digest mismatch and ENGINE_FAILURE when the engine throws.",
+   "tags": [
+    "replay",
+    "determinism",
+    "error-handling"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/journal/CommandJournal.java:CommandJournal",
+   "type": "class",
+   "name": "CommandJournal",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    46,
+    317
+   ],
+   "summary": "AutoCloseable write-ahead journal owning the file channel, lock, base sequence and fail-stop flag.",
+   "tags": [
+    "journal",
+    "persistence",
+    "durability"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:open",
+   "type": "function",
+   "name": "open",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    75,
+    88
+   ],
+   "summary": "Opens (or creates) a journal: acquires the JournalLock, then delegates to openLocked; an overload accepts an already-held lock.",
+   "tags": [
+    "factory",
+    "journal",
+    "locking"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:openLocked",
+   "type": "function",
+   "name": "openLocked",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    98,
+    127
+   ],
+   "summary": "Checks the header and rules version before changing anything, adopts new rules for an empty journal, writes a header if missing and cuts any torn tail.",
+   "tags": [
+    "journal",
+    "recovery",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:writeFresh",
+   "type": "function",
+   "name": "writeFresh",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    130,
+    132
+   ],
+   "summary": "Atomically writes a fresh journal containing only a header with the given base sequence (used by compaction).",
+   "tags": [
+    "journal",
+    "compaction",
+    "durability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:openJournals",
+   "type": "function",
+   "name": "openJournals",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    134,
+    136
+   ],
+   "summary": "Diagnostic count of journals open in this JVM, used by tests to prove handles were released.",
+   "tags": [
+    "diagnostics",
+    "test-support"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:append",
+   "type": "function",
+   "name": "append",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    138,
+    140
+   ],
+   "summary": "Appends a single command by delegating to appendAll.",
+   "tags": [
+    "journal",
+    "persistence"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:appendAll",
+   "type": "function",
+   "name": "appendAll",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    143,
+    166
+   ],
+   "summary": "Encodes a whole batch, writes it in one call and fsyncs once; marks the journal failed on any I/O error and refuses later appends.",
+   "tags": [
+    "journal",
+    "durability",
+    "fsync",
+    "batching"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:read",
+   "type": "function",
+   "name": "read",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    169,
+    200
+   ],
+   "summary": "Streams every record through its own input stream, skipping the header and decoding each line into a Command for the consumer.",
+   "tags": [
+    "journal",
+    "deserialization",
+    "streaming"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:baseSequence",
+   "type": "function",
+   "name": "baseSequence",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    203,
+    205
+   ],
+   "summary": "Returns the snapshot base sequence named in the header.",
+   "tags": [
+    "accessor",
+    "journal"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:hasFailed",
+   "type": "function",
+   "name": "hasFailed",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    207,
+    209
+   ],
+   "summary": "Reports whether a write or fsync has failed (fail-stop state).",
+   "tags": [
+    "accessor",
+    "fail-stop"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:getTruncatedBytesOnOpen",
+   "type": "function",
+   "name": "getTruncatedBytesOnOpen",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    211,
+    213
+   ],
+   "summary": "Returns how many torn-tail bytes were cut on open.",
+   "tags": [
+    "accessor",
+    "recovery"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:adoptedRulesFrom",
+   "type": "function",
+   "name": "adoptedRulesFrom",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    216,
+    218
+   ],
+   "summary": "Returns the old rules version an empty journal adopted from, or 0.",
+   "tags": [
+    "accessor",
+    "versioning"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:close",
+   "type": "function",
+   "name": "close",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    221,
+    233
+   ],
+   "summary": "Idempotently closes the channel and releases the owned lock, decrementing the open-journal counter.",
+   "tags": [
+    "lifecycle",
+    "journal",
+    "locking"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:checkHeader",
+   "type": "function",
+   "name": "checkHeader",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    241,
+    260
+   ],
+   "summary": "Reads the first record and validates it as a journal header with a matching rules version, refusing foreign or mismatched files unchanged.",
+   "tags": [
+    "validation",
+    "journal",
+    "versioning"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:cutTornTail",
+   "type": "function",
+   "name": "cutTornTail",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    263,
+    273
+   ],
+   "summary": "Truncates bytes after the last complete record and fsyncs the cut, returning the number of bytes removed.",
+   "tags": [
+    "recovery",
+    "durability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:endOfLastCompleteRecord",
+   "type": "function",
+   "name": "endOfLastCompleteRecord",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    277,
+    297
+   ],
+   "summary": "Scans the file backwards in blocks to find the offset just past the last newline-terminated record.",
+   "tags": [
+    "recovery",
+    "io",
+    "scanning"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/CommandJournal.java:readFirstRecord",
+   "type": "function",
+   "name": "readFirstRecord",
+   "filePath": "src/main/java/exchangeserver/journal/CommandJournal.java",
+   "lineRange": [
+    299,
+    316
+   ],
+   "summary": "Reads bytes up to the first newline, reporting whether the record was complete and the file size.",
+   "tags": [
+    "io",
+    "journal",
+    "header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/journal/JournalCodec.java:JournalCodec",
+   "type": "class",
+   "name": "JournalCodec",
+   "filePath": "src/main/java/exchangeserver/journal/JournalCodec.java",
+   "lineRange": [
+    39,
+    194
+   ],
+   "summary": "Package-private static codec holding format constants, the Header record, and encode/decode/seal/unseal functions.",
+   "tags": [
+    "serialization",
+    "codec",
+    "journal"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/JournalCodec.java:decodeHeader",
+   "type": "function",
+   "name": "decodeHeader",
+   "filePath": "src/main/java/exchangeserver/journal/JournalCodec.java",
+   "lineRange": [
+    63,
+    85
+   ],
+   "summary": "Parses and validates a sealed HEADER record into a format-checked rules version and base sequence.",
+   "tags": [
+    "deserialization",
+    "validation",
+    "header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/JournalCodec.java:encode",
+   "type": "function",
+   "name": "encode",
+   "filePath": "src/main/java/exchangeserver/journal/JournalCodec.java",
+   "lineRange": [
+    87,
+    127
+   ],
+   "summary": "Encodes any Command into its sealed comma-separated record, writing a dash as a MARKET order's price.",
+   "tags": [
+    "serialization",
+    "codec"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/JournalCodec.java:decode",
+   "type": "function",
+   "name": "decode",
+   "filePath": "src/main/java/exchangeserver/journal/JournalCodec.java",
+   "lineRange": [
+    130,
+    163
+   ],
+   "summary": "Unseals and parses a record into the matching Command, rebuilding orders via OrderRequest factories; any failure becomes IllegalStateException for corrupt data.",
+   "tags": [
+    "deserialization",
+    "validation",
+    "codec"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/journal/JournalCodec.java:unseal",
+   "type": "function",
+   "name": "unseal",
+   "filePath": "src/main/java/exchangeserver/journal/JournalCodec.java",
+   "lineRange": [
+    171,
+    187
+   ],
+   "summary": "Verifies and strips the trailing CRC-32C, with a specific error for CRLF-converted files.",
+   "tags": [
+    "checksum",
+    "validation",
+    "integrity"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/core/ReplayTest.java:ReplayTest",
+   "type": "class",
+   "name": "ReplayTest",
+   "filePath": "src/test/java/exchangeserver/core/ReplayTest.java",
+   "lineRange": [
+    28,
+    217
+   ],
+   "summary": "JUnit test class with Verify, Feed and Check nested groups for Replay.",
+   "tags": [
+    "test",
+    "replay",
+    "junit"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/journal/CommandJournalTest.java:CommandJournalTest",
+   "type": "class",
+   "name": "CommandJournalTest",
+   "filePath": "src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "lineRange": [
+    27,
+    343
+   ],
+   "summary": "JUnit test class with Header, AppendAndRead, Recovery, Exclusive and FailStop nested groups.",
+   "tags": [
+    "test",
+    "journal",
+    "junit"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/journal/JournalCodecTest.java:JournalCodecTest",
+   "type": "class",
+   "name": "JournalCodecTest",
+   "filePath": "src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "lineRange": [
+    22,
+    195
+   ],
+   "summary": "JUnit test class with RoundTrip, Header and corruption-rejection nested groups for JournalCodec.",
+   "tags": [
+    "test",
+    "serialization",
+    "junit"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+   "target": "class:src/main/java/exchangeserver/command/CheckCommand.java:CheckCommand",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+   "target": "class:src/main/java/exchangeserver/command/CheckCommand.java:CheckCommand",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Command.java",
+   "target": "class:src/main/java/exchangeserver/command/Command.java:Command",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Command.java",
+   "target": "class:src/main/java/exchangeserver/command/Command.java:Command",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "target": "class:src/main/java/exchangeserver/command/NewOrderCommand.java:NewOrderCommand",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "target": "class:src/main/java/exchangeserver/command/NewOrderCommand.java:NewOrderCommand",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+   "target": "class:src/main/java/exchangeserver/command/SkipCommand.java:SkipCommand",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+   "target": "class:src/main/java/exchangeserver/command/SkipCommand.java:SkipCommand",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Pending.java",
+   "target": "class:src/main/java/exchangeserver/core/Pending.java:Pending",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "class:src/main/java/exchangeserver/core/Replay.java:Replay",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "function:src/main/java/exchangeserver/core/Replay.java:run",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "function:src/main/java/exchangeserver/core/Replay.java:snapshotFor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "function:src/main/java/exchangeserver/core/Replay.java:feed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "class:src/main/java/exchangeserver/journal/CommandJournal.java:CommandJournal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "class:src/main/java/exchangeserver/journal/CommandJournal.java:CommandJournal",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:open",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:open",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:openLocked",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:writeFresh",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:writeFresh",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:openJournals",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:openJournals",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:append",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:append",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:appendAll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:appendAll",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:read",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:read",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:baseSequence",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:baseSequence",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:hasFailed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:hasFailed",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:getTruncatedBytesOnOpen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:getTruncatedBytesOnOpen",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:adoptedRulesFrom",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:adoptedRulesFrom",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:close",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:close",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:checkHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:cutTornTail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:endOfLastCompleteRecord",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:readFirstRecord",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "class:src/main/java/exchangeserver/journal/JournalCodec.java:JournalCodec",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "function:src/main/java/exchangeserver/journal/JournalCodec.java:decodeHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "function:src/main/java/exchangeserver/journal/JournalCodec.java:encode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "function:src/main/java/exchangeserver/journal/JournalCodec.java:decode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "function:src/main/java/exchangeserver/journal/JournalCodec.java:unseal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "target": "class:src/test/java/exchangeserver/core/ReplayTest.java:ReplayTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "target": "class:src/test/java/exchangeserver/journal/CommandJournalTest.java:CommandJournalTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "target": "class:src/test/java/exchangeserver/journal/JournalCodecTest.java:JournalCodecTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/CommandInterceptor.java",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Pending.java",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "target": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "target": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "class:src/main/java/exchangeserver/command/CheckCommand.java:CheckCommand",
+   "target": "class:src/main/java/exchangeserver/command/Command.java:Command",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:src/main/java/exchangeserver/command/NewOrderCommand.java:NewOrderCommand",
+   "target": "class:src/main/java/exchangeserver/command/Command.java:Command",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:src/main/java/exchangeserver/command/SkipCommand.java:SkipCommand",
+   "target": "class:src/main/java/exchangeserver/command/Command.java:Command",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/journal/CommandJournal.java:appendAll",
+   "target": "function:src/main/java/exchangeserver/journal/JournalCodec.java:encode",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/journal/CommandJournal.java:read",
+   "target": "function:src/main/java/exchangeserver/journal/JournalCodec.java:decode",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/journal/CommandJournal.java:checkHeader",
+   "target": "function:src/main/java/exchangeserver/journal/JournalCodec.java:decodeHeader",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/journal/CommandJournal.java:openLocked",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:checkHeader",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Replay.java:run",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:read",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Replay.java:feed",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:read",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Replay.java:snapshotFor",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:baseSequence",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "file:src/main/java/exchangeserver/core/Ledger.java",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "file:src/main/java/exchangeserver/core/CommandInterceptor.java",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Replay.java",
+   "target": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "target": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "target": "file:src/test/java/exchangeserver/journal/JournalCodecTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

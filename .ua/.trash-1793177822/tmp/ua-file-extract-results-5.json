@@ -1,0 +1,2640 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 11,
+  "filesSkipped": [],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 11,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 11,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "results": [
+    {
+      "path": "src/main/java/exchangeserver/book/Fill.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 13,
+      "nonEmptyLines": 9,
+      "classes": [
+        {
+          "name": "Fill",
+          "startLine": 11,
+          "endLine": 13,
+          "methods": [],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Fill",
+          "line": 11,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/book/RestingOrderView.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 20,
+      "nonEmptyLines": 14,
+      "functions": [
+        {
+          "name": "remainingQuantity",
+          "startLine": 17,
+          "endLine": 19,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "RestingOrderView",
+          "startLine": 14,
+          "endLine": 20,
+          "methods": [
+            "remainingQuantity"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "remainingQuantity",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "RestingOrderView",
+          "line": 14,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 2,
+        "functionCount": 1,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/core/Snapshot.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 137,
+      "nonEmptyLines": 118,
+      "functions": [
+        {
+          "name": "empty",
+          "startLine": 52,
+          "endLine": 54,
+          "params": []
+        },
+        {
+          "name": "engineState",
+          "startLine": 56,
+          "endLine": 58,
+          "params": []
+        },
+        {
+          "name": "path",
+          "startLine": 60,
+          "endLine": 62,
+          "params": [
+            "journal",
+            "lastSequence"
+          ]
+        },
+        {
+          "name": "write",
+          "startLine": 64,
+          "endLine": 77,
+          "params": [
+            "file"
+          ]
+        },
+        {
+          "name": "read",
+          "startLine": 79,
+          "endLine": 116,
+          "params": [
+            "file"
+          ]
+        },
+        {
+          "name": "line",
+          "startLine": 118,
+          "endLine": 120,
+          "params": [
+            "sb",
+            "text"
+          ]
+        },
+        {
+          "name": "fields",
+          "startLine": 122,
+          "endLine": 136,
+          "params": [
+            "lines",
+            "index",
+            "type",
+            "count"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Snapshot",
+          "startLine": 41,
+          "endLine": 137,
+          "methods": [
+            "empty",
+            "engineState",
+            "path",
+            "write",
+            "read",
+            "line",
+            "fields"
+          ],
+          "properties": [
+            "FORMAT_VERSION"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "empty",
+          "callee": "new Snapshot",
+          "lineNumber": 53
+        },
+        {
+          "caller": "empty",
+          "callee": "new OutputDigest().hex",
+          "lineNumber": 53
+        },
+        {
+          "caller": "empty",
+          "callee": "new OutputDigest",
+          "lineNumber": 53
+        },
+        {
+          "caller": "empty",
+          "callee": "List.of",
+          "lineNumber": 53
+        },
+        {
+          "caller": "empty",
+          "callee": "Map.of",
+          "lineNumber": 53
+        },
+        {
+          "caller": "engineState",
+          "callee": "new EngineState",
+          "lineNumber": 57
+        },
+        {
+          "caller": "path",
+          "callee": "journal.resolveSibling",
+          "lineNumber": 61
+        },
+        {
+          "caller": "path",
+          "callee": "journal.getFileName",
+          "lineNumber": 61
+        },
+        {
+          "caller": "write",
+          "callee": "new StringBuilder",
+          "lineNumber": 65
+        },
+        {
+          "caller": "write",
+          "callee": "line",
+          "lineNumber": 66
+        },
+        {
+          "caller": "write",
+          "callee": "lastTimestamp.toString",
+          "lineNumber": 67
+        },
+        {
+          "caller": "write",
+          "callee": "line",
+          "lineNumber": 69
+        },
+        {
+          "caller": "write",
+          "callee": "o.orderId",
+          "lineNumber": 69
+        },
+        {
+          "caller": "write",
+          "callee": "o.participant",
+          "lineNumber": 69
+        },
+        {
+          "caller": "write",
+          "callee": "o.clientOrderId",
+          "lineNumber": 69
+        },
+        {
+          "caller": "write",
+          "callee": "o.side",
+          "lineNumber": 69
+        },
+        {
+          "caller": "write",
+          "callee": "o.orderType",
+          "lineNumber": 70
+        },
+        {
+          "caller": "write",
+          "callee": "o.price",
+          "lineNumber": 70
+        },
+        {
+          "caller": "write",
+          "callee": "o.originalQuantity",
+          "lineNumber": 70
+        },
+        {
+          "caller": "write",
+          "callee": "o.filledQuantity",
+          "lineNumber": 70
+        },
+        {
+          "caller": "write",
+          "callee": "o.timestamp",
+          "lineNumber": 71
+        },
+        {
+          "caller": "write",
+          "callee": "new TreeMap<>",
+          "lineNumber": 73
+        },
+        {
+          "caller": "write",
+          "callee": "sorted.forEach",
+          "lineNumber": 74
+        },
+        {
+          "caller": "write",
+          "callee": "line",
+          "lineNumber": 74
+        },
+        {
+          "caller": "write",
+          "callee": "line",
+          "lineNumber": 75
+        },
+        {
+          "caller": "write",
+          "callee": "orders.size",
+          "lineNumber": 75
+        },
+        {
+          "caller": "write",
+          "callee": "sorted.size",
+          "lineNumber": 75
+        },
+        {
+          "caller": "write",
+          "callee": "Durable.writeAtomically",
+          "lineNumber": 76
+        },
+        {
+          "caller": "write",
+          "callee": "sb.toString",
+          "lineNumber": 76
+        },
+        {
+          "caller": "read",
+          "callee": "Files.exists",
+          "lineNumber": 80
+        },
+        {
+          "caller": "read",
+          "callee": "new IllegalStateException",
+          "lineNumber": 81
+        },
+        {
+          "caller": "read",
+          "callee": "Files.readAllLines",
+          "lineNumber": 83
+        },
+        {
+          "caller": "read",
+          "callee": "fields",
+          "lineNumber": 86
+        },
+        {
+          "caller": "read",
+          "callee": "Integer.parseInt",
+          "lineNumber": 87
+        },
+        {
+          "caller": "read",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 88
+        },
+        {
+          "caller": "read",
+          "callee": "Long.parseLong",
+          "lineNumber": 90
+        },
+        {
+          "caller": "read",
+          "callee": "Long.parseLong",
+          "lineNumber": 91
+        },
+        {
+          "caller": "read",
+          "callee": "h[4].equals",
+          "lineNumber": 92
+        },
+        {
+          "caller": "read",
+          "callee": "Instant.parse",
+          "lineNumber": 92
+        },
+        {
+          "caller": "read",
+          "callee": "Long.parseLong",
+          "lineNumber": 93
+        },
+        {
+          "caller": "read",
+          "callee": "OutputDigest.resume",
+          "lineNumber": 95
+        },
+        {
+          "caller": "read",
+          "callee": "new ArrayList<>",
+          "lineNumber": 97
+        },
+        {
+          "caller": "read",
+          "callee": "lines.size",
+          "lineNumber": 98
+        },
+        {
+          "caller": "read",
+          "callee": "lines.get(n).startsWith",
+          "lineNumber": 98
+        },
+        {
+          "caller": "read",
+          "callee": "lines.get",
+          "lineNumber": 98
+        },
+        {
+          "caller": "read",
+          "callee": "fields",
+          "lineNumber": 99
+        },
+        {
+          "caller": "read",
+          "callee": "orders.add",
+          "lineNumber": 100
+        },
+        {
+          "caller": "read",
+          "callee": "new RestingOrderView",
+          "lineNumber": 100
+        },
+        {
+          "caller": "read",
+          "callee": "Long.parseLong",
+          "lineNumber": 100
+        },
+        {
+          "caller": "read",
+          "callee": "Side.valueOf",
+          "lineNumber": 100
+        },
+        {
+          "caller": "read",
+          "callee": "OrderType.valueOf",
+          "lineNumber": 100
+        },
+        {
+          "caller": "read",
+          "callee": "Long.parseLong",
+          "lineNumber": 101
+        },
+        {
+          "caller": "read",
+          "callee": "Long.parseLong",
+          "lineNumber": 101
+        },
+        {
+          "caller": "read",
+          "callee": "Long.parseLong",
+          "lineNumber": 101
+        },
+        {
+          "caller": "read",
+          "callee": "Instant.parse",
+          "lineNumber": 101
+        },
+        {
+          "caller": "read",
+          "callee": "new TreeMap<>",
+          "lineNumber": 103
+        },
+        {
+          "caller": "read",
+          "callee": "lines.size",
+          "lineNumber": 104
+        },
+        {
+          "caller": "read",
+          "callee": "lines.get(n).startsWith",
+          "lineNumber": 104
+        },
+        {
+          "caller": "read",
+          "callee": "lines.get",
+          "lineNumber": 104
+        },
+        {
+          "caller": "read",
+          "callee": "fields",
+          "lineNumber": 105
+        },
+        {
+          "caller": "read",
+          "callee": "lastOseqs.put",
+          "lineNumber": 106
+        },
+        {
+          "caller": "read",
+          "callee": "Long.parseLong",
+          "lineNumber": 106
+        },
+        {
+          "caller": "read",
+          "callee": "fields",
+          "lineNumber": 108
+        },
+        {
+          "caller": "read",
+          "callee": "Long.parseLong",
+          "lineNumber": 109
+        },
+        {
+          "caller": "read",
+          "callee": "orders.size",
+          "lineNumber": 109
+        },
+        {
+          "caller": "read",
+          "callee": "Long.parseLong",
+          "lineNumber": 109
+        },
+        {
+          "caller": "read",
+          "callee": "lastOseqs.size",
+          "lineNumber": 109
+        },
+        {
+          "caller": "read",
+          "callee": "lines.size",
+          "lineNumber": 109
+        },
+        {
+          "caller": "read",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 110
+        },
+        {
+          "caller": "read",
+          "callee": "new Snapshot",
+          "lineNumber": 112
+        },
+        {
+          "caller": "read",
+          "callee": "new IllegalStateException",
+          "lineNumber": 114
+        },
+        {
+          "caller": "read",
+          "callee": "e.getMessage",
+          "lineNumber": 114
+        },
+        {
+          "caller": "line",
+          "callee": "sb.append(text).append(',').append(Checksums.crcHex(text)).append",
+          "lineNumber": 119
+        },
+        {
+          "caller": "line",
+          "callee": "sb.append(text).append(',').append",
+          "lineNumber": 119
+        },
+        {
+          "caller": "line",
+          "callee": "sb.append(text).append",
+          "lineNumber": 119
+        },
+        {
+          "caller": "line",
+          "callee": "sb.append",
+          "lineNumber": 119
+        },
+        {
+          "caller": "line",
+          "callee": "Checksums.crcHex",
+          "lineNumber": 119
+        },
+        {
+          "caller": "fields",
+          "callee": "lines.size",
+          "lineNumber": 123
+        },
+        {
+          "caller": "fields",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 124
+        },
+        {
+          "caller": "fields",
+          "callee": "lines.get",
+          "lineNumber": 126
+        },
+        {
+          "caller": "fields",
+          "callee": "record.lastIndexOf",
+          "lineNumber": 127
+        },
+        {
+          "caller": "fields",
+          "callee": "Checksums.crcHex(record.substring(0, comma)).equals",
+          "lineNumber": 128
+        },
+        {
+          "caller": "fields",
+          "callee": "Checksums.crcHex",
+          "lineNumber": 128
+        },
+        {
+          "caller": "fields",
+          "callee": "record.substring",
+          "lineNumber": 128
+        },
+        {
+          "caller": "fields",
+          "callee": "record.substring",
+          "lineNumber": 128
+        },
+        {
+          "caller": "fields",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 129
+        },
+        {
+          "caller": "fields",
+          "callee": "record.substring(0, comma).split",
+          "lineNumber": 131
+        },
+        {
+          "caller": "fields",
+          "callee": "record.substring",
+          "lineNumber": 131
+        },
+        {
+          "caller": "fields",
+          "callee": "f[0].equals",
+          "lineNumber": 132
+        },
+        {
+          "caller": "fields",
+          "callee": "new IllegalArgumentException",
+          "lineNumber": 133
+        }
+      ],
+      "metrics": {
+        "importCount": 6,
+        "exportCount": 0,
+        "functionCount": 7,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/domain/OrderType.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 23,
+      "nonEmptyLines": 19,
+      "functions": [
+        {
+          "name": "canRest",
+          "startLine": 20,
+          "endLine": 22,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "OrderType",
+          "startLine": 12,
+          "endLine": 23,
+          "methods": [
+            "canRest"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "canRest",
+          "line": 20,
+          "isDefault": false
+        },
+        {
+          "name": "OrderType",
+          "line": 12,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 1,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/domain/Side.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 10,
+      "nonEmptyLines": 8,
+      "functions": [
+        {
+          "name": "opposite",
+          "startLine": 7,
+          "endLine": 9,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "Side",
+          "startLine": 3,
+          "endLine": 10,
+          "methods": [
+            "opposite"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "opposite",
+          "line": 7,
+          "isDefault": false
+        },
+        {
+          "name": "Side",
+          "line": 3,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 1,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/engine/EngineState.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 22,
+      "nonEmptyLines": 16,
+      "classes": [
+        {
+          "name": "EngineState",
+          "startLine": 14,
+          "endLine": 22,
+          "methods": [],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "EngineState",
+          "line": 14,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/gateway/ClientMessage.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 40,
+      "nonEmptyLines": 29,
+      "classes": [
+        {
+          "name": "ClientMessage",
+          "startLine": 9,
+          "endLine": 40,
+          "methods": [],
+          "properties": []
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/main/java/exchangeserver/journal/Checksums.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 18,
+      "nonEmptyLines": 13,
+      "functions": [
+        {
+          "name": "Checksums",
+          "startLine": 10,
+          "endLine": 11,
+          "params": []
+        },
+        {
+          "name": "crcHex",
+          "startLine": 13,
+          "endLine": 17,
+          "params": [
+            "text"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Checksums",
+          "startLine": 8,
+          "endLine": 18,
+          "methods": [
+            "Checksums",
+            "crcHex"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "crcHex",
+          "line": 13,
+          "isDefault": false
+        },
+        {
+          "name": "Checksums",
+          "line": 8,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "crcHex",
+          "callee": "new CRC32C",
+          "lineNumber": 14
+        },
+        {
+          "caller": "crcHex",
+          "callee": "crc.update",
+          "lineNumber": 15
+        },
+        {
+          "caller": "crcHex",
+          "callee": "text.getBytes",
+          "lineNumber": 15
+        },
+        {
+          "caller": "crcHex",
+          "callee": "String.format",
+          "lineNumber": 16
+        },
+        {
+          "caller": "crcHex",
+          "callee": "crc.getValue",
+          "lineNumber": 16
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/test/java/exchangeserver/book/PriceLevelTest.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 256,
+      "nonEmptyLines": 221,
+      "functions": [
+        {
+          "name": "sell",
+          "startLine": 24,
+          "endLine": 26,
+          "params": [
+            "id",
+            "price",
+            "qty"
+          ]
+        },
+        {
+          "name": "orders",
+          "startLine": 29,
+          "endLine": 35,
+          "params": []
+        },
+        {
+          "name": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "startLine": 242,
+          "endLine": 250,
+          "params": []
+        },
+        {
+          "name": "realNodeNeedsAnOrder",
+          "startLine": 252,
+          "endLine": 255,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "PriceLevelTest",
+          "startLine": 18,
+          "endLine": 256,
+          "methods": [
+            "sell",
+            "orders",
+            "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+            "realNodeNeedsAnOrder"
+          ],
+          "properties": [
+            "T",
+            "level"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "sell",
+          "callee": "new Order",
+          "lineNumber": 25
+        },
+        {
+          "caller": "sell",
+          "callee": "OrderRequest.limit",
+          "lineNumber": 25
+        },
+        {
+          "caller": "orders",
+          "callee": "level.ordersHeadToTail",
+          "lineNumber": 30
+        },
+        {
+          "caller": "orders",
+          "callee": "level.ordersTailToHead",
+          "lineNumber": 31
+        },
+        {
+          "caller": "orders",
+          "callee": "java.util.Collections.reverse",
+          "lineNumber": 32
+        },
+        {
+          "caller": "orders",
+          "callee": "assertEquals",
+          "lineNumber": 33
+        },
+        {
+          "caller": "newLevelIsEmpty",
+          "callee": "assertTrue",
+          "lineNumber": 42
+        },
+        {
+          "caller": "newLevelIsEmpty",
+          "callee": "level.isEmpty",
+          "lineNumber": 42
+        },
+        {
+          "caller": "newLevelIsEmpty",
+          "callee": "assertEquals",
+          "lineNumber": 43
+        },
+        {
+          "caller": "newLevelIsEmpty",
+          "callee": "level.getTotalVolume",
+          "lineNumber": 43
+        },
+        {
+          "caller": "newLevelIsEmpty",
+          "callee": "assertEquals",
+          "lineNumber": 44
+        },
+        {
+          "caller": "newLevelIsEmpty",
+          "callee": "level.getOrderCount",
+          "lineNumber": 44
+        },
+        {
+          "caller": "newLevelIsEmpty",
+          "callee": "assertNull",
+          "lineNumber": 45
+        },
+        {
+          "caller": "newLevelIsEmpty",
+          "callee": "level.headNode",
+          "lineNumber": 45
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "sell",
+          "lineNumber": 50
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "sell",
+          "lineNumber": 51
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "sell",
+          "lineNumber": 52
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "level.addOrder",
+          "lineNumber": 53
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "level.addOrder",
+          "lineNumber": 54
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "level.addOrder",
+          "lineNumber": 55
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "assertEquals",
+          "lineNumber": 56
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "List.of",
+          "lineNumber": 56
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "orders",
+          "lineNumber": 56
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "assertEquals",
+          "lineNumber": 57
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "level.getTotalVolume",
+          "lineNumber": 57
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "assertEquals",
+          "lineNumber": 58
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "level.getOrderCount",
+          "lineNumber": 58
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "assertSame",
+          "lineNumber": 59
+        },
+        {
+          "caller": "appendsInTimePriorityAndKeepsTotals",
+          "callee": "level.headNode",
+          "lineNumber": 59
+        },
+        {
+          "caller": "returnsTheLinkedNode",
+          "callee": "sell",
+          "lineNumber": 64
+        },
+        {
+          "caller": "returnsTheLinkedNode",
+          "callee": "level.addOrder",
+          "lineNumber": 65
+        },
+        {
+          "caller": "returnsTheLinkedNode",
+          "callee": "assertSame",
+          "lineNumber": 66
+        },
+        {
+          "caller": "returnsTheLinkedNode",
+          "callee": "assertSame",
+          "lineNumber": 67
+        },
+        {
+          "caller": "rejectsWrongPriceOrSideWithoutChange",
+          "callee": "assertThrows",
+          "lineNumber": 72
+        },
+        {
+          "caller": "rejectsWrongPriceOrSideWithoutChange",
+          "callee": "level.addOrder",
+          "lineNumber": 72
+        },
+        {
+          "caller": "rejectsWrongPriceOrSideWithoutChange",
+          "callee": "sell",
+          "lineNumber": 72
+        },
+        {
+          "caller": "rejectsWrongPriceOrSideWithoutChange",
+          "callee": "new Order",
+          "lineNumber": 73
+        },
+        {
+          "caller": "rejectsWrongPriceOrSideWithoutChange",
+          "callee": "OrderRequest.limit",
+          "lineNumber": 73
+        },
+        {
+          "caller": "rejectsWrongPriceOrSideWithoutChange",
+          "callee": "assertThrows",
+          "lineNumber": 74
+        },
+        {
+          "caller": "rejectsWrongPriceOrSideWithoutChange",
+          "callee": "level.addOrder",
+          "lineNumber": 74
+        },
+        {
+          "caller": "rejectsWrongPriceOrSideWithoutChange",
+          "callee": "assertTrue",
+          "lineNumber": 75
+        },
+        {
+          "caller": "rejectsWrongPriceOrSideWithoutChange",
+          "callee": "level.isEmpty",
+          "lineNumber": 75
+        },
+        {
+          "caller": "rejectsWrongPriceOrSideWithoutChange",
+          "callee": "assertEquals",
+          "lineNumber": 76
+        },
+        {
+          "caller": "rejectsWrongPriceOrSideWithoutChange",
+          "callee": "level.getTotalVolume",
+          "lineNumber": 76
+        },
+        {
+          "caller": "rejectsAnExhaustedOrder",
+          "callee": "sell",
+          "lineNumber": 81
+        },
+        {
+          "caller": "rejectsAnExhaustedOrder",
+          "callee": "a.fill",
+          "lineNumber": 82
+        },
+        {
+          "caller": "rejectsAnExhaustedOrder",
+          "callee": "assertThrows",
+          "lineNumber": 83
+        },
+        {
+          "caller": "rejectsAnExhaustedOrder",
+          "callee": "level.addOrder",
+          "lineNumber": 83
+        },
+        {
+          "caller": "rejectsAnExhaustedOrder",
+          "callee": "assertTrue",
+          "lineNumber": 84
+        },
+        {
+          "caller": "rejectsAnExhaustedOrder",
+          "callee": "level.isEmpty",
+          "lineNumber": 84
+        },
+        {
+          "caller": "addsRemainingNotOriginalQuantity",
+          "callee": "sell",
+          "lineNumber": 89
+        },
+        {
+          "caller": "addsRemainingNotOriginalQuantity",
+          "callee": "a.fill",
+          "lineNumber": 90
+        },
+        {
+          "caller": "addsRemainingNotOriginalQuantity",
+          "callee": "level.addOrder",
+          "lineNumber": 91
+        },
+        {
+          "caller": "addsRemainingNotOriginalQuantity",
+          "callee": "assertEquals",
+          "lineNumber": 92
+        },
+        {
+          "caller": "addsRemainingNotOriginalQuantity",
+          "callee": "level.getTotalVolume",
+          "lineNumber": 92
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "sell",
+          "lineNumber": 101
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "level.addOrder",
+          "lineNumber": 102
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "level.addOrder",
+          "lineNumber": 103
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "sell",
+          "lineNumber": 103
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "assertEquals",
+          "lineNumber": 104
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "level.fillHead",
+          "lineNumber": 104
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "assertEquals",
+          "lineNumber": 105
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "a.getRemainingQuantity",
+          "lineNumber": 105
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "assertEquals",
+          "lineNumber": 106
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "level.getTotalVolume",
+          "lineNumber": 106
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "assertSame",
+          "lineNumber": 107
+        },
+        {
+          "caller": "partialFillKeepsTheHead",
+          "callee": "level.headNode",
+          "lineNumber": 107
+        },
+        {
+          "caller": "fillsAtMostTheHeadsRemainder",
+          "callee": "sell",
+          "lineNumber": 112
+        },
+        {
+          "caller": "fillsAtMostTheHeadsRemainder",
+          "callee": "level.addOrder",
+          "lineNumber": 113
+        },
+        {
+          "caller": "fillsAtMostTheHeadsRemainder",
+          "callee": "level.addOrder",
+          "lineNumber": 114
+        },
+        {
+          "caller": "fillsAtMostTheHeadsRemainder",
+          "callee": "sell",
+          "lineNumber": 114
+        },
+        {
+          "caller": "fillsAtMostTheHeadsRemainder",
+          "callee": "assertEquals",
+          "lineNumber": 115
+        },
+        {
+          "caller": "fillsAtMostTheHeadsRemainder",
+          "callee": "level.fillHead",
+          "lineNumber": 115
+        },
+        {
+          "caller": "fillsAtMostTheHeadsRemainder",
+          "callee": "assertEquals",
+          "lineNumber": 116
+        },
+        {
+          "caller": "fillsAtMostTheHeadsRemainder",
+          "callee": "a.getRemainingQuantity",
+          "lineNumber": 116
+        },
+        {
+          "caller": "fillsAtMostTheHeadsRemainder",
+          "callee": "assertEquals",
+          "lineNumber": 117
+        },
+        {
+          "caller": "fillsAtMostTheHeadsRemainder",
+          "callee": "level.getTotalVolume",
+          "lineNumber": 117
+        },
+        {
+          "caller": "neverRemovesAnExhaustedHead",
+          "callee": "sell",
+          "lineNumber": 122
+        },
+        {
+          "caller": "neverRemovesAnExhaustedHead",
+          "callee": "level.addOrder",
+          "lineNumber": 123
+        },
+        {
+          "caller": "neverRemovesAnExhaustedHead",
+          "callee": "level.fillHead",
+          "lineNumber": 124
+        },
+        {
+          "caller": "neverRemovesAnExhaustedHead",
+          "callee": "assertEquals",
+          "lineNumber": 125
+        },
+        {
+          "caller": "neverRemovesAnExhaustedHead",
+          "callee": "level.getOrderCount",
+          "lineNumber": 125
+        },
+        {
+          "caller": "neverRemovesAnExhaustedHead",
+          "callee": "assertSame",
+          "lineNumber": 126
+        },
+        {
+          "caller": "neverRemovesAnExhaustedHead",
+          "callee": "level.headNode",
+          "lineNumber": 126
+        },
+        {
+          "caller": "refusesToFillAnExhaustedHeadAgain",
+          "callee": "level.addOrder",
+          "lineNumber": 131
+        },
+        {
+          "caller": "refusesToFillAnExhaustedHeadAgain",
+          "callee": "sell",
+          "lineNumber": 131
+        },
+        {
+          "caller": "refusesToFillAnExhaustedHeadAgain",
+          "callee": "level.fillHead",
+          "lineNumber": 132
+        },
+        {
+          "caller": "refusesToFillAnExhaustedHeadAgain",
+          "callee": "assertThrows",
+          "lineNumber": 133
+        },
+        {
+          "caller": "refusesToFillAnExhaustedHeadAgain",
+          "callee": "level.fillHead",
+          "lineNumber": 133
+        },
+        {
+          "caller": "refusesOnEmptyLevelOrNonPositiveQuantity",
+          "callee": "assertThrows",
+          "lineNumber": 138
+        },
+        {
+          "caller": "refusesOnEmptyLevelOrNonPositiveQuantity",
+          "callee": "level.fillHead",
+          "lineNumber": 138
+        },
+        {
+          "caller": "refusesOnEmptyLevelOrNonPositiveQuantity",
+          "callee": "level.addOrder",
+          "lineNumber": 139
+        },
+        {
+          "caller": "refusesOnEmptyLevelOrNonPositiveQuantity",
+          "callee": "sell",
+          "lineNumber": 139
+        },
+        {
+          "caller": "refusesOnEmptyLevelOrNonPositiveQuantity",
+          "callee": "assertThrows",
+          "lineNumber": 140
+        },
+        {
+          "caller": "refusesOnEmptyLevelOrNonPositiveQuantity",
+          "callee": "level.fillHead",
+          "lineNumber": 140
+        },
+        {
+          "caller": "refusesOnEmptyLevelOrNonPositiveQuantity",
+          "callee": "assertThrows",
+          "lineNumber": 141
+        },
+        {
+          "caller": "refusesOnEmptyLevelOrNonPositiveQuantity",
+          "callee": "level.fillHead",
+          "lineNumber": 141
+        },
+        {
+          "caller": "refusesOnEmptyLevelOrNonPositiveQuantity",
+          "callee": "assertEquals",
+          "lineNumber": 142
+        },
+        {
+          "caller": "refusesOnEmptyLevelOrNonPositiveQuantity",
+          "callee": "level.getTotalVolume",
+          "lineNumber": 142
+        },
+        {
+          "caller": "addThree",
+          "callee": "sell",
+          "lineNumber": 157
+        },
+        {
+          "caller": "addThree",
+          "callee": "sell",
+          "lineNumber": 158
+        },
+        {
+          "caller": "addThree",
+          "callee": "sell",
+          "lineNumber": 159
+        },
+        {
+          "caller": "addThree",
+          "callee": "level.addOrder",
+          "lineNumber": 160
+        },
+        {
+          "caller": "addThree",
+          "callee": "level.addOrder",
+          "lineNumber": 161
+        },
+        {
+          "caller": "addThree",
+          "callee": "level.addOrder",
+          "lineNumber": 162
+        },
+        {
+          "caller": "middle",
+          "callee": "addThree",
+          "lineNumber": 167
+        },
+        {
+          "caller": "middle",
+          "callee": "level.unlink",
+          "lineNumber": 168
+        },
+        {
+          "caller": "middle",
+          "callee": "assertEquals",
+          "lineNumber": 169
+        },
+        {
+          "caller": "middle",
+          "callee": "List.of",
+          "lineNumber": 169
+        },
+        {
+          "caller": "middle",
+          "callee": "orders",
+          "lineNumber": 169
+        },
+        {
+          "caller": "middle",
+          "callee": "assertEquals",
+          "lineNumber": 170
+        },
+        {
+          "caller": "middle",
+          "callee": "level.getTotalVolume",
+          "lineNumber": 170
+        },
+        {
+          "caller": "middle",
+          "callee": "assertEquals",
+          "lineNumber": 171
+        },
+        {
+          "caller": "middle",
+          "callee": "level.getOrderCount",
+          "lineNumber": 171
+        },
+        {
+          "caller": "head",
+          "callee": "addThree",
+          "lineNumber": 176
+        },
+        {
+          "caller": "head",
+          "callee": "level.unlink",
+          "lineNumber": 177
+        },
+        {
+          "caller": "head",
+          "callee": "assertEquals",
+          "lineNumber": 178
+        },
+        {
+          "caller": "head",
+          "callee": "List.of",
+          "lineNumber": 178
+        },
+        {
+          "caller": "head",
+          "callee": "orders",
+          "lineNumber": 178
+        },
+        {
+          "caller": "head",
+          "callee": "assertSame",
+          "lineNumber": 179
+        },
+        {
+          "caller": "head",
+          "callee": "level.headNode",
+          "lineNumber": 179
+        },
+        {
+          "caller": "tailThenAppend",
+          "callee": "addThree",
+          "lineNumber": 184
+        },
+        {
+          "caller": "tailThenAppend",
+          "callee": "level.unlink",
+          "lineNumber": 185
+        },
+        {
+          "caller": "tailThenAppend",
+          "callee": "sell",
+          "lineNumber": 186
+        },
+        {
+          "caller": "tailThenAppend",
+          "callee": "level.addOrder",
+          "lineNumber": 187
+        },
+        {
+          "caller": "tailThenAppend",
+          "callee": "assertEquals",
+          "lineNumber": 188
+        },
+        {
+          "caller": "tailThenAppend",
+          "callee": "List.of",
+          "lineNumber": 188
+        },
+        {
+          "caller": "tailThenAppend",
+          "callee": "orders",
+          "lineNumber": 188
+        },
+        {
+          "caller": "onlyNodeLeavesAnEmptyLevel",
+          "callee": "level.addOrder",
+          "lineNumber": 193
+        },
+        {
+          "caller": "onlyNodeLeavesAnEmptyLevel",
+          "callee": "sell",
+          "lineNumber": 193
+        },
+        {
+          "caller": "onlyNodeLeavesAnEmptyLevel",
+          "callee": "level.unlink",
+          "lineNumber": 194
+        },
+        {
+          "caller": "onlyNodeLeavesAnEmptyLevel",
+          "callee": "assertTrue",
+          "lineNumber": 195
+        },
+        {
+          "caller": "onlyNodeLeavesAnEmptyLevel",
+          "callee": "level.isEmpty",
+          "lineNumber": 195
+        },
+        {
+          "caller": "onlyNodeLeavesAnEmptyLevel",
+          "callee": "assertEquals",
+          "lineNumber": 196
+        },
+        {
+          "caller": "onlyNodeLeavesAnEmptyLevel",
+          "callee": "level.getTotalVolume",
+          "lineNumber": 196
+        },
+        {
+          "caller": "onlyNodeLeavesAnEmptyLevel",
+          "callee": "assertEquals",
+          "lineNumber": 197
+        },
+        {
+          "caller": "onlyNodeLeavesAnEmptyLevel",
+          "callee": "level.getOrderCount",
+          "lineNumber": 197
+        },
+        {
+          "caller": "subtractsRemainingSoAFilledOrderSubtractsNothing",
+          "callee": "addThree",
+          "lineNumber": 202
+        },
+        {
+          "caller": "subtractsRemainingSoAFilledOrderSubtractsNothing",
+          "callee": "level.fillHead",
+          "lineNumber": 203
+        },
+        {
+          "caller": "subtractsRemainingSoAFilledOrderSubtractsNothing",
+          "callee": "assertEquals",
+          "lineNumber": 204
+        },
+        {
+          "caller": "subtractsRemainingSoAFilledOrderSubtractsNothing",
+          "callee": "level.getTotalVolume",
+          "lineNumber": 204
+        },
+        {
+          "caller": "subtractsRemainingSoAFilledOrderSubtractsNothing",
+          "callee": "level.unlink",
+          "lineNumber": 205
+        },
+        {
+          "caller": "subtractsRemainingSoAFilledOrderSubtractsNothing",
+          "callee": "assertEquals",
+          "lineNumber": 206
+        },
+        {
+          "caller": "subtractsRemainingSoAFilledOrderSubtractsNothing",
+          "callee": "level.getTotalVolume",
+          "lineNumber": 206
+        },
+        {
+          "caller": "clearsTheNodesLinks",
+          "callee": "addThree",
+          "lineNumber": 211
+        },
+        {
+          "caller": "clearsTheNodesLinks",
+          "callee": "level.unlink",
+          "lineNumber": 212
+        },
+        {
+          "caller": "clearsTheNodesLinks",
+          "callee": "assertNull",
+          "lineNumber": 213
+        },
+        {
+          "caller": "clearsTheNodesLinks",
+          "callee": "assertNull",
+          "lineNumber": 214
+        },
+        {
+          "caller": "clearsTheNodesLinks",
+          "callee": "assertNull",
+          "lineNumber": 215
+        },
+        {
+          "caller": "refusesASecondUnlink",
+          "callee": "addThree",
+          "lineNumber": 220
+        },
+        {
+          "caller": "refusesASecondUnlink",
+          "callee": "level.unlink",
+          "lineNumber": 221
+        },
+        {
+          "caller": "refusesASecondUnlink",
+          "callee": "assertThrows",
+          "lineNumber": 222
+        },
+        {
+          "caller": "refusesASecondUnlink",
+          "callee": "level.unlink",
+          "lineNumber": 222
+        },
+        {
+          "caller": "refusesASecondUnlink",
+          "callee": "assertEquals",
+          "lineNumber": 223
+        },
+        {
+          "caller": "refusesASecondUnlink",
+          "callee": "List.of",
+          "lineNumber": 223
+        },
+        {
+          "caller": "refusesASecondUnlink",
+          "callee": "orders",
+          "lineNumber": 223
+        },
+        {
+          "caller": "refusesANodeFromAnotherLevel",
+          "callee": "addThree",
+          "lineNumber": 228
+        },
+        {
+          "caller": "refusesANodeFromAnotherLevel",
+          "callee": "new PriceLevel",
+          "lineNumber": 229
+        },
+        {
+          "caller": "refusesANodeFromAnotherLevel",
+          "callee": "other.addOrder",
+          "lineNumber": 230
+        },
+        {
+          "caller": "refusesANodeFromAnotherLevel",
+          "callee": "sell",
+          "lineNumber": 230
+        },
+        {
+          "caller": "refusesANodeFromAnotherLevel",
+          "callee": "assertThrows",
+          "lineNumber": 231
+        },
+        {
+          "caller": "refusesANodeFromAnotherLevel",
+          "callee": "level.unlink",
+          "lineNumber": 231
+        },
+        {
+          "caller": "refusesANodeFromAnotherLevel",
+          "callee": "assertEquals",
+          "lineNumber": 232
+        },
+        {
+          "caller": "refusesANodeFromAnotherLevel",
+          "callee": "List.of",
+          "lineNumber": 232
+        },
+        {
+          "caller": "refusesANodeFromAnotherLevel",
+          "callee": "orders",
+          "lineNumber": 232
+        },
+        {
+          "caller": "refusesANodeFromAnotherLevel",
+          "callee": "assertEquals",
+          "lineNumber": 233
+        },
+        {
+          "caller": "refusesANodeFromAnotherLevel",
+          "callee": "other.getOrderCount",
+          "lineNumber": 233
+        },
+        {
+          "caller": "refusesASentinel",
+          "callee": "assertThrows",
+          "lineNumber": 238
+        },
+        {
+          "caller": "refusesASentinel",
+          "callee": "level.unlink",
+          "lineNumber": 238
+        },
+        {
+          "caller": "refusesASentinel",
+          "callee": "OrderNode.sentinel",
+          "lineNumber": 238
+        },
+        {
+          "caller": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "callee": "level.addOrder",
+          "lineNumber": 244
+        },
+        {
+          "caller": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "callee": "sell",
+          "lineNumber": 244
+        },
+        {
+          "caller": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "callee": "level.addOrder",
+          "lineNumber": 245
+        },
+        {
+          "caller": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "callee": "sell",
+          "lineNumber": 245
+        },
+        {
+          "caller": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "callee": "assertSame",
+          "lineNumber": 246
+        },
+        {
+          "caller": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "callee": "level.nextNode",
+          "lineNumber": 246
+        },
+        {
+          "caller": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "callee": "assertNull",
+          "lineNumber": 247
+        },
+        {
+          "caller": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "callee": "level.nextNode",
+          "lineNumber": 247
+        },
+        {
+          "caller": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "callee": "level.unlink",
+          "lineNumber": 248
+        },
+        {
+          "caller": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "callee": "assertThrows",
+          "lineNumber": 249
+        },
+        {
+          "caller": "nextNodeWalksInTimePriorityAndRefusesForeignNodes",
+          "callee": "level.nextNode",
+          "lineNumber": 249
+        },
+        {
+          "caller": "realNodeNeedsAnOrder",
+          "callee": "assertThrows",
+          "lineNumber": 254
+        },
+        {
+          "caller": "realNodeNeedsAnOrder",
+          "callee": "new OrderNode",
+          "lineNumber": 254
+        }
+      ],
+      "metrics": {
+        "importCount": 3,
+        "exportCount": 0,
+        "functionCount": 4,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/test/java/exchangeserver/core/SnapshotTest.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 88,
+      "nonEmptyLines": 75,
+      "functions": [
+        {
+          "name": "sample",
+          "startLine": 29,
+          "endLine": 34,
+          "params": []
+        },
+        {
+          "name": "roundTrip",
+          "startLine": 36,
+          "endLine": 43,
+          "params": []
+        },
+        {
+          "name": "anyChangedCharacterIsCaught",
+          "startLine": 45,
+          "endLine": 53,
+          "params": []
+        },
+        {
+          "name": "aTruncatedFileIsCaughtByItsEndRecord",
+          "startLine": 55,
+          "endLine": 62,
+          "params": []
+        },
+        {
+          "name": "anEndRecordThatDisagreesIsCaught",
+          "startLine": 64,
+          "endLine": 73,
+          "params": []
+        },
+        {
+          "name": "aMissingSnapshotIsExplained",
+          "startLine": 75,
+          "endLine": 79,
+          "params": []
+        },
+        {
+          "name": "theEmptySnapshotIsTheStartOfHistory",
+          "startLine": 81,
+          "endLine": 87,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "SnapshotTest",
+          "startLine": 22,
+          "endLine": 88,
+          "methods": [
+            "sample",
+            "roundTrip",
+            "anyChangedCharacterIsCaught",
+            "aTruncatedFileIsCaughtByItsEndRecord",
+            "anEndRecordThatDisagreesIsCaught",
+            "aMissingSnapshotIsExplained",
+            "theEmptySnapshotIsTheStartOfHistory"
+          ],
+          "properties": [
+            "T",
+            "dir"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "sample",
+          "callee": "new Snapshot",
+          "lineNumber": 30
+        },
+        {
+          "caller": "sample",
+          "callee": "List.of",
+          "lineNumber": 31
+        },
+        {
+          "caller": "sample",
+          "callee": "new RestingOrderView",
+          "lineNumber": 31
+        },
+        {
+          "caller": "sample",
+          "callee": "new RestingOrderView",
+          "lineNumber": 32
+        },
+        {
+          "caller": "sample",
+          "callee": "T.plusSeconds",
+          "lineNumber": 32
+        },
+        {
+          "caller": "sample",
+          "callee": "Map.of",
+          "lineNumber": 33
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "Snapshot.path",
+          "lineNumber": 38
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "dir.resolve",
+          "lineNumber": 38
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "assertEquals",
+          "lineNumber": 39
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "file.getFileName().toString",
+          "lineNumber": 39
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "file.getFileName",
+          "lineNumber": 39
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "sample().write",
+          "lineNumber": 40
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "sample",
+          "lineNumber": 40
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "assertEquals",
+          "lineNumber": 41
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "sample",
+          "lineNumber": 41
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "Snapshot.read",
+          "lineNumber": 41
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "assertTrue",
+          "lineNumber": 42
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "Files.readString(file, UTF_8).contains",
+          "lineNumber": 42
+        },
+        {
+          "caller": "roundTrip",
+          "callee": "Files.readString",
+          "lineNumber": 42
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "dir.resolve",
+          "lineNumber": 47
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "sample().write",
+          "lineNumber": 48
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "sample",
+          "lineNumber": 48
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "Files.readString(file, UTF_8).replace",
+          "lineNumber": 49
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "Files.readString",
+          "lineNumber": 49
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "Files.writeString",
+          "lineNumber": 50
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "assertThrows",
+          "lineNumber": 51
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "Snapshot.read",
+          "lineNumber": 51
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "assertTrue",
+          "lineNumber": 52
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 52
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "e.getMessage",
+          "lineNumber": 52
+        },
+        {
+          "caller": "anyChangedCharacterIsCaught",
+          "callee": "e.getMessage",
+          "lineNumber": 52
+        },
+        {
+          "caller": "aTruncatedFileIsCaughtByItsEndRecord",
+          "callee": "dir.resolve",
+          "lineNumber": 57
+        },
+        {
+          "caller": "aTruncatedFileIsCaughtByItsEndRecord",
+          "callee": "sample().write",
+          "lineNumber": 58
+        },
+        {
+          "caller": "aTruncatedFileIsCaughtByItsEndRecord",
+          "callee": "sample",
+          "lineNumber": 58
+        },
+        {
+          "caller": "aTruncatedFileIsCaughtByItsEndRecord",
+          "callee": "Files.readAllLines",
+          "lineNumber": 59
+        },
+        {
+          "caller": "aTruncatedFileIsCaughtByItsEndRecord",
+          "callee": "Files.writeString",
+          "lineNumber": 60
+        },
+        {
+          "caller": "aTruncatedFileIsCaughtByItsEndRecord",
+          "callee": "String.join",
+          "lineNumber": 60
+        },
+        {
+          "caller": "aTruncatedFileIsCaughtByItsEndRecord",
+          "callee": "lines.subList",
+          "lineNumber": 60
+        },
+        {
+          "caller": "aTruncatedFileIsCaughtByItsEndRecord",
+          "callee": "lines.size",
+          "lineNumber": 60
+        },
+        {
+          "caller": "aTruncatedFileIsCaughtByItsEndRecord",
+          "callee": "assertThrows",
+          "lineNumber": 61
+        },
+        {
+          "caller": "aTruncatedFileIsCaughtByItsEndRecord",
+          "callee": "Snapshot.read",
+          "lineNumber": 61
+        },
+        {
+          "caller": "anEndRecordThatDisagreesIsCaught",
+          "callee": "dir.resolve",
+          "lineNumber": 66
+        },
+        {
+          "caller": "anEndRecordThatDisagreesIsCaught",
+          "callee": "sample().write",
+          "lineNumber": 67
+        },
+        {
+          "caller": "anEndRecordThatDisagreesIsCaught",
+          "callee": "sample",
+          "lineNumber": 67
+        },
+        {
+          "caller": "anEndRecordThatDisagreesIsCaught",
+          "callee": "Files.readAllLines",
+          "lineNumber": 68
+        },
+        {
+          "caller": "anEndRecordThatDisagreesIsCaught",
+          "callee": "lines.set",
+          "lineNumber": 70
+        },
+        {
+          "caller": "anEndRecordThatDisagreesIsCaught",
+          "callee": "lines.size",
+          "lineNumber": 70
+        },
+        {
+          "caller": "anEndRecordThatDisagreesIsCaught",
+          "callee": "Checksums.crcHex",
+          "lineNumber": 70
+        },
+        {
+          "caller": "anEndRecordThatDisagreesIsCaught",
+          "callee": "Files.writeString",
+          "lineNumber": 71
+        },
+        {
+          "caller": "anEndRecordThatDisagreesIsCaught",
+          "callee": "String.join",
+          "lineNumber": 71
+        },
+        {
+          "caller": "anEndRecordThatDisagreesIsCaught",
+          "callee": "assertThrows",
+          "lineNumber": 72
+        },
+        {
+          "caller": "anEndRecordThatDisagreesIsCaught",
+          "callee": "Snapshot.read",
+          "lineNumber": 72
+        },
+        {
+          "caller": "aMissingSnapshotIsExplained",
+          "callee": "assertThrows",
+          "lineNumber": 77
+        },
+        {
+          "caller": "aMissingSnapshotIsExplained",
+          "callee": "Snapshot.read",
+          "lineNumber": 77
+        },
+        {
+          "caller": "aMissingSnapshotIsExplained",
+          "callee": "dir.resolve",
+          "lineNumber": 77
+        },
+        {
+          "caller": "aMissingSnapshotIsExplained",
+          "callee": "assertTrue",
+          "lineNumber": 78
+        },
+        {
+          "caller": "aMissingSnapshotIsExplained",
+          "callee": "e.getMessage().contains",
+          "lineNumber": 78
+        },
+        {
+          "caller": "aMissingSnapshotIsExplained",
+          "callee": "e.getMessage",
+          "lineNumber": 78
+        },
+        {
+          "caller": "aMissingSnapshotIsExplained",
+          "callee": "e.getMessage",
+          "lineNumber": 78
+        },
+        {
+          "caller": "theEmptySnapshotIsTheStartOfHistory",
+          "callee": "Snapshot.empty",
+          "lineNumber": 83
+        },
+        {
+          "caller": "theEmptySnapshotIsTheStartOfHistory",
+          "callee": "assertEquals",
+          "lineNumber": 84
+        },
+        {
+          "caller": "theEmptySnapshotIsTheStartOfHistory",
+          "callee": "empty.lastSequence",
+          "lineNumber": 84
+        },
+        {
+          "caller": "theEmptySnapshotIsTheStartOfHistory",
+          "callee": "assertEquals",
+          "lineNumber": 85
+        },
+        {
+          "caller": "theEmptySnapshotIsTheStartOfHistory",
+          "callee": "new OutputDigest().hex",
+          "lineNumber": 85
+        },
+        {
+          "caller": "theEmptySnapshotIsTheStartOfHistory",
+          "callee": "new OutputDigest",
+          "lineNumber": 85
+        },
+        {
+          "caller": "theEmptySnapshotIsTheStartOfHistory",
+          "callee": "empty.digest",
+          "lineNumber": 85
+        },
+        {
+          "caller": "theEmptySnapshotIsTheStartOfHistory",
+          "callee": "assertTrue",
+          "lineNumber": 86
+        },
+        {
+          "caller": "theEmptySnapshotIsTheStartOfHistory",
+          "callee": "empty.orders().isEmpty",
+          "lineNumber": 86
+        },
+        {
+          "caller": "theEmptySnapshotIsTheStartOfHistory",
+          "callee": "empty.orders",
+          "lineNumber": 86
+        }
+      ],
+      "metrics": {
+        "importCount": 4,
+        "exportCount": 0,
+        "functionCount": 7,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/test/java/exchangeserver/engine/ResponseTest.java",
+      "language": "java",
+      "fileCategory": "code",
+      "totalLines": 87,
+      "nonEmptyLines": 72,
+      "functions": [
+        {
+          "name": "consistentResponsesAreAccepted",
+          "startLine": 19,
+          "endLine": 25,
+          "params": []
+        },
+        {
+          "name": "filledMustEqualTheSumOfTrades",
+          "startLine": 27,
+          "endLine": 30,
+          "params": []
+        },
+        {
+          "name": "filledMeansNothingRemains",
+          "startLine": 32,
+          "endLine": 35,
+          "params": []
+        },
+        {
+          "name": "restedAndCancelledMeanSomethingRemains",
+          "startLine": 37,
+          "endLine": 41,
+          "params": []
+        },
+        {
+          "name": "reasonGoesWithRejectedOnly",
+          "startLine": 43,
+          "endLine": 48,
+          "params": []
+        },
+        {
+          "name": "selfTradePreventedGoesWithCancelledOnly",
+          "startLine": 51,
+          "endLine": 60,
+          "params": []
+        },
+        {
+          "name": "rejectedCannotHaveTraded",
+          "startLine": 62,
+          "endLine": 66,
+          "params": []
+        },
+        {
+          "name": "negativeRemainingIsRejected",
+          "startLine": 68,
+          "endLine": 71,
+          "params": []
+        },
+        {
+          "name": "tradesAreCopied",
+          "startLine": 73,
+          "endLine": 80,
+          "params": []
+        },
+        {
+          "name": "tradeNeedsPositivePriceAndQuantity",
+          "startLine": 82,
+          "endLine": 86,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "ResponseTest",
+          "startLine": 14,
+          "endLine": 87,
+          "methods": [
+            "consistentResponsesAreAccepted",
+            "filledMustEqualTheSumOfTrades",
+            "filledMeansNothingRemains",
+            "restedAndCancelledMeanSomethingRemains",
+            "reasonGoesWithRejectedOnly",
+            "selfTradePreventedGoesWithCancelledOnly",
+            "rejectedCannotHaveTraded",
+            "negativeRemainingIsRejected",
+            "tradesAreCopied",
+            "tradeNeedsPositivePriceAndQuantity"
+          ],
+          "properties": [
+            "T",
+            "T5"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "consistentResponsesAreAccepted",
+          "callee": "new Response",
+          "lineNumber": 21
+        },
+        {
+          "caller": "consistentResponsesAreAccepted",
+          "callee": "List.of",
+          "lineNumber": 21
+        },
+        {
+          "caller": "consistentResponsesAreAccepted",
+          "callee": "new Response",
+          "lineNumber": 22
+        },
+        {
+          "caller": "consistentResponsesAreAccepted",
+          "callee": "List.of",
+          "lineNumber": 22
+        },
+        {
+          "caller": "consistentResponsesAreAccepted",
+          "callee": "new Response",
+          "lineNumber": 23
+        },
+        {
+          "caller": "consistentResponsesAreAccepted",
+          "callee": "List.of",
+          "lineNumber": 23
+        },
+        {
+          "caller": "consistentResponsesAreAccepted",
+          "callee": "new Response",
+          "lineNumber": 24
+        },
+        {
+          "caller": "consistentResponsesAreAccepted",
+          "callee": "List.of",
+          "lineNumber": 24
+        },
+        {
+          "caller": "filledMustEqualTheSumOfTrades",
+          "callee": "assertThrows",
+          "lineNumber": 29
+        },
+        {
+          "caller": "filledMustEqualTheSumOfTrades",
+          "callee": "new Response",
+          "lineNumber": 29
+        },
+        {
+          "caller": "filledMustEqualTheSumOfTrades",
+          "callee": "List.of",
+          "lineNumber": 29
+        },
+        {
+          "caller": "filledMeansNothingRemains",
+          "callee": "assertThrows",
+          "lineNumber": 34
+        },
+        {
+          "caller": "filledMeansNothingRemains",
+          "callee": "new Response",
+          "lineNumber": 34
+        },
+        {
+          "caller": "filledMeansNothingRemains",
+          "callee": "List.of",
+          "lineNumber": 34
+        },
+        {
+          "caller": "restedAndCancelledMeanSomethingRemains",
+          "callee": "assertThrows",
+          "lineNumber": 39
+        },
+        {
+          "caller": "restedAndCancelledMeanSomethingRemains",
+          "callee": "new Response",
+          "lineNumber": 39
+        },
+        {
+          "caller": "restedAndCancelledMeanSomethingRemains",
+          "callee": "List.of",
+          "lineNumber": 39
+        },
+        {
+          "caller": "restedAndCancelledMeanSomethingRemains",
+          "callee": "assertThrows",
+          "lineNumber": 40
+        },
+        {
+          "caller": "restedAndCancelledMeanSomethingRemains",
+          "callee": "new Response",
+          "lineNumber": 40
+        },
+        {
+          "caller": "restedAndCancelledMeanSomethingRemains",
+          "callee": "List.of",
+          "lineNumber": 40
+        },
+        {
+          "caller": "reasonGoesWithRejectedOnly",
+          "callee": "assertThrows",
+          "lineNumber": 45
+        },
+        {
+          "caller": "reasonGoesWithRejectedOnly",
+          "callee": "new Response",
+          "lineNumber": 45
+        },
+        {
+          "caller": "reasonGoesWithRejectedOnly",
+          "callee": "List.of",
+          "lineNumber": 45
+        },
+        {
+          "caller": "reasonGoesWithRejectedOnly",
+          "callee": "assertThrows",
+          "lineNumber": 46
+        },
+        {
+          "caller": "reasonGoesWithRejectedOnly",
+          "callee": "new Response",
+          "lineNumber": 47
+        },
+        {
+          "caller": "reasonGoesWithRejectedOnly",
+          "callee": "List.of",
+          "lineNumber": 47
+        },
+        {
+          "caller": "selfTradePreventedGoesWithCancelledOnly",
+          "callee": "new Response",
+          "lineNumber": 53
+        },
+        {
+          "caller": "selfTradePreventedGoesWithCancelledOnly",
+          "callee": "List.of",
+          "lineNumber": 53
+        },
+        {
+          "caller": "selfTradePreventedGoesWithCancelledOnly",
+          "callee": "assertThrows",
+          "lineNumber": 54
+        },
+        {
+          "caller": "selfTradePreventedGoesWithCancelledOnly",
+          "callee": "new Response",
+          "lineNumber": 55
+        },
+        {
+          "caller": "selfTradePreventedGoesWithCancelledOnly",
+          "callee": "List.of",
+          "lineNumber": 55
+        },
+        {
+          "caller": "selfTradePreventedGoesWithCancelledOnly",
+          "callee": "assertThrows",
+          "lineNumber": 56
+        },
+        {
+          "caller": "selfTradePreventedGoesWithCancelledOnly",
+          "callee": "new Response",
+          "lineNumber": 57
+        },
+        {
+          "caller": "selfTradePreventedGoesWithCancelledOnly",
+          "callee": "List.of",
+          "lineNumber": 57
+        },
+        {
+          "caller": "selfTradePreventedGoesWithCancelledOnly",
+          "callee": "assertThrows",
+          "lineNumber": 58
+        },
+        {
+          "caller": "selfTradePreventedGoesWithCancelledOnly",
+          "callee": "new Response",
+          "lineNumber": 59
+        },
+        {
+          "caller": "selfTradePreventedGoesWithCancelledOnly",
+          "callee": "List.of",
+          "lineNumber": 59
+        },
+        {
+          "caller": "rejectedCannotHaveTraded",
+          "callee": "assertThrows",
+          "lineNumber": 64
+        },
+        {
+          "caller": "rejectedCannotHaveTraded",
+          "callee": "new Response",
+          "lineNumber": 65
+        },
+        {
+          "caller": "rejectedCannotHaveTraded",
+          "callee": "List.of",
+          "lineNumber": 65
+        },
+        {
+          "caller": "negativeRemainingIsRejected",
+          "callee": "assertThrows",
+          "lineNumber": 70
+        },
+        {
+          "caller": "negativeRemainingIsRejected",
+          "callee": "new Response",
+          "lineNumber": 70
+        },
+        {
+          "caller": "negativeRemainingIsRejected",
+          "callee": "List.of",
+          "lineNumber": 70
+        },
+        {
+          "caller": "tradesAreCopied",
+          "callee": "new ArrayList<>",
+          "lineNumber": 75
+        },
+        {
+          "caller": "tradesAreCopied",
+          "callee": "List.of",
+          "lineNumber": 75
+        },
+        {
+          "caller": "tradesAreCopied",
+          "callee": "new Response",
+          "lineNumber": 76
+        },
+        {
+          "caller": "tradesAreCopied",
+          "callee": "trades.clear",
+          "lineNumber": 77
+        },
+        {
+          "caller": "tradesAreCopied",
+          "callee": "assertEquals",
+          "lineNumber": 78
+        },
+        {
+          "caller": "tradesAreCopied",
+          "callee": "r.trades().size",
+          "lineNumber": 78
+        },
+        {
+          "caller": "tradesAreCopied",
+          "callee": "r.trades",
+          "lineNumber": 78
+        },
+        {
+          "caller": "tradesAreCopied",
+          "callee": "assertThrows",
+          "lineNumber": 79
+        },
+        {
+          "caller": "tradesAreCopied",
+          "callee": "r.trades().clear",
+          "lineNumber": 79
+        },
+        {
+          "caller": "tradesAreCopied",
+          "callee": "r.trades",
+          "lineNumber": 79
+        },
+        {
+          "caller": "tradeNeedsPositivePriceAndQuantity",
+          "callee": "assertThrows",
+          "lineNumber": 84
+        },
+        {
+          "caller": "tradeNeedsPositivePriceAndQuantity",
+          "callee": "new Trade",
+          "lineNumber": 84
+        },
+        {
+          "caller": "tradeNeedsPositivePriceAndQuantity",
+          "callee": "assertThrows",
+          "lineNumber": 85
+        },
+        {
+          "caller": "tradeNeedsPositivePriceAndQuantity",
+          "callee": "new Trade",
+          "lineNumber": 85
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 0,
+        "functionCount": 10,
+        "classCount": 1
+      }
+    }
+  ]
+}

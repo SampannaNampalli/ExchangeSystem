@@ -1,0 +1,1326 @@
+{
+ "nodes": [
+  {
+   "id": "file:src/main/java/exchangeserver/Main.java",
+   "type": "file",
+   "name": "Main.java",
+   "filePath": "src/main/java/exchangeserver/Main.java",
+   "summary": "Command-line entry point that parses options, runs operator tools (--add-user, --quarantine, --compact), or loads credentials, binds the TCP/TLS gateway and starts the ExchangeService writer; maps failures to exit codes 0/1/2 with fail-stop on halt.",
+   "tags": [
+    "entry-point",
+    "cli",
+    "bootstrap",
+    "operator-tools",
+    "lifecycle"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Uses a shutdown hook that halts the process itself so a signal stop exits 0; exit code 2 signals a halted writer (fail-stop)."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/Main.java:Main",
+   "type": "class",
+   "name": "Main",
+   "filePath": "src/main/java/exchangeserver/Main.java",
+   "lineRange": [
+    43,
+    238
+   ],
+   "summary": "Static launcher class holding argument parsing, the serve loop and operator tool dispatch.",
+   "tags": [
+    "entry-point",
+    "cli",
+    "bootstrap"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/Main.java:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "src/main/java/exchangeserver/Main.java",
+   "lineRange": [
+    66,
+    118
+   ],
+   "summary": "Parses command-line options and dispatches to --add-user, --quarantine, --compact tools or to serve; returns exit codes.",
+   "tags": [
+    "entry-point",
+    "cli",
+    "method"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/Main.java:serve",
+   "type": "function",
+   "name": "serve",
+   "filePath": "src/main/java/exchangeserver/Main.java",
+   "lineRange": [
+    120,
+    184
+   ],
+   "summary": "Loads credentials, builds TLS context, binds TcpGateway, starts ExchangeService with recovery, logs the recovery report and waits for stop or halt.",
+   "tags": [
+    "entry-point",
+    "cli",
+    "method"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/Main.java:hint",
+   "type": "function",
+   "name": "hint",
+   "filePath": "src/main/java/exchangeserver/Main.java",
+   "lineRange": [
+    187,
+    198
+   ],
+   "summary": "Chooses operator advice for a startup failure, e.g. by ReplayException kind.",
+   "tags": [
+    "entry-point",
+    "cli",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/Main.java:readSecret",
+   "type": "function",
+   "name": "readSecret",
+   "filePath": "src/main/java/exchangeserver/Main.java",
+   "lineRange": [
+    212,
+    232
+   ],
+   "summary": "Reads a new participant secret from the console, or one stdin line (stripping a UTF-8 BOM) when no terminal is attached.",
+   "tags": [
+    "entry-point",
+    "cli",
+    "method"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/client/ClientMain.java",
+   "type": "file",
+   "name": "ClientMain.java",
+   "filePath": "src/main/java/exchangeserver/client/ClientMain.java",
+   "summary": "Interactive console client that connects to the gateway (optionally over TLS with a truststore), forwards typed protocol lines and prints every server line as it arrives.",
+   "tags": [
+    "entry-point",
+    "cli",
+    "client",
+    "tls",
+    "networking"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/client/ClientMain.java:ClientMain",
+   "type": "class",
+   "name": "ClientMain",
+   "filePath": "src/main/java/exchangeserver/client/ClientMain.java",
+   "lineRange": [
+    22,
+    78
+   ],
+   "summary": "Static console client launcher for manual protocol testing.",
+   "tags": [
+    "entry-point",
+    "cli",
+    "client"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/client/ClientMain.java:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "src/main/java/exchangeserver/client/ClientMain.java",
+   "lineRange": [
+    27,
+    77
+   ],
+   "summary": "Parses host/port/TLS options, opens the socket, prints server lines on a reader thread and sends stdin lines until exit.",
+   "tags": [
+    "entry-point",
+    "cli",
+    "method"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "type": "file",
+   "name": "Sequencer.java",
+   "filePath": "src/main/java/exchangeserver/command/Sequencer.java",
+   "summary": "The only component that reads the clock and counts: stamps new orders, cancels, cancel-alls, CHECK and SKIP records with sequence numbers, order ids and non-decreasing timestamps so everything downstream stays deterministic.",
+   "tags": [
+    "sequencer",
+    "determinism",
+    "factory",
+    "command-stamping",
+    "single-writer"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/command/Sequencer.java:Sequencer",
+   "type": "class",
+   "name": "Sequencer",
+   "filePath": "src/main/java/exchangeserver/command/Sequencer.java",
+   "lineRange": [
+    20,
+    94
+   ],
+   "summary": "Clock-reading, counter-owning stamper of commands; not thread-safe, used only by the writer thread.",
+   "tags": [
+    "sequencer",
+    "determinism",
+    "factory"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/command/Sequencer.java:resume",
+   "type": "function",
+   "name": "resume",
+   "filePath": "src/main/java/exchangeserver/command/Sequencer.java",
+   "lineRange": [
+    40,
+    46
+   ],
+   "summary": "Creates a sequencer continuing after a replayed journal from the last sequence number, last issued order id and last timestamp (D41).",
+   "tags": [
+    "sequencer",
+    "determinism",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/command/Sequencer.java:stampNewOrder",
+   "type": "function",
+   "name": "stampNewOrder",
+   "filePath": "src/main/java/exchangeserver/command/Sequencer.java",
+   "lineRange": [
+    48,
+    52
+   ],
+   "summary": "Stamps an OrderRequest into a NewOrderCommand with the next sequence number, order id and timestamp.",
+   "tags": [
+    "sequencer",
+    "determinism",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCancel",
+   "type": "function",
+   "name": "stampCancel",
+   "filePath": "src/main/java/exchangeserver/command/Sequencer.java",
+   "lineRange": [
+    54,
+    58
+   ],
+   "summary": "Stamps a CancelOrderCommand, consuming a sequence number only once the command is valid.",
+   "tags": [
+    "sequencer",
+    "determinism",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCancelAll",
+   "type": "function",
+   "name": "stampCancelAll",
+   "filePath": "src/main/java/exchangeserver/command/Sequencer.java",
+   "lineRange": [
+    60,
+    64
+   ],
+   "summary": "Stamps a CancelAllCommand for a participant.",
+   "tags": [
+    "sequencer",
+    "determinism",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCheck",
+   "type": "function",
+   "name": "stampCheck",
+   "filePath": "src/main/java/exchangeserver/command/Sequencer.java",
+   "lineRange": [
+    66,
+    70
+   ],
+   "summary": "Stamps a CHECK command carrying the output digest so replay can verify it (D70).",
+   "tags": [
+    "sequencer",
+    "determinism",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/command/Sequencer.java:stampSkip",
+   "type": "function",
+   "name": "stampSkip",
+   "filePath": "src/main/java/exchangeserver/command/Sequencer.java",
+   "lineRange": [
+    72,
+    76
+   ],
+   "summary": "Stamps a SKIP record quarantining a poison-pill command.",
+   "tags": [
+    "sequencer",
+    "determinism",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/command/Sequencer.java:nextTimestamp",
+   "type": "function",
+   "name": "nextTimestamp",
+   "filePath": "src/main/java/exchangeserver/command/Sequencer.java",
+   "lineRange": [
+    86,
+    93
+   ],
+   "summary": "Reads the clock and reuses the previous timestamp if the clock stepped back, keeping timestamps monotonic (D33).",
+   "tags": [
+    "sequencer",
+    "determinism",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "file",
+   "name": "Exchange.java",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "summary": "Core single-writer pipeline: stamps each batch with the Sequencer, appends it to the CommandJournal with one fsync, applies it to the Ledger, notifies the OutputListener and completes futures; also handles recovery/replay with CHECK digests, poison-pill quarantine and offline compaction.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "replay",
+    "recovery",
+    "single-writer"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/core/Exchange.java:Exchange",
+   "type": "class",
+   "name": "Exchange",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    58,
+    359
+   ],
+   "summary": "Owns sequencer, journal and ledger; processes batches write-ahead and exposes recovery, quarantine and compaction.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "replay"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:open",
+   "type": "function",
+   "name": "open",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    116,
+    137
+   ],
+   "summary": "Opens the journal, restores from a snapshot if the header names a base, replays every record verifying CHECK digests, and resumes the sequencer.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:quarantine",
+   "type": "function",
+   "name": "quarantine",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    141,
+    166
+   ],
+   "summary": "Operator tool: appends a SKIP record for a given sequence number to a stopped exchange's journal.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:compact",
+   "type": "function",
+   "name": "compact",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    174,
+    194
+   ],
+   "summary": "Under the journal lock, replays the journal, writes a snapshot, archives the old journal and writes a fresh empty one based at the last sequence (D71).",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:process",
+   "type": "function",
+   "name": "process",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    198,
+    253
+   ],
+   "summary": "Processes one batch: optional CHECK, stamping, a single appendAll+fsync, ledger application with poison-pill quarantine, listener notification and future completion (D61, D76).",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:read",
+   "type": "function",
+   "name": "read",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    255,
+    266
+   ],
+   "summary": "Answers non-journalled read requests such as snapshot and resend from current state.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:result",
+   "type": "function",
+   "name": "result",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    268,
+    276
+   ],
+   "summary": "Maps an engine output to the typed result returned to the caller.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:runOne",
+   "type": "function",
+   "name": "runOne",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    311,
+    322
+   ],
+   "summary": "Runs a single request as a one-element batch for synchronous callers and tests.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:submit",
+   "type": "function",
+   "name": "submit",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    291,
+    293
+   ],
+   "summary": "Synchronously submits a new order via runOne.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:cancel",
+   "type": "function",
+   "name": "cancel",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    295,
+    297
+   ],
+   "summary": "Synchronously cancels an order via runOne.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:cancelAll",
+   "type": "function",
+   "name": "cancelAll",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    299,
+    301
+   ],
+   "summary": "Synchronously cancels all of a participant's orders via runOne.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:snapshot",
+   "type": "function",
+   "name": "snapshot",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    303,
+    305
+   ],
+   "summary": "Returns a book snapshot to a given depth via runOne.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:resend",
+   "type": "function",
+   "name": "resend",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    307,
+    309
+   ],
+   "summary": "Returns retained private events for a participant from a given output sequence via runOne.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/core/Exchange.java:close",
+   "type": "function",
+   "name": "close",
+   "filePath": "src/main/java/exchangeserver/core/Exchange.java",
+   "lineRange": [
+    355,
+    358
+   ],
+   "summary": "Closes the journal.",
+   "tags": [
+    "core",
+    "write-ahead-log",
+    "method"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/core/ReplayException.java",
+   "type": "file",
+   "name": "ReplayException.java",
+   "filePath": "src/main/java/exchangeserver/core/ReplayException.java",
+   "summary": "Exception raised when replay cannot rebuild state at a known record, distinguishing an ENGINE_FAILURE poison pill from a DIVERGED CHECK digest so the operator gets the right advice.",
+   "tags": [
+    "exception",
+    "replay",
+    "recovery",
+    "error-handling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/core/ReplayException.java:ReplayException",
+   "type": "class",
+   "name": "ReplayException",
+   "filePath": "src/main/java/exchangeserver/core/ReplayException.java",
+   "lineRange": [
+    12,
+    37
+   ],
+   "summary": "Checked replay failure carrying a Kind (ENGINE_FAILURE or DIVERGED) and the offending sequence number.",
+   "tags": [
+    "exception",
+    "replay",
+    "recovery"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "class:src/main/java/exchangeserver/Main.java:Main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "class:src/main/java/exchangeserver/Main.java:Main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "function:src/main/java/exchangeserver/Main.java:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "function:src/main/java/exchangeserver/Main.java:serve",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "function:src/main/java/exchangeserver/Main.java:hint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "function:src/main/java/exchangeserver/Main.java:readSecret",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "file:src/main/java/exchangeserver/core/ReplayException.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/Main.java",
+   "target": "file:src/main/java/exchangeserver/gateway/Tls.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ClientMain.java",
+   "target": "class:src/main/java/exchangeserver/client/ClientMain.java:ClientMain",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ClientMain.java",
+   "target": "class:src/main/java/exchangeserver/client/ClientMain.java:ClientMain",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ClientMain.java",
+   "target": "function:src/main/java/exchangeserver/client/ClientMain.java:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/client/ClientMain.java",
+   "target": "file:src/main/java/exchangeserver/gateway/Tls.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "target": "class:src/main/java/exchangeserver/command/Sequencer.java:Sequencer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "target": "class:src/main/java/exchangeserver/command/Sequencer.java:Sequencer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:resume",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:stampNewOrder",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCancel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCancelAll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCheck",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:stampSkip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:nextTimestamp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "class:src/main/java/exchangeserver/core/Exchange.java:Exchange",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "class:src/main/java/exchangeserver/core/Exchange.java:Exchange",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:open",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:quarantine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:compact",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:process",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:read",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:result",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:runOne",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:submit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:cancel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:cancelAll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:snapshot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:resend",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:close",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/engine/Response.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/journal/JournalLock.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/ReplayException.java",
+   "target": "class:src/main/java/exchangeserver/core/ReplayException.java:ReplayException",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/ReplayException.java",
+   "target": "class:src/main/java/exchangeserver/core/ReplayException.java:ReplayException",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/Main.java:main",
+   "target": "function:src/main/java/exchangeserver/gateway/Credentials.java:addUser",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/Main.java:main",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:quarantine",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/Main.java:main",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:compact",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/Main.java:main",
+   "target": "function:src/main/java/exchangeserver/Main.java:serve",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/Main.java:main",
+   "target": "function:src/main/java/exchangeserver/Main.java:readSecret",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/Main.java:serve",
+   "target": "function:src/main/java/exchangeserver/gateway/Credentials.java:load",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/Main.java:serve",
+   "target": "function:src/main/java/exchangeserver/gateway/Tls.java:serverContext",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/Main.java:serve",
+   "target": "function:src/main/java/exchangeserver/gateway/Tls.java:passwordFromEnvironment",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/Main.java:serve",
+   "target": "function:src/main/java/exchangeserver/core/ExchangeService.java:start",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/Main.java:serve",
+   "target": "function:src/main/java/exchangeserver/core/ExchangeService.java:recovery",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/Main.java:serve",
+   "target": "function:src/main/java/exchangeserver/Main.java:hint",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/client/ClientMain.java:main",
+   "target": "function:src/main/java/exchangeserver/gateway/Tls.java:clientContext",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/client/ClientMain.java:main",
+   "target": "function:src/main/java/exchangeserver/gateway/Tls.java:passwordFromEnvironment",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:open",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:open",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:open",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:resume",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:quarantine",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:open",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:quarantine",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:resume",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:quarantine",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:stampSkip",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:quarantine",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:append",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:compact",
+   "target": "function:src/main/java/exchangeserver/journal/JournalLock.java:acquire",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:compact",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:open",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:compact",
+   "target": "function:src/main/java/exchangeserver/journal/Durable.java:copyDurably",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:compact",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:writeFresh",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:process",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCheck",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:process",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:stampNewOrder",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:process",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCancel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:process",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCancelAll",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:process",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:appendAll",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:process",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:read",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:process",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:result",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:submit",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:runOne",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:cancel",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:runOne",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:cancelAll",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:runOne",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:snapshot",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:runOne",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:resend",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:runOne",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:runOne",
+   "target": "function:src/main/java/exchangeserver/core/Exchange.java:process",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/core/Exchange.java:close",
+   "target": "function:src/main/java/exchangeserver/journal/CommandJournal.java:close",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/command/Sequencer.java:stampNewOrder",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:nextTimestamp",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCancel",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:nextTimestamp",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCancelAll",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:nextTimestamp",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/command/Sequencer.java:stampCheck",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:nextTimestamp",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/command/Sequencer.java:stampSkip",
+   "target": "function:src/main/java/exchangeserver/command/Sequencer.java:nextTimestamp",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "target": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

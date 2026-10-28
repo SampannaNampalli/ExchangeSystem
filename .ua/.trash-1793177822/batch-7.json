@@ -1,0 +1,466 @@
+{
+ "nodes": [
+  {
+   "id": "document:CLAUDE.md",
+   "type": "document",
+   "name": "CLAUDE.md",
+   "filePath": "CLAUDE.md",
+   "summary": "Guidance for Claude Code agents working in the repository: build/test/bench/run commands, the cross-file architecture (single live path from ClientSession through ExchangeService and the writer thread, determinism, package-enforced book ownership, recovery and replay rules, gateway security), test conventions and Windows environment pitfalls.",
+   "tags": [
+    "documentation",
+    "development",
+    "architecture",
+    "ai-guidance",
+    "conventions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:README.md",
+   "type": "document",
+   "name": "README.md",
+   "filePath": "README.md",
+   "summary": "Project overview for ExchangeServer2 with an at-a-glance metrics table (latency, durable throughput, tests, mutation score), feature highlights across matching, durability, concurrency and security, build/run instructions, a sample protocol session, the package layout and links to the Vision, Spec and study guides.",
+   "tags": [
+    "documentation",
+    "entry-point",
+    "overview",
+    "getting-started"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:mvnw.cmd",
+   "type": "file",
+   "name": "mvnw.cmd",
+   "filePath": "mvnw.cmd",
+   "summary": "Apache Maven Wrapper 3.3.2 launcher for Windows: a batch/PowerShell polyglot that reads distributionUrl from .mvn/wrapper/maven-wrapper.properties, downloads and verifies the Maven distribution into ~/.m2/wrapper/dists, and runs Maven so no local install is needed.",
+   "tags": [
+    "build-system",
+    "script",
+    "maven-wrapper",
+    "windows",
+    "tooling"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Polyglot file: the batch portion is wrapped in a PowerShell block comment (<# ... #>), and re-invokes itself through powershell to execute the PowerShell portion."
+  },
+  {
+   "id": "config:pom.xml",
+   "type": "config",
+   "name": "pom.xml",
+   "filePath": "pom.xml",
+   "summary": "Maven build for exchange-server2 2.0.0-SNAPSHOT targeting Java 17 with UTF-8 and -Xlint:all; JUnit 5 and JMH as test-only dependencies, surefire excluding benchmarks, a runnable jar with exchangeserver.Main, plus \"bench\" (JMH via exec plugin) and \"mutation\" (PIT over domain/book/engine/command/journal/core) profiles.",
+   "tags": [
+    "configuration",
+    "build-system",
+    "maven",
+    "mutation-testing",
+    "benchmarking"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Maven profiles keep optional tooling (JMH runs, PIT mutation testing) out of the default build lifecycle."
+  }
+ ],
+ "edges": [
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/core/Ledger.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/core/OutputListener.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/core/CommandInterceptor.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:src/test/java/exchangeserver/testing/MutableClock.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:docs/understanding/build-full-context.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "document:docs/ExchangeServer2_Vision.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "document:docs/ExchangeServer2_Spec.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "document:docs/understanding/00-START-HERE.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "file:mvnw.cmd",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CLAUDE.md",
+   "target": "config:pom.xml",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Tls.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/core/Ledger.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/client/ClientMain.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "document:docs/ExchangeServer2_Vision.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "document:docs/ExchangeServer2_Spec.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "document:docs/understanding/00-START-HERE.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "config:pom.xml",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:mvnw.cmd",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:mvnw.cmd",
+   "target": "config:.mvn/wrapper/maven-wrapper.properties",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:mvnw.cmd",
+   "target": "config:pom.xml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:mvnw.cmd",
+   "target": "file:mvnw",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:pom.xml",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:pom.xml",
+   "target": "file:src/test/java/exchangeserver/bench/MatchingBenchmark.java",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:pom.xml",
+   "target": "file:src/test/java/exchangeserver/bench/BatchingBenchmark.java",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:pom.xml",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:pom.xml",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:pom.xml",
+   "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:pom.xml",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

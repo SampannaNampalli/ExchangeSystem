@@ -1,0 +1,10 @@
+{
+  "projectRoot": "S:/Codes and Programs/Programs/Dev/Exchange Server Misc/ExchangeServer2",
+  "batchFiles": [
+    {"path": "CLAUDE.md", "language": "markdown", "sizeLines": 121, "fileCategory": "docs"},
+    {"path": "README.md", "language": "markdown", "sizeLines": 173, "fileCategory": "docs"},
+    {"path": "mvnw.cmd", "language": "batch", "sizeLines": 149, "fileCategory": "script"},
+    {"path": "pom.xml", "language": "xml", "sizeLines": 171, "fileCategory": "config"}
+  ],
+  "batchImportData": {"CLAUDE.md": [], "README.md": [], "mvnw.cmd": [], "pom.xml": []}
+}

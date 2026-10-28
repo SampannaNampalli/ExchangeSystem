@@ -1,0 +1,71 @@
+{
+  "batchIndex": 9,
+  "files": [
+    {
+      "path": "docs/understanding/07-modules/book.md",
+      "language": "markdown",
+      "sizeLines": 609,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/07-modules/client-and-main.md",
+      "language": "markdown",
+      "sizeLines": 387,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/07-modules/domain-and-commands.md",
+      "language": "markdown",
+      "sizeLines": 640,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/07-modules/engine.md",
+      "language": "markdown",
+      "sizeLines": 847,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/07-modules/exchange-and-replay.md",
+      "language": "markdown",
+      "sizeLines": 495,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/07-modules/exchange-service.md",
+      "language": "markdown",
+      "sizeLines": 314,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/07-modules/gateway.md",
+      "language": "markdown",
+      "sizeLines": 653,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/07-modules/journal.md",
+      "language": "markdown",
+      "sizeLines": 834,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/understanding/07-modules/ledger-and-snapshots.md",
+      "language": "markdown",
+      "sizeLines": 390,
+      "fileCategory": "docs"
+    }
+  ],
+  "batchImportData": {
+    "docs/understanding/07-modules/book.md": [],
+    "docs/understanding/07-modules/client-and-main.md": [],
+    "docs/understanding/07-modules/domain-and-commands.md": [],
+    "docs/understanding/07-modules/engine.md": [],
+    "docs/understanding/07-modules/exchange-and-replay.md": [],
+    "docs/understanding/07-modules/exchange-service.md": [],
+    "docs/understanding/07-modules/gateway.md": [],
+    "docs/understanding/07-modules/journal.md": [],
+    "docs/understanding/07-modules/ledger-and-snapshots.md": []
+  },
+  "neighborMap": {}
+}

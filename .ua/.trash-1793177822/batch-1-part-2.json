@@ -1,0 +1,1496 @@
+{
+ "nodes": [
+  {
+   "id": "file:src/main/java/exchangeserver/engine/Execution.java",
+   "type": "file",
+   "name": "Execution.java",
+   "filePath": "src/main/java/exchangeserver/engine/Execution.java",
+   "summary": "Record for a fill on a resting (passive) order addressed to its owner, the only way the maker learns about its fills.",
+   "tags": [
+    "data-model",
+    "fill",
+    "value-object",
+    "engine"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/engine/Execution.java:Execution",
+   "type": "class",
+   "name": "Execution",
+   "filePath": "src/main/java/exchangeserver/engine/Execution.java",
+   "lineRange": [
+    11,
+    13
+   ],
+   "summary": "Record of a passive fill delivered to the resting order's owner.",
+   "tags": [
+    "data-model",
+    "fill",
+    "value-object",
+    "engine"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "type": "file",
+   "name": "OrderOutput.java",
+   "filePath": "src/main/java/exchangeserver/engine/OrderOutput.java",
+   "summary": "Engine output record for a new order: the Response (whose trades are exposed as the output's trades), passive fills and level updates.",
+   "tags": [
+    "data-model",
+    "engine-output",
+    "order",
+    "value-object"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/engine/OrderOutput.java:OrderOutput",
+   "type": "class",
+   "name": "OrderOutput",
+   "filePath": "src/main/java/exchangeserver/engine/OrderOutput.java",
+   "lineRange": [
+    9,
+    22
+   ],
+   "summary": "EngineOutput record for a new order, delegating trades to its Response.",
+   "tags": [
+    "data-model",
+    "engine-output",
+    "order",
+    "value-object"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/engine/Reason.java",
+   "type": "file",
+   "name": "Reason.java",
+   "filePath": "src/main/java/exchangeserver/engine/Reason.java",
+   "summary": "Enum of state-dependent reasons a new order did not simply trade and rest (duplicate client order id, price band, open-order and book caps, post-only cross, self-trade prevention), with isReject() distinguishing rejects from SELF_TRADE_PREVENTED cancels.",
+   "tags": [
+    "type-definition",
+    "enum",
+    "validation",
+    "engine",
+    "rules"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/engine/Reason.java:Reason",
+   "type": "class",
+   "name": "Reason",
+   "filePath": "src/main/java/exchangeserver/engine/Reason.java",
+   "lineRange": [
+    12,
+    29
+   ],
+   "summary": "Enum of engine reject/cancel reasons with isReject().",
+   "tags": [
+    "type-definition",
+    "enum",
+    "validation",
+    "engine"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/engine/Trade.java",
+   "type": "file",
+   "name": "Trade.java",
+   "filePath": "src/main/java/exchangeserver/engine/Trade.java",
+   "summary": "Validated record of one trade: resting-level price, quantity, both order ids, aggressor side and the incoming command's timestamp (D34, keeps replay deterministic).",
+   "tags": [
+    "data-model",
+    "trade",
+    "value-object",
+    "determinism"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/engine/Trade.java:Trade",
+   "type": "class",
+   "name": "Trade",
+   "filePath": "src/main/java/exchangeserver/engine/Trade.java",
+   "lineRange": [
+    15,
+    27
+   ],
+   "summary": "Validated trade record with positive price and quantity.",
+   "tags": [
+    "data-model",
+    "trade",
+    "value-object",
+    "determinism"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "type": "file",
+   "name": "Protocol.java",
+   "filePath": "src/main/java/exchangeserver/gateway/Protocol.java",
+   "summary": "Defines and implements the ASCII line wire protocol (D53): parses client messages (LOGIN, NEW, CANCEL, RESEND, SUBSCRIBE, ...) and formats server lines (FILL, ORDER, CANCELLED, BOOK, TRADE, LEVEL, ERROR); its header comment is the protocol reference.",
+   "tags": [
+    "serialization",
+    "parser",
+    "line-protocol",
+    "gateway",
+    "api-schema"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/gateway/Protocol.java:Protocol",
+   "type": "class",
+   "name": "Protocol",
+   "filePath": "src/main/java/exchangeserver/gateway/Protocol.java",
+   "lineRange": [
+    47,
+    217
+   ],
+   "summary": "Non-instantiable utility class with static parse and format methods for the line protocol.",
+   "tags": [
+    "serialization",
+    "parser",
+    "line-protocol",
+    "gateway"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "type": "file",
+   "name": "TcpGateway.java",
+   "filePath": "src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "summary": "Thread-per-connection TCP/TLS gateway that accepts sessions, authenticates logins, enforces session limits (D74, D75) and, as the exchange's OutputListener, routes private events to the participant's sessions and market data to subscribers; triggers cancel-on-disconnect.",
+   "tags": [
+    "gateway",
+    "networking",
+    "event-handler",
+    "security",
+    "entry-point"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Nested Settings record uses immutable with-er methods; session sets use ConcurrentHashMap compute for atomic add/remove per key."
+  },
+  {
+   "id": "class:src/main/java/exchangeserver/gateway/TcpGateway.java:TcpGateway",
+   "type": "class",
+   "name": "TcpGateway",
+   "filePath": "src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "lineRange": [
+    50,
+    320
+   ],
+   "summary": "Gateway class implementing OutputListener: accept loop, session registry, routing and settings.",
+   "tags": [
+    "gateway",
+    "networking",
+    "event-handler",
+    "security"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "type": "file",
+   "name": "OutputDigestTest.java",
+   "filePath": "src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "summary": "Unit tests for OutputDigest: identical outputs give identical digests, every output kind and every field contributes, cancel results are included, and the digest resumes from its hex form.",
+   "tags": [
+    "test",
+    "determinism",
+    "checksum",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/core/OutputDigestTest.java:OutputDigestTest",
+   "type": "class",
+   "name": "OutputDigestTest",
+   "filePath": "src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "lineRange": [
+    20,
+    92
+   ],
+   "summary": "JUnit test class for OutputDigest.",
+   "tags": [
+    "test",
+    "determinism",
+    "checksum",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "type": "file",
+   "name": "OutputLogTest.java",
+   "filePath": "src/test/java/exchangeserver/core/OutputLogTest.java",
+   "summary": "Unit tests for OutputLog: per-participant oseq numbering with requester first, CANCEL_ALL numbering, retention limits, resume after snapshot, and rejecting a mismatched command/output pair.",
+   "tags": [
+    "test",
+    "event-sourcing",
+    "resend",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/core/OutputLogTest.java:OutputLogTest",
+   "type": "class",
+   "name": "OutputLogTest",
+   "filePath": "src/test/java/exchangeserver/core/OutputLogTest.java",
+   "lineRange": [
+    26,
+    97
+   ],
+   "summary": "JUnit test class for OutputLog.",
+   "tags": [
+    "test",
+    "event-sourcing",
+    "resend",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "type": "file",
+   "name": "ProtocolTest.java",
+   "filePath": "src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "summary": "Unit tests for Protocol grouped into Parse and Format: parsing valid and malformed client lines and formatting every server line type.",
+   "tags": [
+    "test",
+    "parser",
+    "line-protocol",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/gateway/ProtocolTest.java:ProtocolTest",
+   "type": "class",
+   "name": "ProtocolTest",
+   "filePath": "src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "lineRange": [
+    26,
+    159
+   ],
+   "summary": "JUnit test class with @Nested Parse and Format groups.",
+   "tags": [
+    "test",
+    "parser",
+    "line-protocol",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "type": "file",
+   "name": "TcpGatewayTest.java",
+   "filePath": "src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "summary": "End-to-end gateway tests over real sockets using ExchangeClient and a journalled ExchangeService, grouped into Session, Security, Limits, Trading, Resend, CancelOnDisconnect and MarketData behaviours, including restart persistence.",
+   "tags": [
+    "test",
+    "integration-test",
+    "networking",
+    "gateway",
+    "security"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:src/test/java/exchangeserver/gateway/TcpGatewayTest.java:TcpGatewayTest",
+   "type": "class",
+   "name": "TcpGatewayTest",
+   "filePath": "src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "lineRange": [
+    40,
+    769
+   ],
+   "summary": "JUnit integration test class with seven @Nested behaviour groups and start/stop/login helpers.",
+   "tags": [
+    "test",
+    "integration-test",
+    "networking",
+    "gateway"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/OrderOutput.java:trades",
+   "type": "function",
+   "name": "trades",
+   "filePath": "src/main/java/exchangeserver/engine/OrderOutput.java",
+   "lineRange": [
+    18,
+    21
+   ],
+   "summary": "Returns the trades carried by the order's Response.",
+   "tags": [
+    "engine-output",
+    "accessor",
+    "order"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/engine/Reason.java:isReject",
+   "type": "function",
+   "name": "isReject",
+   "filePath": "src/main/java/exchangeserver/engine/Reason.java",
+   "lineRange": [
+    26,
+    28
+   ],
+   "summary": "True for every reason except SELF_TRADE_PREVENTED, which pairs with CANCELLED rather than REJECTED.",
+   "tags": [
+    "validation",
+    "rules",
+    "engine"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Protocol.java:parse",
+   "type": "function",
+   "name": "parse",
+   "filePath": "src/main/java/exchangeserver/gateway/Protocol.java",
+   "lineRange": [
+    60,
+    100
+   ],
+   "summary": "Parses one client line into a ClientMessage (LOGIN, NEW, CANCEL, RESEND, SUBSCRIBE, PING, QUIT, ...), enforcing arity and line length.",
+   "tags": [
+    "parser",
+    "line-protocol",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Protocol.java:parseNew",
+   "type": "function",
+   "name": "parseNew",
+   "filePath": "src/main/java/exchangeserver/gateway/Protocol.java",
+   "lineRange": [
+    102,
+    114
+   ],
+   "summary": "Parses the fields of a NEW order line, handling MARKET orders without a price.",
+   "tags": [
+    "parser",
+    "line-protocol",
+    "order"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Protocol.java:lines",
+   "type": "function",
+   "name": "lines",
+   "filePath": "src/main/java/exchangeserver/gateway/Protocol.java",
+   "lineRange": [
+    145,
+    166
+   ],
+   "summary": "Formats a private event as protocol lines: FILL/ORDER for order replies, CANCELLED or CANCEL_REJECT for cancels, a MAKER FILL for passive fills, optionally marked resend=1.",
+   "tags": [
+    "serialization",
+    "line-protocol",
+    "formatting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/Protocol.java:levels",
+   "type": "function",
+   "name": "levels",
+   "filePath": "src/main/java/exchangeserver/gateway/Protocol.java",
+   "lineRange": [
+    191,
+    203
+   ],
+   "summary": "Formats book levels as price x qty lists for BOOK snapshots, using '-' for an empty side.",
+   "tags": [
+    "serialization",
+    "market-data",
+    "formatting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:port",
+   "type": "function",
+   "name": "port",
+   "filePath": "src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "lineRange": [
+    131,
+    133
+   ],
+   "summary": "Returns the bound local port.",
+   "tags": [
+    "accessor",
+    "networking",
+    "gateway"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:startAccepting",
+   "type": "function",
+   "name": "startAccepting",
+   "filePath": "src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "lineRange": [
+    140,
+    147
+   ],
+   "summary": "Starts the daemon acceptor thread; fails if already accepting.",
+   "tags": [
+    "lifecycle",
+    "networking",
+    "gateway"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:attach",
+   "type": "function",
+   "name": "attach",
+   "filePath": "src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "lineRange": [
+    149,
+    151
+   ],
+   "summary": "Attaches the ExchangeService that sessions forward requests to.",
+   "tags": [
+    "lifecycle",
+    "gateway",
+    "wiring"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:start",
+   "type": "function",
+   "name": "start",
+   "filePath": "src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "lineRange": [
+    153,
+    158
+   ],
+   "summary": "Attaches the service and starts accepting in one step.",
+   "tags": [
+    "lifecycle",
+    "gateway",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:acceptLoop",
+   "type": "function",
+   "name": "acceptLoop",
+   "filePath": "src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "lineRange": [
+    164,
+    205
+   ],
+   "summary": "Accept loop with exponential backoff on transient failures, a session cap that answers ERROR, and creation of a ClientSession per connection.",
+   "tags": [
+    "networking",
+    "resilience",
+    "concurrency"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:removed",
+   "type": "function",
+   "name": "removed",
+   "filePath": "src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "lineRange": [
+    239,
+    263
+   ],
+   "summary": "Unregisters a closed session and, when it was the participant's last and requested COD, issues a journalled CANCEL_ALL (D72).",
+   "tags": [
+    "session-management",
+    "cancel-on-disconnect",
+    "concurrency"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:onOutput",
+   "type": "function",
+   "name": "onOutput",
+   "filePath": "src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "lineRange": [
+    285,
+    310
+   ],
+   "summary": "Writer-thread callback that formats private events for each session of the participant and TRADE/LEVEL lines for subscribers, only enqueuing lines so no client can stall the exchange.",
+   "tags": [
+    "event-handler",
+    "routing",
+    "market-data"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:close",
+   "type": "function",
+   "name": "close",
+   "filePath": "src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "lineRange": [
+    313,
+    319
+   ],
+   "summary": "Closes the server socket and drops every session without stopping the exchange.",
+   "tags": [
+    "lifecycle",
+    "networking",
+    "gateway"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/test/java/exchangeserver/core/OutputDigestTest.java:eachFieldChangesTheDigest",
+   "type": "function",
+   "name": "eachFieldChangesTheDigest",
+   "filePath": "src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "lineRange": [
+    53,
+    70
+   ],
+   "summary": "Checks that changing any single field of an output changes the digest.",
+   "tags": [
+    "test",
+    "checksum",
+    "determinism"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/test/java/exchangeserver/core/OutputDigestTest.java:itResumesFromItsHexForm",
+   "type": "function",
+   "name": "itResumesFromItsHexForm",
+   "filePath": "src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "lineRange": [
+    82,
+    91
+   ],
+   "summary": "Checks that a digest resumed from its hex string continues identically.",
+   "tags": [
+    "test",
+    "checksum",
+    "snapshot"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/test/java/exchangeserver/core/OutputLogTest.java:eachParticipantIsNumberedFromOneRequesterFirst",
+   "type": "function",
+   "name": "eachParticipantIsNumberedFromOneRequesterFirst",
+   "filePath": "src/test/java/exchangeserver/core/OutputLogTest.java",
+   "lineRange": [
+    40,
+    52
+   ],
+   "summary": "Checks per-participant numbering starting at 1 with the requester's reply ahead of maker fills.",
+   "tags": [
+    "test",
+    "event-sourcing",
+    "ordering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/test/java/exchangeserver/core/OutputLogTest.java:onlyTheMostRecentEventsAreRetained",
+   "type": "function",
+   "name": "onlyTheMostRecentEventsAreRetained",
+   "filePath": "src/test/java/exchangeserver/core/OutputLogTest.java",
+   "lineRange": [
+    63,
+    77
+   ],
+   "summary": "Checks that only the last `retention` events are kept and older RESEND requests report a gap.",
+   "tags": [
+    "test",
+    "resend",
+    "retention"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/test/java/exchangeserver/core/OutputLogTest.java:resumingContinuesTheNumberingWithNothingRetained",
+   "type": "function",
+   "name": "resumingContinuesTheNumberingWithNothingRetained",
+   "filePath": "src/test/java/exchangeserver/core/OutputLogTest.java",
+   "lineRange": [
+    79,
+    88
+   ],
+   "summary": "Checks that resume() continues oseq numbering from snapshot values with no retained events.",
+   "tags": [
+    "test",
+    "snapshot",
+    "resend"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/test/java/exchangeserver/gateway/TcpGatewayTest.java:credentials",
+   "type": "function",
+   "name": "credentials",
+   "filePath": "src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "lineRange": [
+    52,
+    61
+   ],
+   "summary": "Builds low-iteration test Credentials for the participants used by the tests.",
+   "tags": [
+    "test",
+    "test-fixture",
+    "security"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/test/java/exchangeserver/gateway/TcpGatewayTest.java:start",
+   "type": "function",
+   "name": "start",
+   "filePath": "src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "lineRange": [
+    95,
+    105
+   ],
+   "summary": "Starts a journalled ExchangeService and TcpGateway with given settings for a test.",
+   "tags": [
+    "test",
+    "test-fixture",
+    "lifecycle"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:src/test/java/exchangeserver/gateway/TcpGatewayTest.java:restartKeepsTheBookForTheNextGateway",
+   "type": "function",
+   "name": "restartKeepsTheBookForTheNextGateway",
+   "filePath": "src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "lineRange": [
+    759,
+    768
+   ],
+   "summary": "Checks that restarting the exchange from its journal preserves the book for a new gateway.",
+   "tags": [
+    "test",
+    "recovery",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:src/main/java/exchangeserver/engine/Execution.java",
+   "target": "class:src/main/java/exchangeserver/engine/Execution.java:Execution",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/Execution.java",
+   "target": "class:src/main/java/exchangeserver/engine/Execution.java:Execution",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/Execution.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "target": "class:src/main/java/exchangeserver/engine/OrderOutput.java:OrderOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "target": "class:src/main/java/exchangeserver/engine/OrderOutput.java:OrderOutput",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/Reason.java",
+   "target": "class:src/main/java/exchangeserver/engine/Reason.java:Reason",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/Reason.java",
+   "target": "class:src/main/java/exchangeserver/engine/Reason.java:Reason",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/Trade.java",
+   "target": "class:src/main/java/exchangeserver/engine/Trade.java:Trade",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/Trade.java",
+   "target": "class:src/main/java/exchangeserver/engine/Trade.java:Trade",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/Trade.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "class:src/main/java/exchangeserver/gateway/Protocol.java:Protocol",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelStatus.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "file:src/main/java/exchangeserver/engine/Response.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "class:src/main/java/exchangeserver/gateway/TcpGateway.java:TcpGateway",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "class:src/main/java/exchangeserver/gateway/TcpGateway.java:TcpGateway",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "file:src/main/java/exchangeserver/core/OutputListener.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "class:src/test/java/exchangeserver/core/OutputDigestTest.java:OutputDigestTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Response.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "class:src/test/java/exchangeserver/core/OutputLogTest.java:OutputLogTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Response.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "class:src/test/java/exchangeserver/gateway/ProtocolTest.java:ProtocolTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/OrderStatus.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Reason.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Response.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "target": "class:src/test/java/exchangeserver/gateway/TcpGatewayTest.java:TcpGatewayTest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "target": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "target": "file:src/main/java/exchangeserver/core/OutputListener.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "target": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "target": "function:src/main/java/exchangeserver/engine/OrderOutput.java:trades",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "target": "function:src/main/java/exchangeserver/engine/OrderOutput.java:trades",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/Reason.java",
+   "target": "function:src/main/java/exchangeserver/engine/Reason.java:isReject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/engine/Reason.java",
+   "target": "function:src/main/java/exchangeserver/engine/Reason.java:isReject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Protocol.java:parse",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Protocol.java:parseNew",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Protocol.java:lines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "function:src/main/java/exchangeserver/gateway/Protocol.java:levels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:port",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:port",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:startAccepting",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:startAccepting",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:attach",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:attach",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:start",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:start",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:acceptLoop",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:removed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:onOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:onOutput",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:close",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:close",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "function:src/test/java/exchangeserver/core/OutputDigestTest.java:eachFieldChangesTheDigest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "target": "function:src/test/java/exchangeserver/core/OutputDigestTest.java:itResumesFromItsHexForm",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "function:src/test/java/exchangeserver/core/OutputLogTest.java:eachParticipantIsNumberedFromOneRequesterFirst",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "function:src/test/java/exchangeserver/core/OutputLogTest.java:onlyTheMostRecentEventsAreRetained",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "target": "function:src/test/java/exchangeserver/core/OutputLogTest.java:resumingContinuesTheNumberingWithNothingRetained",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "target": "function:src/test/java/exchangeserver/gateway/TcpGatewayTest.java:credentials",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "target": "function:src/test/java/exchangeserver/gateway/TcpGatewayTest.java:start",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "target": "function:src/test/java/exchangeserver/gateway/TcpGatewayTest.java:restartKeepsTheBookForTheNextGateway",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "class:src/main/java/exchangeserver/engine/OrderOutput.java:OrderOutput",
+   "target": "class:src/main/java/exchangeserver/engine/EngineOutput.java:EngineOutput",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:src/main/java/exchangeserver/gateway/TcpGateway.java:TcpGateway",
+   "target": "class:src/main/java/exchangeserver/core/OutputListener.java:OutputListener",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:onOutput",
+   "target": "function:src/main/java/exchangeserver/gateway/Protocol.java:lines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:removed",
+   "target": "function:src/main/java/exchangeserver/core/ExchangeService.java:cancelAll",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:start",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:attach",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:start",
+   "target": "function:src/main/java/exchangeserver/gateway/TcpGateway.java:startAccepting",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "target": "file:src/test/java/exchangeserver/gateway/ProtocolTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

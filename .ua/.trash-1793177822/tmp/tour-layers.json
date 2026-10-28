@@ -1,0 +1,47 @@
+[
+ {
+  "id": "layer:gateway",
+  "name": "Gateway & Entry Points",
+  "description": "TCP/TLS gateway with authenticated client sessions and the line-based wire protocol, plus the Main launcher (server, add-user, compact, quarantine modes) and the interactive CLI client."
+ },
+ {
+  "id": "layer:core",
+  "name": "Exchange Core",
+  "description": "Single-writer ExchangeService queue and Exchange.process pipeline that stamps, journals, feeds the Ledger and notifies listeners, plus replay, snapshots, output digest and poison-pill recovery."
+ },
+ {
+  "id": "layer:command-journal",
+  "name": "Commands & Journal",
+  "description": "Sequencer-stamped command records (NEW, CANCEL, CANCEL_ALL, SKIP, CHECK) and the checksummed, fsynced, file-locked write-ahead CommandJournal with its v3 text codec."
+ },
+ {
+  "id": "layer:engine",
+  "name": "Matching Engine",
+  "description": "Deterministic price-time MatchingEngine and its output records (responses, executions, trades, cancel results, book snapshots, reject reasons)."
+ },
+ {
+  "id": "layer:book",
+  "name": "Order Book",
+  "description": "Limit order book with price levels and order nodes whose package-private mutators enforce the book invariants, exposing fills, level updates and read-only resting-order views."
+ },
+ {
+  "id": "layer:domain",
+  "name": "Domain Model",
+  "description": "Foundational order types, sides, validated OrderRequest and the versioned Rules that every replayed behaviour depends on."
+ },
+ {
+  "id": "layer:test",
+  "name": "Tests & Benchmarks",
+  "description": "JUnit test classes mirroring each main package with @Nested behaviour groups, the MutableClock test seam, and JMH matching and batching benchmarks."
+ },
+ {
+  "id": "layer:documentation",
+  "name": "Documentation & Study Guides",
+  "description": "Vision and Spec design documents (roadmap, numbered decisions D1-D77), README and CLAUDE.md, and the understanding/ study guides with the generator that assembles FULL-CONTEXT.md."
+ },
+ {
+  "id": "layer:config",
+  "name": "Build & Tooling",
+  "description": "Maven pom with test, mutation (PIT) and bench (JMH) profiles, the Maven wrapper scripts and properties, and git attributes that keep the journal LF-only."
+ }
+]

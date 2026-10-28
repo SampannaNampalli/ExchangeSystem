@@ -1,0 +1,801 @@
+{
+ "nodes": [
+  {
+   "id": "document:docs/understanding/07-modules/book.md",
+   "type": "document",
+   "name": "book.md",
+   "filePath": "docs/understanding/07-modules/book.md",
+   "summary": "Study guide for the book package: PriceLevel FIFO queues and OrderBook, the book invariants (id map iff resting, no empty or crossed levels, per-participant open counts), package-private mutators, a worked example, complexity and tests.",
+   "tags": [
+    "documentation",
+    "study-guide",
+    "order-book",
+    "invariants",
+    "data-structures"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Markdown guide citing source as path:LINE, so line references must be refreshed when the cited code moves."
+  },
+  {
+   "id": "document:docs/understanding/07-modules/client-and-main.md",
+   "type": "document",
+   "name": "client-and-main.md",
+   "filePath": "docs/understanding/07-modules/client-and-main.md",
+   "summary": "Study guide for the process entry point Main (argument parsing, startup, user management, compaction, exit codes) and the ExchangeClient/ClientMain command-line client, with tests and self-check questions.",
+   "tags": [
+    "documentation",
+    "study-guide",
+    "entry-point",
+    "cli",
+    "client"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Markdown guide citing source as path:LINE, so line references must be refreshed when the cited code moves."
+  },
+  {
+   "id": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "type": "document",
+   "name": "domain-and-commands.md",
+   "filePath": "docs/understanding/07-modules/domain-and-commands.md",
+   "summary": "Study guide for the domain and command packages: OrderRequest as the sole validation layer, Order, Side, OrderType and Rules (versioned replay rules), plus the sealed Command records and the Sequencer that stamps ids, sequence numbers and timestamps.",
+   "tags": [
+    "documentation",
+    "study-guide",
+    "domain-model",
+    "determinism",
+    "commands"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Markdown guide citing source as path:LINE, so line references must be refreshed when the cited code moves."
+  },
+  {
+   "id": "document:docs/understanding/07-modules/engine.md",
+   "type": "document",
+   "name": "engine.md",
+   "filePath": "docs/understanding/07-modules/engine.md",
+   "summary": "In-depth study guide for MatchingEngine: price-time matching, order types, rejects and self-trade prevention, the EngineOutput/Response/Trade result types, engine state snapshots and how determinism is achieved and tested.",
+   "tags": [
+    "documentation",
+    "study-guide",
+    "matching-engine",
+    "determinism",
+    "price-time-priority"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Markdown guide citing source as path:LINE, so line references must be refreshed when the cited code moves."
+  },
+  {
+   "id": "document:docs/understanding/07-modules/exchange-and-replay.md",
+   "type": "document",
+   "name": "exchange-and-replay.md",
+   "filePath": "docs/understanding/07-modules/exchange-and-replay.md",
+   "summary": "Study guide for core.Exchange and Replay: replay-before-open, the stamp-journal-apply-notify batch in process, poison-pill quarantine and rebuild from snapshot, operator tools, and the small helper types (Request, Pending, OutputListener, ReplayException).",
+   "tags": [
+    "documentation",
+    "study-guide",
+    "recovery",
+    "replay",
+    "poison-pill"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Markdown guide citing source as path:LINE, so line references must be refreshed when the cited code moves."
+  },
+  {
+   "id": "document:docs/understanding/07-modules/exchange-service.md",
+   "type": "document",
+   "name": "exchange-service.md",
+   "filePath": "docs/understanding/07-modules/exchange-service.md",
+   "summary": "Study guide for ExchangeService, the single-writer thread: startup, the shared lock that makes enqueue either refused or never lost, the batching writer loop, and the state machine for stop and halt, with its concurrency tests.",
+   "tags": [
+    "documentation",
+    "study-guide",
+    "concurrency",
+    "single-writer",
+    "threading"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Markdown guide citing source as path:LINE, so line references must be refreshed when the cited code moves."
+  },
+  {
+   "id": "document:docs/understanding/07-modules/gateway.md",
+   "type": "document",
+   "name": "gateway.md",
+   "filePath": "docs/understanding/07-modules/gateway.md",
+   "summary": "Study guide for the gateway package: TcpGateway accept loop and OutputListener fan-out, ClientSession reader threads with login, timeouts, in-flight cap and rate limit, the line Protocol and ClientMessage, PBKDF2 Credentials (D74) and optional TLS.",
+   "tags": [
+    "documentation",
+    "study-guide",
+    "networking",
+    "security",
+    "protocol"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Markdown guide citing source as path:LINE, so line references must be refreshed when the cited code moves."
+  },
+  {
+   "id": "document:docs/understanding/07-modules/journal.md",
+   "type": "document",
+   "name": "journal.md",
+   "filePath": "docs/understanding/07-modules/journal.md",
+   "summary": "Study guide for the journal package: the v3 text record format with CRC32C checksums in JournalCodec, CommandJournal open/lock/torn-tail handling and batched fsync, JournalLock, Durable atomic writes, and lifecycle failure states.",
+   "tags": [
+    "documentation",
+    "study-guide",
+    "write-ahead-log",
+    "durability",
+    "persistence"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Markdown guide citing source as path:LINE, so line references must be refreshed when the cited code moves."
+  },
+  {
+   "id": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "type": "document",
+   "name": "ledger-and-snapshots.md",
+   "filePath": "docs/understanding/07-modules/ledger-and-snapshots.md",
+   "summary": "Study guide for core.Ledger and its parts: the engine plus OutputDigest (D70) checked by CHECK records, OutputLog and numbered PrivateEvent streams (D73), and Snapshot files (D71) used for compaction and recovery.",
+   "tags": [
+    "documentation",
+    "study-guide",
+    "snapshots",
+    "digest",
+    "recovery"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Markdown guide citing source as path:LINE, so line references must be refreshed when the cited code moves."
+  }
+ ],
+ "edges": [
+  {
+   "source": "document:docs/understanding/07-modules/book.md",
+   "target": "file:src/main/java/exchangeserver/book/CancelResult.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/book.md",
+   "target": "file:src/main/java/exchangeserver/book/Fill.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/book.md",
+   "target": "file:src/main/java/exchangeserver/book/LevelUpdate.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/book.md",
+   "target": "file:src/main/java/exchangeserver/book/OrderBook.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/book.md",
+   "target": "file:src/main/java/exchangeserver/book/OrderNode.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/book.md",
+   "target": "file:src/main/java/exchangeserver/book/PriceLevel.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/book.md",
+   "target": "file:src/main/java/exchangeserver/book/RestingOrderView.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/book.md",
+   "target": "file:src/test/java/exchangeserver/book/OrderBookTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/client-and-main.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/client-and-main.md",
+   "target": "file:src/main/java/exchangeserver/client/ClientMain.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/client-and-main.md",
+   "target": "file:src/main/java/exchangeserver/client/ExchangeClient.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/client-and-main.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/client-and-main.md",
+   "target": "file:src/test/java/exchangeserver/MainTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/client-and-main.md",
+   "target": "file:src/test/java/exchangeserver/client/ExchangeClientTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/command/CancelAllCommand.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/command/CancelOrderCommand.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/command/CheckCommand.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/command/Command.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/command/NewOrderCommand.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/command/Sequencer.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/command/SkipCommand.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/core/Replay.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/domain/Order.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/domain/OrderRequest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/domain/OrderType.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/domain/Rules.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/domain/Side.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/domain-and-commands.md",
+   "target": "file:src/test/java/exchangeserver/testing/MutableClock.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/core/Ledger.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/engine/BookSnapshot.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/engine/CancelAllOutput.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/engine/CancelOutput.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/engine/EngineOutput.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/engine/EngineState.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/engine/Execution.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/engine/MatchingEngine.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/engine/OrderOutput.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/engine/Reason.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/engine/Response.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/main/java/exchangeserver/engine/Trade.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/engine.md",
+   "target": "file:src/test/java/exchangeserver/engine/MatchingEngineTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-and-replay.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-and-replay.md",
+   "target": "file:src/main/java/exchangeserver/core/OutputListener.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-and-replay.md",
+   "target": "file:src/main/java/exchangeserver/core/Pending.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-and-replay.md",
+   "target": "file:src/main/java/exchangeserver/core/Replay.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-and-replay.md",
+   "target": "file:src/main/java/exchangeserver/core/ReplayException.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-and-replay.md",
+   "target": "file:src/main/java/exchangeserver/core/Request.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-and-replay.md",
+   "target": "file:src/test/java/exchangeserver/MainTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-and-replay.md",
+   "target": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-and-replay.md",
+   "target": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-service.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-service.md",
+   "target": "file:src/main/java/exchangeserver/core/ExchangeService.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/exchange-service.md",
+   "target": "file:src/test/java/exchangeserver/core/ExchangeServiceTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/gateway.md",
+   "target": "file:src/main/java/exchangeserver/Main.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/gateway.md",
+   "target": "file:src/main/java/exchangeserver/core/Request.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/gateway.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientMessage.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/gateway.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/gateway.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/gateway.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/gateway.md",
+   "target": "file:src/main/java/exchangeserver/gateway/TcpGateway.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/gateway.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Tls.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/gateway.md",
+   "target": "file:src/test/java/exchangeserver/gateway/CredentialsTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/gateway.md",
+   "target": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/journal.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/journal.md",
+   "target": "file:src/main/java/exchangeserver/core/Replay.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/journal.md",
+   "target": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/journal.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Credentials.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/journal.md",
+   "target": "file:src/main/java/exchangeserver/journal/Checksums.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/journal.md",
+   "target": "file:src/main/java/exchangeserver/journal/CommandJournal.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/journal.md",
+   "target": "file:src/main/java/exchangeserver/journal/Durable.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/journal.md",
+   "target": "file:src/main/java/exchangeserver/journal/JournalCodec.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/journal.md",
+   "target": "file:src/main/java/exchangeserver/journal/JournalLock.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/journal.md",
+   "target": "file:src/test/java/exchangeserver/journal/CommandJournalTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/main/java/exchangeserver/core/Exchange.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/main/java/exchangeserver/core/Ledger.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/main/java/exchangeserver/core/OutputDigest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/main/java/exchangeserver/core/OutputLog.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/main/java/exchangeserver/core/PrivateEvent.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/main/java/exchangeserver/core/Replay.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/main/java/exchangeserver/core/Snapshot.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/main/java/exchangeserver/gateway/ClientSession.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/main/java/exchangeserver/gateway/Protocol.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/test/java/exchangeserver/core/ExchangeTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/test/java/exchangeserver/core/OutputDigestTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/test/java/exchangeserver/core/OutputLogTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/test/java/exchangeserver/core/ReplayTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/test/java/exchangeserver/core/SnapshotTest.java",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/understanding/07-modules/ledger-and-snapshots.md",
+   "target": "file:src/test/java/exchangeserver/gateway/TcpGatewayTest.java",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}
