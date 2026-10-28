@@ -471,8 +471,8 @@ the idle timeout (300 s) after it; the exception ends the session with an `ERROR
 `src/main/java/exchangeserver/gateway/ClientSession.java:157`, `166-168`, `308`; Spec D75).
 
 **Why.** **[Verified]** Spec §6 and Vision §5: "TCP or TLS, line protocol, thread-per-connection". **[Inferred]**
-Blocking I/O with two threads per client is the simplest model to reason about; NIO or virtual threads are listed as
-a future candidate (Vision §7).
+Blocking I/O with two threads per client is the simplest model to reason about; NIO or virtual threads are planned
+as roadmap step 13 (Vision §7).
 
 **Minimum.** Closing a socket's input or output stream closes the whole socket (which is why the reader never uses
 try-with-resources on the input stream: **[Verified]** `src/main/java/exchangeserver/gateway/ClientSession.java:153-154`).

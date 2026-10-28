@@ -194,7 +194,7 @@ Recovered through sequence 4 from snapshot 4: replayed 0 commands, cut 0 torn by
 - **Rejects, BUSY, SESSION_BUSY and RATE_LIMITED refusals** are answered to the client, not logged.
 - **Metrics**: none exported. The writer's `batches()`, `processed()`, `largestBatch()` are the only counters; they lag the replies (updated after a batch's futures complete) and are final only after `stop()` [Verified — `src/main/java/exchangeserver/core/ExchangeService.java:107-112`].
 
-Observability (metrics, structured logs) stays on the Vision's candidate list [Verified — Vision §7].
+Observability is planned: metrics and structured logs as roadmap step 10, tracing and SLOs as step 28 [Verified — Vision §7].
 
 ---
 

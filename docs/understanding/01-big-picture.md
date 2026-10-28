@@ -14,9 +14,11 @@ participants.
 
 The project's stated purpose is learning: "a hands-on way to understand production-grade software systems",
 where "depth of understanding matters more than feature count" (**[Verified]** `docs/ExchangeServer2_Vision.md`
-§1). Its non-goals are just as telling: one instrument only, no multi-threaded matching, no replication, no FIX
-protocol, no production hardening beyond the learning goals (**[Verified]** Vision §6). Authentication and TLS used
-to be non-goals; they were built on 2026-10-27 (Spec D74).
+§1). Its non-goals are just as telling: no matching on several threads in one process, no price-indexed arrays,
+no full FIX compliance, no real money, no paid always-on cloud cluster (**[Verified]** Vision §6). Authentication
+and TLS used to be non-goals; they were built on 2026-10-27 (Spec D74). The same day, Vision v5 moved multiple
+symbols, replication and sharding, DevOps and a public play-money demo from the non-goals onto the roadmap (Vision §7
+steps 8–31); none of it is built yet, so the code is still single-instrument and single-process.
 
 This guide gives you the shape of the whole system. Guide 05 traces each flow in detail; guide 07 opens each
 module.

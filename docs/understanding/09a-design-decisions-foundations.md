@@ -61,7 +61,7 @@ Records revised by the risk fixes (details in guide 09b): 2 and 15 (snapshots, D
 
 **Alternatives not taken.** [Inferred]
 - Lock the book (`synchronized` methods or a `ReentrantReadWriteLock`): every caller pays for contention, and the processing order would come from lock acquisition order, so the sequencer would need its own lock to keep it consistent with the journal.
-- Multi-threaded matching (e.g. partition by instrument): irrelevant for a single instrument, and listed as a non-goal (Vision §6).
+- Multi-threaded matching (e.g. partition by instrument): irrelevant for a single instrument. Matching on several threads in one process stays a non-goal (Vision §6); partitioning by instrument is planned instead as separate single-writer shards (Vision §7 step 24).
 - An `ExecutorService` with one thread: equivalent; the threads guide the author studied compares a bare thread with a single-thread executor (section 4.2). The bare thread gives explicit control of the stop and halt states [Inferred].
 
 **Trade-offs and consequences.**
@@ -372,7 +372,7 @@ CANCEL_ALL,4,2026-10-27T14:20:42.045241200Z,alice,2b6bb4a5
 
 **Decision.** ASCII lines, `TYPE key=value ...` outbound; FILL lines before the ORDER outcome; market data after the reply for the same command. One reader and one sender thread per connection, plus an acceptor; at most 256 sessions [Verified — Spec D53, §6].
 
-**Why.** [Verified — Spec D53] "Self-describing, extensible, debuggable with any line client." The ordering is "received → matches → done". ⚠ Gap: thread-per-connection has no stated reason beyond being the simple choice; NIO or virtual threads are a roadmap candidate [Verified — Vision §7 candidate 4].
+**Why.** [Verified — Spec D53] "Self-describing, extensible, debuggable with any line client." The ordering is "received → matches → done". ⚠ Gap: thread-per-connection has no stated reason beyond being the simple choice; NIO or virtual threads are planned as roadmap step 13 [Verified — Vision §7].
 
 **Alternatives not taken.** FIX (non-goal, Vision §6); binary protocols; NIO selectors; Java 21 virtual threads (the project targets 17) [Verified/Inferred].
 

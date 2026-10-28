@@ -1,15 +1,81 @@
 # ExchangeServer2
 
-A single-instrument limit order book with a price-time-priority matching engine, a write-ahead journal with
-replay, a single-writer thread model and a plain TCP gateway. A rewrite of `ExchangeServer` that follows
-`docs/ExchangeServer2_Vision.md` (purpose, principles, roadmap) and `docs/ExchangeServer2_Spec.md` (code state,
-decisions, open threads).
+A crash-safe, deterministic exchange matching engine in Java 17: a single-instrument limit order book with
+price-time-priority matching, a checksummed write-ahead journal with replay and snapshots, a single-writer thread
+model, and an authenticated TCP/TLS gateway. It uses only the JDK at runtime (JUnit and JMH are test-only).
 
 ```
-client --TCP--> gateway (stateless checks) --queue--> writer thread: stamp -> journal (fsync per batch) -> engine -> book
-                                                                    |                                        |
-                                                             replay on restart              replies, fills, market data
+client --TCP/TLS--> gateway (auth, stateless checks, rate limits) --queue--> writer thread:
+        stamp (sequencer) -> journal (one write + one fsync per batch) -> matching engine -> order book
+                                  |                                              |
+                    replay + snapshot on restart                 replies, fills, market data
 ```
+
+## At a glance
+
+| | |
+|---|---|
+| **Engine latency** | ~0.65–1.1 µs per command, flat from 10 to 100,000 price levels per side (JMH) |
+| **Durable throughput** | 43,300 fsynced orders/s with 64 clients, **53x** fsync-per-command, p50 1.4 ms / p99 2.4 ms |
+| **Tests** | 453 JUnit 5 tests, all green on Windows and on Linux (Docker) |
+| **Mutation testing** | PIT: 702 mutants, 92% killed, 94% test strength, 94% line coverage; every survivor explained |
+| **Randomised checking** | book invariants re-derived from scratch after each of 30,000 random engine commands |
+| **Design record** | 77 numbered design decisions, each with its reason ([Spec §3](docs/ExchangeServer2_Spec.md)) |
+| **Code size** | ~5,700 lines of production Java (62 files), ~5,700 lines of tests (26 files); warning-free under `-Xlint:all` |
+| **Runtime dependencies** | none beyond the JDK |
+
+Benchmarks ran on a laptop (Windows 11, JDK 17, JMH 1.37; one fsync costs ~1.5 ms on that disk), so treat them as
+indicative. Full tables: [Spec §5](docs/ExchangeServer2_Spec.md).
+
+## Highlights
+
+**Matching engine**
+- Price-time priority with five order types: LIMIT, IOC, FOK, MARKET and POST_ONLY.
+- O(1) cancel: each price level is a doubly linked list with sentinel nodes, plus an `orderId -> node` map.
+  Best-price lookup is O(log L) on a `TreeMap`, measured at 8–18 ns, under 2% of a command.
+- Pre-trade risk checks: ±10% price band and market-order collar, duplicate client-order-id detection, per-participant
+  and global resting-order caps, and self-trade prevention (cancel the incoming remainder).
+- The compiler enforces ownership: every `PriceLevel` mutator is package-private, so the engine can read the book but
+  can only change it through methods that keep its invariants.
+
+**Durability and recovery**
+- Write-ahead journal: no reply, fill or market-data message exists for a command that is not fsynced.
+- **Smart batching** (take whatever is waiting, one fsync, then process): the same latency as fsync-per-command at low
+  load, and throughput that grows with load. A timer-based "linger" batch measured worse, because Windows rounds
+  timed waits up to ~15.6 ms.
+- Deterministic replay: the engine reads no clock and has no counters, randomness or hash-iteration order, so a
+  restart rebuilds the identical book. A periodic **output digest** (FNV-1a over every engine output) is journalled
+  and compared during replay, so a code change that alters behaviour is detected, not replayed silently.
+- CRC-32C on every journal and snapshot record, directory fsync, torn-tail repair, atomic file replacement and
+  crash-safe compaction into snapshots, which bound recovery time.
+- Fail-stop with a poison-pill policy: a command that crashes the engine is quarantined (`SKIP`) and the engine is
+  rebuilt by replay; an I/O failure halts the process (exit code 2) rather than continuing in an unknown state.
+- One process per journal, enforced by a lock file that works on both Windows (mandatory locks) and POSIX (where
+  closing any handle drops a process's locks).
+
+**Concurrency**
+- One writer thread owns the sequencer, journal, engine and book: no locks in the hot path and no data races by
+  construction. Other threads, reads included, reach the state only through a queue, and each caller gets its own
+  `CompletableFuture`.
+- Shutdown never loses an accepted request (tested with 5 × 1,000 requests racing `stop()`).
+- Backpressure: a full queue is refused with `BUSY` and a slow consumer is disconnected, so neither can stall the
+  writer.
+
+**Gateway and security**
+- Line-based TCP protocol, optional TLS 1.3/1.2; binds to loopback unless told otherwise.
+- Salted PBKDF2-HMAC-SHA256 credentials with constant-time comparison.
+- Per-session token-bucket rate limit, in-flight limit, login and idle timeouts, and line-length limits.
+- A numbered private stream per participant with `RESEND` after reconnecting, and opt-in cancel-on-disconnect.
+
+**Engineering process**
+- Every behaviour change goes through mutation testing; surviving mutants are either killed with a new test or
+  explained (fsync and log calls, equivalent boundaries) in [Spec §7](docs/ExchangeServer2_Spec.md).
+- Optimisations are measured before they are kept: a cached best-level pointer was benchmarked and rejected; smart
+  batching was benchmarked and kept.
+- A full code review produced 10 findings (concurrency races, resource leaks, a lost-reply bug). Each fix that a test
+  can observe has a regression test, and each of those tests was confirmed to fail against the old code.
+- Cross-platform checks: running on Linux exposed a file-locking difference between Windows and POSIX, which a
+  child-JVM test now covers on both.
 
 ## Build and test
 
@@ -93,3 +159,15 @@ moving to a build with a new `Rules.VERSION`: compact with the old build, then s
 | `client` | `ExchangeClient`, `ClientMain` |
 
 Tests mirror the packages: one test class per production class, `@Nested` groups per behaviour.
+
+## Documentation
+
+- [docs/ExchangeServer2_Vision.md](docs/ExchangeServer2_Vision.md): purpose, engineering principles, non-goals and
+  the roadmap.
+- [docs/ExchangeServer2_Spec.md](docs/ExchangeServer2_Spec.md): the exact code state, the 77 design decisions with
+  their reasons, the journal format and failure model, benchmark and mutation-testing results, and known
+  limitations.
+- [docs/understanding/](docs/understanding/00-START-HERE.md): study guides that walk through the code.
+
+**Known limitations** (deliberate scope; see Spec §8): one instrument, one matching thread, offline compaction, two
+platform threads per connection (256 sessions max), and no replication or failover.

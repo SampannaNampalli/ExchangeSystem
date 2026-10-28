@@ -5,9 +5,9 @@ needs to be read from earlier specs.
 **Companion:** `ExchangeServer2_Vision.md` (purpose, working style, principles, **roadmap**).
 **Verified on 2026-10-27 against the working tree:** `mvnw test` compiles with `-Xlint:all` and no warnings,
 **453 tests, all green on Windows; the suite also ran green on Linux** (§11; the earlier "326 green, three runs" hid a flaky test, §10 #1).
-**Status:** roadmap steps 1–7 complete, and next candidates 1–3 (snapshots and rotation, output sequence numbers
-and resend, self-trade prevention) plus the security work (Vision §7); every risk from the study-guide review is
-addressed (§11).
+**Status:** roadmap steps 1–7 complete, plus snapshots and offline compaction, output sequence numbers and resend,
+self-trade prevention and the security work; every risk from the study-guide review is addressed (§11). Steps 8–31
+(Vision §7, v5: DevOps, multiple symbols, public demo, replication, sharding) are planned, none started.
 
 ---
 
