@@ -56,40 +56,46 @@ public final class ExchangeService {
         HALTED
     }
 
-    public record Settings(int queueCapacity, int maxBatchSize, long lingerNanos, Clock clock) {
+    public record Settings(int queueCapacity, int maxBatchSize, long lingerNanos, Clock clock, Exchange.Options exchange) {
 
         public Settings {
             Objects.requireNonNull(clock, "clock");
+            Objects.requireNonNull(exchange, "exchange");
             if (queueCapacity <= 0 || maxBatchSize <= 0 || lingerNanos < 0) {
                 throw new IllegalArgumentException("Bad settings");
             }
         }
 
         public static Settings defaults() {
-            return new Settings(100_000, 1_000, 0, Clock.systemUTC());
+            return new Settings(100_000, 1_000, 0, Clock.systemUTC(), Exchange.Options.defaults());
         }
 
         public Settings withQueueCapacity(int capacity) {
-            return new Settings(capacity, maxBatchSize, lingerNanos, clock);
+            return new Settings(capacity, maxBatchSize, lingerNanos, clock, exchange);
         }
 
         public Settings withMaxBatchSize(int size) {
-            return new Settings(queueCapacity, size, lingerNanos, clock);
+            return new Settings(queueCapacity, size, lingerNanos, clock, exchange);
         }
 
         public Settings withLinger(Duration linger) {
-            return new Settings(queueCapacity, maxBatchSize, linger.toNanos(), clock);
+            return new Settings(queueCapacity, maxBatchSize, linger.toNanos(), clock, exchange);
         }
 
         public Settings withClock(Clock c) {
-            return new Settings(queueCapacity, maxBatchSize, lingerNanos, c);
+            return new Settings(queueCapacity, maxBatchSize, lingerNanos, c, exchange);
+        }
+
+        public Settings withExchangeOptions(Exchange.Options options) {
+            return new Settings(queueCapacity, maxBatchSize, lingerNanos, clock, options);
         }
     }
 
     private static final System.Logger LOG = System.getLogger(ExchangeService.class.getName());
 
-    private final Pending<Void> STOP = new Pending<>(null);     // marker, compared by identity
+    private final Pending<Void> stopMarker = new Pending<>(null);       // compared by identity
     private final Exchange exchange;
+    private final Exchange.Recovery recovery;
     private final OutputListener listener;
     private final Settings settings;
     private final BlockingQueue<Pending<?>> queue = new LinkedBlockingQueue<>();
@@ -98,13 +104,16 @@ public final class ExchangeService {
     private volatile State state = State.RUNNING;
     private volatile Throwable haltCause;
 
-    // Written only by the writer thread; volatile so other threads can read a recent value.
+    // Written only by the writer thread; volatile so other threads can read a recent value. Updated after the
+    // batch's futures complete, so a caller holding a result may still see the previous values; after stop()
+    // returns true (the writer's join) they are final.
     private volatile long batches;
     private volatile long processed;
     private volatile int largestBatch;
 
     private ExchangeService(Exchange exchange, OutputListener listener, Settings settings) {
         this.exchange = exchange;
+        this.recovery = exchange.recovery();
         this.listener = listener;
         this.settings = settings;
         this.writer = new Thread(this::run, "exchange-writer");
@@ -118,16 +127,17 @@ public final class ExchangeService {
         return start(journalFile, listener, settings, CommandInterceptor.NONE);
     }
 
-    public static ExchangeService start(Path journalFile, OutputListener listener) throws IOException {
-        return start(journalFile, listener, Settings.defaults());
-    }
-
     static ExchangeService start(Path journalFile, OutputListener listener, Settings settings,
                                  CommandInterceptor interceptor) throws IOException {
-        Exchange exchange = Exchange.open(journalFile, settings.clock(), interceptor);
+        Exchange exchange = Exchange.open(journalFile, settings.clock(), interceptor, settings.exchange());
         ExchangeService service = new ExchangeService(exchange, Objects.requireNonNull(listener, "listener"), settings);
         service.writer.start();
         return service;
+    }
+
+    // What recovery did at start (L1). Built on the starting thread before the writer existed; immutable.
+    public Exchange.Recovery recovery() {
+        return recovery;
     }
 
     // ---------- Hand-in (any thread) ----------
@@ -149,6 +159,14 @@ public final class ExchangeService {
         return handOff(enqueue(new Pending<>(new Request.Snapshot(depth)), null));
     }
 
+    public CompletableFuture<List<CancelResult>> cancelAll(String participant) {
+        return handOff(enqueue(new Pending<>(new Request.CancelAll(participant)), null));
+    }
+
+    public CompletableFuture<ResendResult> resend(String participant, long fromOseq) {
+        return handOff(enqueue(new Pending<>(new Request.Resend(participant, fromOseq)), null));
+    }
+
     private static <R> CompletableFuture<R> handOff(CompletableFuture<R> internal) {
         CompletableFuture<R> mine = new CompletableFuture<>();
         internal.whenCompleteAsync((value, failure) -> {
@@ -162,8 +180,9 @@ public final class ExchangeService {
     }
 
     // Callback variants, for the gateway: the callback is attached before the request is queued, so it runs on the
-    // writer thread, before that command's OutputListener call; that is how a reply goes out before the fills and
-    // market data the same command caused. The callback must not block: it holds up the whole exchange.
+    // writer thread right after that command's OutputListener call (D76), or on the caller's thread if the request
+    // is refused. A read's callback runs on the writer before any later command's output, which is how SUBSCRIBE
+    // and LOGIN join a stream with no gap. The callback must not block: it holds up the whole exchange.
     public void submit(OrderRequest order, BiConsumer<? super Response, ? super Throwable> onDone) {
         enqueue(new Pending<>(new Request.Submit(Objects.requireNonNull(order, "order"))), onDone);
     }
@@ -176,10 +195,29 @@ public final class ExchangeService {
         enqueue(new Pending<>(new Request.Snapshot(depth)), onDone);
     }
 
+    public void cancelAll(String participant, BiConsumer<? super List<CancelResult>, ? super Throwable> onDone) {
+        enqueue(new Pending<>(new Request.CancelAll(participant)), onDone);
+    }
+
+    public void attach(String participant, BiConsumer<? super Long, ? super Throwable> onDone) {
+        enqueue(new Pending<>(new Request.Attach(participant)), onDone);
+    }
+
+    public void resend(String participant, long fromOseq, BiConsumer<? super ResendResult, ? super Throwable> onDone) {
+        enqueue(new Pending<>(new Request.Resend(participant, fromOseq)), onDone);
+    }
+
     // Returns the internal future: for handOff() only, never to a caller.
     private <R> CompletableFuture<R> enqueue(Pending<R> pending, BiConsumer<? super R, ? super Throwable> onDone) {
         if (onDone != null) {
-            pending.result.whenComplete(onDone);
+            pending.result.whenComplete((value, failure) -> {
+                // whenComplete would capture a throw in a future nobody reads: log it instead (M9).
+                try {
+                    onDone.accept(value, failure);
+                } catch (RuntimeException | Error callbackBug) {
+                    LOG.log(Level.ERROR, "Request callback failed", callbackBug);
+                }
+            });
         }
         ExchangeException refusal = null;
         synchronized (lock) {
@@ -203,11 +241,15 @@ public final class ExchangeService {
 
     // Refuses new requests, lets the writer finish everything already accepted, and waits for it to end.
     // Idempotent: later callers just wait. Returns false if the writer did not end within the timeout.
+    // Not from the writer thread (a listener or callback): it would wait for its own end.
     public boolean stop(Duration timeout) throws InterruptedException {
+        if (Thread.currentThread() == writer) {
+            throw new IllegalStateException("stop() called on the writer thread: it would wait for itself");
+        }
         synchronized (lock) {
             if (state == State.RUNNING) {
                 state = State.STOPPING;
-                queue.add(STOP);
+                queue.add(stopMarker);
             }
         }
         writer.join(Math.max(1, timeout.toMillis()));
@@ -253,7 +295,7 @@ public final class ExchangeService {
                 if (settings.lingerNanos() > 0) {
                     linger(batch);
                 }
-                stopping = batch.remove(STOP);      // always last: nothing is accepted after it
+                stopping = batch.remove(stopMarker);    // always last: nothing is accepted after it
                 if (!batch.isEmpty()) {
                     exchange.process(batch, listener);
                     batches++;
@@ -283,7 +325,7 @@ public final class ExchangeService {
     // Group commit with a timeout: keep collecting until the batch is full or the linger time is up.
     private void linger(List<Pending<?>> batch) throws InterruptedException {
         long deadline = System.nanoTime() + settings.lingerNanos();
-        while (batch.size() < settings.maxBatchSize() && batch.get(batch.size() - 1) != STOP) {
+        while (batch.size() < settings.maxBatchSize() && batch.get(batch.size() - 1) != stopMarker) {
             long left = deadline - System.nanoTime();
             if (left <= 0) {
                 break;
@@ -310,7 +352,7 @@ public final class ExchangeService {
         List<Pending<?>> left = new ArrayList<>();
         queue.drainTo(left);
         for (Pending<?> p : left) {
-            if (p != STOP) {
+            if (p != stopMarker) {
                 p.fail(refusal);
             }
         }

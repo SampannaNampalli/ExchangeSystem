@@ -37,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // Every wait has a timeout (threads guide 4.4): a bug must fail the test, not hang it.
+// The writer's stats (batches, processed, largestBatch) are read only after stop(): the writer updates them after
+// a batch's futures complete, so a completed future does not make them current; the writer's join() does.
 class ExchangeServiceTest {
 
     private static final Duration WAIT = Duration.ofSeconds(30);
@@ -152,10 +154,10 @@ class ExchangeServiceTest {
                     assertTrue(orderIds.add(r.orderId()), "order id issued twice");
                 }
             }
-            assertEquals(threads * each, service.processed());
             BookSnapshot before = await(service.snapshot(Integer.MAX_VALUE));
 
             assertTrue(service.stop(WAIT));
+            assertEquals(threads * each + 1, service.processed(), "every order, plus the snapshot read");
             try (Exchange replayed = Exchange.open(journal(), clock)) {
                 assertEquals(threads * each, replayed.lastSequenceNumber());
                 assertEquals(before, replayed.snapshot(Integer.MAX_VALUE), "the journal alone rebuilds the book");
@@ -232,11 +234,13 @@ class ExchangeServiceTest {
             assertFalse(threads.get(0).equals("exchange-writer"), threads.toString());
         }
 
+        // D76: the listener (which sends the request's own lines) runs first, then the request's callback, so a
+        // callback that sees the last request complete knows its lines were already offered.
         @Test
-        void callbackRunsOnTheWriterBeforeTheListener() throws Exception {
+        void listenerRunsOnTheWriterBeforeTheCallback() throws Exception {
             List<String> events = Collections.synchronizedList(new ArrayList<>());
             ExchangeService service = start(ExchangeService.Settings.defaults(), CommandInterceptor.NONE,
-                    out -> events.add("listener " + out.sequenceNumber() + " " + Thread.currentThread().getName()));
+                    (out, privateEvents) -> events.add("listener " + out.sequenceNumber() + " " + Thread.currentThread().getName()));
             CountDownLatch done = new CountDownLatch(2);
             for (int i = 1; i <= 2; i++) {
                 service.submit(order("a", "c" + i, Side.BUY, 100), (r, e) -> {
@@ -247,8 +251,8 @@ class ExchangeServiceTest {
             assertTrue(done.await(WAIT.toSeconds(), TimeUnit.SECONDS));
             await(service.snapshot(1));         // happens-before: the listener calls are done too
             assertEquals(List.of(
-                    "reply 1 exchange-writer", "listener 1 exchange-writer",
-                    "reply 2 exchange-writer", "listener 2 exchange-writer"), events);
+                    "listener 1 exchange-writer", "reply 1 exchange-writer",
+                    "listener 2 exchange-writer", "reply 2 exchange-writer"), events);
         }
     }
 
@@ -343,8 +347,9 @@ class ExchangeServiceTest {
                 threads.add(t);
             }
             go.countDown();
-            while (handedIn.get() < producers * each / 3) {
-                Thread.onSpinWait();
+            long deadline = System.nanoTime() + WAIT.toNanos();
+            while (handedIn.get() < producers * each / 3 && System.nanoTime() < deadline) {
+                Thread.onSpinWait();                // L5: bounded, so a stuck producer fails the test instead of hanging it
             }
             assertTrue(service.stop(WAIT), "writer did not end");
             for (Thread t : threads) {
@@ -392,6 +397,7 @@ class ExchangeServiceTest {
             for (CompletableFuture<Response> f : accepted) {
                 await(f);
             }
+            assertTrue(service.stop(WAIT));
             assertEquals(4, service.processed());
         }
     }
@@ -490,6 +496,7 @@ class ExchangeServiceTest {
             for (CompletableFuture<Response> f : waiting) {
                 await(f);
             }
+            assertTrue(service.stop(WAIT));
             assertEquals(50, service.largestBatch());
             assertEquals(2, service.batches());
         }
@@ -508,6 +515,7 @@ class ExchangeServiceTest {
             for (CompletableFuture<Response> f : waiting) {
                 await(f);
             }
+            assertTrue(service.stop(WAIT));
             assertEquals(1, service.largestBatch());
             assertEquals(11, service.batches());
         }
@@ -521,6 +529,7 @@ class ExchangeServiceTest {
             CompletableFuture<Response> second = service.submit(order("a", "2", Side.BUY, 100));
             await(first);
             await(second);
+            assertTrue(service.stop(WAIT));
             assertEquals(1, service.batches());
             assertEquals(2, service.largestBatch());
         }
@@ -542,6 +551,86 @@ class ExchangeServiceTest {
         assertThrows(IllegalArgumentException.class, () -> ExchangeService.Settings.defaults().withQueueCapacity(0));
         assertThrows(IllegalArgumentException.class, () -> ExchangeService.Settings.defaults().withMaxBatchSize(0));
         assertThrows(IllegalArgumentException.class, () -> ExchangeService.Settings.defaults().withLinger(Duration.ofMillis(-1)));
+        assertThrows(IllegalArgumentException.class, () -> new Exchange.Options(0, 1));
+        assertThrows(IllegalArgumentException.class, () -> new Exchange.Options(1, 0));
         assertSame(clock, ExchangeService.Settings.defaults().withClock(clock).clock());
+    }
+
+    @Nested
+    class Robustness {
+
+        // M9: a callback that throws used to vanish into a future nobody reads; now it is logged.
+        @Test
+        void aThrowingCallbackIsLoggedAndTheExchangeCarriesOn() throws Exception {
+            java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ExchangeService.class.getName());
+            List<java.util.logging.LogRecord> records = Collections.synchronizedList(new ArrayList<>());
+            java.util.logging.Handler capture = new java.util.logging.Handler() {
+                @Override
+                public void publish(java.util.logging.LogRecord r) {
+                    records.add(r);
+                }
+
+                @Override
+                public void flush() {
+                }
+
+                @Override
+                public void close() {
+                }
+            };
+            logger.addHandler(capture);
+            try {
+                ExchangeService service = start(CommandInterceptor.NONE);
+                service.submit(order("a", "1", Side.BUY, 100), (r, e) -> {
+                    throw new IllegalStateException("callback bug");
+                });
+                assertEquals(OrderStatus.RESTED, await(service.submit(order("a", "2", Side.BUY, 100))).status());
+                assertTrue(records.stream().anyMatch(r -> r.getMessage().contains("Request callback failed")
+                        && r.getThrown() != null && "callback bug".equals(r.getThrown().getMessage())), records.toString());
+            } finally {
+                logger.removeHandler(capture);
+            }
+        }
+
+        // L6: stop() from the writer thread would wait for itself until the timeout.
+        @Test
+        void stopFromTheWriterThreadIsRefused() throws Exception {
+            CompletableFuture<Throwable> seen = new CompletableFuture<>();
+            ExchangeService[] self = new ExchangeService[1];
+            ExchangeService service = start(ExchangeService.Settings.defaults(), CommandInterceptor.NONE, (out, events) -> {
+                try {
+                    self[0].stop(Duration.ofSeconds(1));
+                    seen.complete(null);
+                } catch (Throwable t) {
+                    seen.complete(t);
+                }
+            });
+            self[0] = service;
+            await(service.submit(order("a", "1", Side.BUY, 100)));
+            assertInstanceOf(IllegalStateException.class, seen.get(WAIT.toSeconds(), TimeUnit.SECONDS));
+            assertEquals(ExchangeService.State.RUNNING, service.state());
+        }
+
+        @Test
+        void cancelAllAndResendThroughTheQueue() throws Exception {
+            ExchangeService service = start(CommandInterceptor.NONE);
+            await(service.submit(order("a", "1", Side.BUY, 100)));
+            await(service.submit(order("a", "2", Side.BUY, 99)));
+            assertEquals(2, await(service.cancelAll("a")).size());
+            ResendResult r = await(service.resend("a", 3));
+            assertEquals(4, r.lastOseq());
+            assertEquals(2, r.events().size());
+            assertTrue(r.events().stream().allMatch(e -> e instanceof PrivateEvent.CancelReply c && c.byCancelAll()));
+        }
+
+        @Test
+        void recoveryIsReportedAtStart() throws Exception {
+            ExchangeService first = start(CommandInterceptor.NONE);
+            await(first.submit(order("a", "1", Side.BUY, 100)));
+            assertTrue(first.stop(WAIT));
+            ExchangeService second = start(CommandInterceptor.NONE);
+            assertEquals(1, second.recovery().replayed());
+            assertEquals(1, second.recovery().lastSequence());
+        }
     }
 }

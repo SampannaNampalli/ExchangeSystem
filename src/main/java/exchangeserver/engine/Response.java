@@ -12,7 +12,7 @@ orderId    the id to cancel with. For DUPLICATE_CLIENT_ORDER_ID it is the origin
 trades     the aggressor's own fills, in match order.
 
  */
-public record Response(long orderId, String clientOrderId, OrderStatus status, RejectReason rejectReason,
+public record Response(long orderId, String clientOrderId, OrderStatus status, Reason reason,
                        long filledQuantity, long remainingQuantity, List<Trade> trades) {
 
     public Response {
@@ -30,8 +30,11 @@ public record Response(long orderId, String clientOrderId, OrderStatus status, R
         if (remainingQuantity < 0) {
             throw new IllegalStateException("Negative remaining quantity");
         }
-        if ((status == OrderStatus.REJECTED) != (rejectReason != null)) {
+        if ((status == OrderStatus.REJECTED) != (reason != null && reason.isReject())) {
             throw new IllegalStateException("A reject reason goes with REJECTED and nothing else");
+        }
+        if (reason == Reason.SELF_TRADE_PREVENTED && status != OrderStatus.CANCELLED) {
+            throw new IllegalStateException("SELF_TRADE_PREVENTED goes with CANCELLED only");
         }
         switch (status) {
             case FILLED -> {

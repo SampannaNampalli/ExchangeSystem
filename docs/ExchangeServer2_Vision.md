@@ -1,6 +1,7 @@
-# ExchangeServer2 — Vision (v4)
+# ExchangeServer2 — Vision (v5)
 
-**Supersedes:** `ExchangeServer_Vision_v3.md` (in the original `Exchange Server` project). Self-contained.
+**Supersedes:** v4 (in git history; v5 extends the roadmap to multiple symbols, DevOps, distributed systems and a
+public demo) and `ExchangeServer_Vision_v3.md` (in the original `Exchange Server` project). Self-contained.
 **Companion:** `ExchangeServer2_Spec.md` (exact code state, decisions, open threads).
 **Rule:** the roadmap lives only here. The spec points to it and does not duplicate it.
 
@@ -16,14 +17,20 @@ justified, tested, and understood well enough to defend.
 and robustness of NASDAQ/LMAX-class venues is not, solo. The aim is to hit the same design problems real systems
 hit and understand why they were solved the way they were.
 
-Learning order: correctness of the core -> concurrency model -> networking -> durability/recovery ->
-(conceptually) distribution -> operability.
+Learning order: correctness of the core -> concurrency model -> networking -> durability/recovery (all done) ->
+delivery and observability -> multiple symbols -> operations and a public deployment -> distribution (replication,
+then partitioning) -> the systems around an exchange.
+
+The project already has three of the four parts of state machine replication: a deterministic engine, an ordered
+command log, and CHECK digests that prove two replays agree. Distribution (§7 phases 5–6) adds the fourth, shipping
+the log to other machines, rather than a redesign.
 
 ---
 
 ## 2. What the system is
 
-A single-instrument limit order book with a price-time-priority matching engine, behind the full pipeline:
+Today, a single-instrument limit order book (multiple symbols are roadmap step 11) with a price-time-priority
+matching engine, behind the full pipeline:
 
 ```
  clients --> TCP gateway --> one ordered queue --> writer thread --------------------------------> OrderBook
@@ -37,7 +44,10 @@ A single-instrument limit order book with a price-time-priority matching engine,
 
 **Status (2026-10-27): roadmap steps 1–7 are implemented** in ExchangeServer2, a rewrite of ExchangeServer into a
 Maven project with real packages. Steps 1–3 were rebuilt with the open threads of Spec v8 closed; steps 4–7 are
-new. The rewrite was written by the LLM at the user's request (see §3).
+new. The rewrite was written by the LLM at the user's request (see §3). The same day, at the user's request, the
+LLM also fixed every risk found by the study-guide review, including the deferred security findings: snapshots and
+offline compaction, output sequence numbers and resend, self-trade prevention, authentication, TLS and per-session
+limits (Spec D63–D77). Steps 8–31 (v5, same day) are planned and not started.
 
 ---
 
@@ -102,20 +112,35 @@ new. The rewrite was written by the LLM at the user's request (see §3).
   queue and get a `CompletableFuture` each. No internal thread-safety in the book.
 - **Batching:** smart batching (take whatever is waiting, one fsync, then process), chosen by measurement.
 - **Poison pills:** quarantine + rebuild live; stop + operator quarantine at startup.
-- **Gateway:** plain TCP, line protocol, thread-per-connection, slow consumers disconnected.
+- **Recovery:** snapshots + offline compaction bound recovery; CHECK records prove replay rebuilt the same outputs.
+- **Gateway:** TCP or TLS, line protocol, thread-per-connection, slow consumers disconnected; authenticated
+  participants, loopback by default, per-session timeouts and limits; a numbered private stream per participant
+  with RESEND; opt-in cancel-on-disconnect; self-trade prevention in the engine.
 
 ---
 
 ## 6. Non-goals (for now)
 
-- Multi-instrument support, multi-threaded matching, distributed replication/consensus.
+- Matching on several threads inside one process (parallel matching behind one journal). fsync dominates a
+  command's cost (Spec §5), so scaling out is done by sharding (step 24) instead. Revisit only if a benchmark asks.
 - Price-indexed array books (needs a bounded price range; benchmarks did not ask for it).
-- Full FIX/ITCH compliance; authentication; TLS.
-- Production hardening beyond the learning goals.
+- Full FIX/ITCH compliance. A binary protocol is step 31; certification-grade compliance is not a goal.
+- Real money. The system is a play-money simulation: no deposits, payouts or real securities, and the public demo
+  uses made-up symbols, not real tickers or real market data.
+- An always-on, paid multi-node cloud cluster. The full cluster runs locally (kind or k3d); the public demo is a
+  small single-host deployment.
+
+Removed from this list in v5, now on the roadmap: multiple instruments, distributed replication and consensus,
+accounts and permissions, online rotation, market-data resend. (Authentication and TLS left it on 2026-10-27, D74.)
 
 ---
 
 ## 7. Roadmap — single source of truth
+
+Step numbers are stable: code comments cite them ("roadmap step 4A"). New steps get the next number, never a reused
+one. Each phase leaves a working system; within a phase, steps are in dependency order.
+
+### Built
 
 | # | Step | State |
 |---|---|---|
@@ -127,13 +152,79 @@ new. The rewrite was written by the LLM at the user's request (see §3).
 | 6 | Benchmarking | **done (ES2)**: JMH; cached pointer rejected; smart batching kept |
 | 7 | Crash recovery via replay, including poison-pill policy | **done (ES2)** |
 | — | Cleanup: one test file per production class with `@Nested` groups | **done (ES2)** |
+| — | Risk fixes from the study-guide review: snapshots + compaction, output digest, journal checksums, private stream + RESEND, cancel-on-disconnect, self-trade prevention (cancel incoming), authentication + TLS + session limits, operability | **done (ES2, 2026-10-27, Spec D63–D77)** |
 
-**Next candidates (not scheduled; pick with the user):**
-1. Snapshots + journal rotation (bounded recovery time; scopes the client-order-id map to a trading day).
-2. Output sequence numbers and resend requests (a reconnecting client recovers missed fills).
-3. Self-trade prevention (needs a policy choice: cancel newest / oldest / both).
-4. NIO or virtual-thread gateway (Java 21) instead of two platform threads per connection.
-5. Distributed systems concepts (replication of the journal, failover), observability (metrics, structured logs).
+### Phase 1 — Delivery foundations (planned)
+
+| # | Step | Scope | Teaches |
+|---|---|---|---|
+| 8 | Continuous integration | GitHub Actions: build and test on a Windows and Linux matrix, warning-free check, nightly PIT, JMH runs that fail on a latency regression; CodeQL, dependency and secret scanning | CI/CD, performance regression gates, DevSecOps |
+| 9 | Containers | Multi-stage Dockerfile, minimal JRE from `jlink`, non-root user, volumes for the journal and users file; `docker compose` for the whole stack; SBOM and signed images published to GHCR | Reproducible builds, image hygiene, supply-chain security |
+| 10 | Metrics and structured logs | Queue depth, batch size, fsync latency histogram, rejects by reason, sessions; JSON logs; Prometheus and Grafana in the compose file | Observability basics; measuring what Spec §5 measured once, continuously |
+
+### Phase 2 — Multiple symbols, one process (planned)
+
+| # | Step | Scope | Teaches |
+|---|---|---|---|
+| 11 | Multiple symbols | Recommended design: one `MatchingEngine` per symbol, routed by the writer, behind the single sequencer, journal and writer thread (the engine and book stay single-instrument). Instrument definitions (tick size, band, caps) journalled and in snapshots, not only in config; journal format v4 and a `Rules.VERSION` bump; symbol in the protocol and market data, per-symbol subscriptions; cancel by order id via an id-to-symbol map; decide which limits are per symbol and which per participant; poison-pill rebuild of only the affected symbol | Routing above an unchanged core; reference data that replay depends on; format migration |
+| 12 | Trading phases and admin commands | Opening and closing auctions, halts, circuit breakers per symbol; admin commands (add instrument, halt, resume) journalled like any other command | Market structure; operator actions as part of the deterministic log |
+
+### Phase 3 — Gateway and operations (planned)
+
+| # | Step | Scope | Teaches |
+|---|---|---|---|
+| 13 | Scalable gateway | NIO selectors, or virtual threads (needs Java 21), instead of two platform threads per connection; measure both | I/O models, measuring a concurrency change |
+| 14 | Online compaction, backups, restore | Compaction and journal rotation while running; snapshots and journals copied to object storage; a rehearsed restore | Operating stateful systems without downtime; disaster recovery |
+| 15 | Accounts and permissions | Users managed while running (no restart), roles (trader, viewer, admin), limits per participant across sessions | Authorization, multi-tenant fairness |
+
+### Phase 4 — Public demo, play money (planned)
+
+| # | Step | Scope | Teaches |
+|---|---|---|---|
+| 16 | Web gateway | WebSocket (and HTTP) gateway in front of the same `OrderRequest` validation as the TCP gateway; the JDK has no WebSocket server, so hand-rolled RFC 6455 framing or a library (decision below) | Protocol adapters; one validation layer for several front doors |
+| 17 | Web front end | Order entry, live L2 book, trade tape, own orders and fills; a read-only public Grafana | Real-time UIs over a streaming API |
+| 18 | Bots | A market maker quoting both sides and random traders, as ordinary authenticated participants | Load that looks like a market; a self-test that never stops |
+| 19 | Hosting | Docker Compose on one VPS; Caddy or nginx with Let's Encrypt; firewall, per-IP limits, a CDN or DDoS shield in front; scheduled backups; demo accounts; a visible "simulation, play money" notice. Moves to primary-backup after step 20 | Deploying and running a public service; abuse protection |
+
+### Phase 5 — Replication, one group (planned)
+
+| # | Step | Scope | Teaches |
+|---|---|---|---|
+| 20 | Primary-backup replication | The primary streams journal batches to backups, which replay and compare CHECK digests; a reply is released only after a majority has fsynced the batch; an epoch (term) in the journal header and every record fences a former primary; manual failover | State machine replication, quorum durability, split brain and fencing |
+| 21 | Failure testing | Fault injection (kill the primary, cut the network with Toxiproxy, full disk, slow fsync) and a history checker: every acknowledged order survives failover | Jepsen-style correctness testing; proving rather than hoping |
+| 22 | Automatic leader election | Own Raft implementation, or a lease from etcd (decision below) | Consensus, leases, election timeouts |
+| 23 | Rolling upgrades | Replicas must run identical logic or replay diverges: upgrade at a snapshot boundary, or gate new behaviour on a journalled version | Upgrading deterministic replicated systems; the generalization of `Rules.VERSION` |
+
+### Phase 6 — Partitioning and orchestration (planned)
+
+| # | Step | Scope | Teaches |
+|---|---|---|---|
+| 24 | Sharding | N replicated groups, each owning a set of symbols; stateless gateways holding a shard map (config or a coordination service); sequence numbers, private streams and digests per shard; cancel-all fanned out across shards; cross-shard risk through per-shard budgets | Partitioning, routing, what a global order costs, cross-partition consistency trade-offs |
+| 25 | Rebalancing | Move a symbol between shards: snapshot one symbol, hand it over, fence the old owner | Ownership transfer, as in Kafka partitions or database ranges |
+| 26 | Kubernetes | A StatefulSet per shard with persistent volumes, anti-affinity across replicas, readiness only after replay, PodDisruptionBudgets; a Helm chart; run on kind or k3d | Stateful workloads on Kubernetes, fsync on network storage |
+| 27 | Deterministic simulation testing | The whole cluster in one thread with simulated network, clock and disk, driven by a seed; any failure replays exactly from its seed (the FoundationDB and TigerBeetle approach) | Testing distributed systems exhaustively; the payoff of a deterministic core |
+| 28 | Tracing, SLOs, load testing | OpenTelemetry traces from gateway to shard, replication lag, SLOs and alerts (e.g. p99 order acknowledgement); a load generator with HdrHistogram that corrects for coordinated omission; capacity per shard | End-to-end observability, capacity planning |
+
+### Phase 7 — Systems around the exchange (planned)
+
+| # | Step | Scope | Teaches |
+|---|---|---|---|
+| 29 | Event streaming | Trades and order events published to Kafka or Redpanda; idempotent consumers keyed on sequence numbers; a schema registry | Event-driven architecture, exactly-once effects, schema evolution |
+| 30 | Downstream services and post-trade | Positions, P&L and trade history in Postgres as read models (CQRS); a drop-copy feed; end-of-day clearing and a reconciliation job | CQRS, read models, reconciliation |
+| 31 | Binary protocols | SBE order entry; market data over UDP multicast with a TCP retransmission server (MoldUDP64-style), which also closes the market-data resend gap | Binary encoding, multicast, gap recovery |
+
+### Open decisions (pick with the user before the step that needs them)
+
+1. **Who writes each step** (§3). The default for new features is the user-writes / LLM-reviews loop.
+2. **Runtime dependencies.** The project has none. Each of a metrics library (step 10), a WebSocket server (16), an
+   etcd client (22) and a Kafka client (29) would add one; decide per step whether to hand-roll instead.
+3. **Java 17 or 21** (step 13: virtual threads need 21).
+4. **Own Raft or an etcd lease** (step 22): more learning versus closer to common practice.
+5. **Limit scopes with several symbols** (step 11): open-order cap and client order id uniqueness per symbol or per
+   participant.
+6. **Phase order.** Phase 4 can come before phase 3 for an earlier public demo, provided the journal is kept small
+   (step 14, or a scheduled restart that compacts).
+7. **Cloud spend.** Default: one small VPS for the demo; the cluster stays local.
 
 ---
 
@@ -141,6 +232,9 @@ new. The rewrite was written by the LLM at the user's request (see §3).
 
 - **Service layer:** Spring Boot dropped (2026-10-24); plain TCP gateway.
 - **Build:** Maven (wrapper included), packages under `exchangeserver.*`, tests in `src/test/java`.
+- **Scope expansion (2026-10-27, v5):** at the user's request the roadmap now covers multiple symbols, DevOps,
+  distributed systems and a public play-money demo (§7 steps 8–31). The multi-symbol design in step 11 is a
+  recommendation, to be confirmed when the step starts.
 
 ---
 
@@ -158,3 +252,13 @@ new. The rewrite was written by the LLM at the user's request (see §3).
 - **Band / collar:** the price range around the last trade outside which priced orders are rejected (band) and
   market orders stop trading (collar).
 - **Backpressure:** refusing (BUSY) instead of queueing without limit.
+- **State machine replication:** several machines apply the same commands in the same order to deterministic code
+  and so reach the same state.
+- **Primary-backup:** one replica (the primary) sequences and journals; backups receive its log and replay it.
+- **Epoch / fencing:** a number that increases with each new primary; records from an older epoch are refused, so a
+  deposed primary cannot keep writing (prevents split brain).
+- **Shard:** an independent group (sequencer, journal, replicas) that owns a subset of the symbols.
+- **Deterministic simulation testing:** running a distributed system inside one deterministic process with
+  simulated network, clock and disk, so every failure reproduces from its random seed.
+- **Coordinated omission:** a load-test error where the generator waits for slow replies and so never measures the
+  requests that would have queued behind them.

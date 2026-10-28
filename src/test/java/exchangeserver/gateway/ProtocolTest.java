@@ -2,12 +2,13 @@ package exchangeserver.gateway;
 
 import exchangeserver.book.CancelResult;
 import exchangeserver.book.LevelUpdate;
+import exchangeserver.core.PrivateEvent;
 import exchangeserver.domain.OrderType;
 import exchangeserver.domain.Side;
 import exchangeserver.engine.BookSnapshot;
 import exchangeserver.engine.Execution;
 import exchangeserver.engine.OrderStatus;
-import exchangeserver.engine.RejectReason;
+import exchangeserver.engine.Reason;
 import exchangeserver.engine.Response;
 import exchangeserver.engine.Trade;
 import org.junit.jupiter.api.Nested;
@@ -16,7 +17,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalLong;
 
@@ -31,8 +31,19 @@ class ProtocolTest {
     class Parse {
 
         @Test
-        void login() {
-            assertEquals(new ClientMessage.Login("alice"), Protocol.parse("LOGIN alice"));
+        void loginWithSecretAndOptionalCancelOnDisconnect() {
+            assertEquals(new ClientMessage.Login("alice", "s3cret!!", false), Protocol.parse("LOGIN alice s3cret!!"));
+            assertEquals(new ClientMessage.Login("alice", "s3cret!!", true), Protocol.parse("LOGIN alice s3cret!! COD"));
+        }
+
+        @Test
+        void loginNeverPrintsTheSecret() {
+            assertEquals("Login[alice, COD]", Protocol.parse("LOGIN alice s3cret!! COD").toString());
+        }
+
+        @Test
+        void resend() {
+            assertEquals(new ClientMessage.Resend(5), Protocol.parse("RESEND 5"));
         }
 
         @Test
@@ -61,7 +72,8 @@ class ProtocolTest {
 
         @ParameterizedTest
         @ValueSource(strings = {
-                "", "HELLO", "login alice", "LOGIN", "LOGIN a b", "NEW", "NEW c1 BUY LIMIT 10",
+                "", "HELLO", "login alice", "LOGIN", "LOGIN a", "LOGIN a b c", "LOGIN a b COD x", "RESEND", "RESEND x",
+                "RESEND 1 2", "NEW", "NEW c1 BUY LIMIT 10",
                 "NEW c1 BUY LIMIT 10 100 extra", "NEW c1 HOLD LIMIT 10 100", "NEW c1 BUY STOP 10 100",
                 "NEW c1 BUY LIMIT ten 100", "NEW c1 BUY LIMIT 10 1.5", "CANCEL", "CANCEL x", "CANCEL 1 2",
                 "PING now", "NEW  c1 BUY LIMIT 10 100",
@@ -82,34 +94,48 @@ class ProtocolTest {
     class Format {
 
         @Test
-        void takerFillsCountLeavesDown() {
+        void orderReplyIsTakerFillsCountingLeavesDownThenTheOrderLine() {
             Response r = new Response(9, "c9", OrderStatus.RESTED, null, 5, 5,
                     List.of(new Trade(100, 2, 9, 1, Side.BUY, T), new Trade(101, 3, 9, 2, Side.BUY, T)));
-            List<String> lines = new ArrayList<>();
-            Protocol.takerFills(r, Side.BUY, 10, lines);
             assertEquals(List.of(
-                    "FILL orderId=9 clOrdId=c9 side=BUY price=100 qty=2 leaves=8 liquidity=TAKER",
-                    "FILL orderId=9 clOrdId=c9 side=BUY price=101 qty=3 leaves=5 liquidity=TAKER"), lines);
+                    "FILL oseq=4 orderId=9 clOrdId=c9 side=BUY price=100 qty=2 leaves=8 liquidity=TAKER",
+                    "FILL oseq=4 orderId=9 clOrdId=c9 side=BUY price=101 qty=3 leaves=5 liquidity=TAKER",
+                    "ORDER oseq=4 orderId=9 clOrdId=c9 status=RESTED filled=5 remaining=5"),
+                    Protocol.lines(new PrivateEvent.OrderReply("bob", 4, Side.BUY, 10, r), false));
         }
 
         @Test
         void makerFill() {
-            assertEquals("FILL orderId=1 clOrdId=a side=SELL price=100 qty=2 leaves=3 liquidity=MAKER",
-                    Protocol.makerFill(new Execution("alice", 1, "a", Side.SELL, 100, 2, 3)));
+            assertEquals(List.of("FILL oseq=2 orderId=1 clOrdId=a side=SELL price=100 qty=2 leaves=3 liquidity=MAKER"),
+                    Protocol.lines(new PrivateEvent.MakerFill("alice", 2, new Execution("alice", 1, "a", Side.SELL, 100, 2, 3)), false));
         }
 
         @Test
-        void orderLine() {
-            assertEquals("ORDER orderId=9 clOrdId=c status=RESTED filled=0 remaining=4",
-                    Protocol.order(new Response(9, "c", OrderStatus.RESTED, null, 0, 4, List.of())));
-            assertEquals("ORDER orderId=3 clOrdId=c status=REJECTED filled=0 remaining=4 reason=DUPLICATE_CLIENT_ORDER_ID",
-                    Protocol.order(new Response(3, "c", OrderStatus.REJECTED, RejectReason.DUPLICATE_CLIENT_ORDER_ID, 0, 4, List.of())));
+        void orderLineWithReason() {
+            assertEquals(List.of("ORDER oseq=1 orderId=3 clOrdId=c status=REJECTED filled=0 remaining=4 reason=DUPLICATE_CLIENT_ORDER_ID"),
+                    Protocol.lines(new PrivateEvent.OrderReply("a", 1, Side.BUY, 4,
+                            new Response(3, "c", OrderStatus.REJECTED, Reason.DUPLICATE_CLIENT_ORDER_ID, 0, 4, List.of())), false));
         }
 
         @Test
         void cancelLines() {
-            assertEquals("CANCELLED orderId=4 qty=6", Protocol.cancel(CancelResult.cancelled(4, 6)));
-            assertEquals("CANCEL_REJECT orderId=4 reason=UNKNOWN_ORDER", Protocol.cancel(CancelResult.unknown(4)));
+            assertEquals(List.of("CANCELLED oseq=7 orderId=4 qty=6"),
+                    Protocol.lines(new PrivateEvent.CancelReply("a", 7, CancelResult.cancelled(4, 6), false), false));
+            assertEquals(List.of("CANCELLED oseq=8 orderId=5 qty=1 reason=CANCEL_ALL"),
+                    Protocol.lines(new PrivateEvent.CancelReply("a", 8, CancelResult.cancelled(5, 1), true), false));
+            assertEquals(List.of("CANCEL_REJECT oseq=9 orderId=4 reason=UNKNOWN_ORDER"),
+                    Protocol.lines(new PrivateEvent.CancelReply("a", 9, CancelResult.unknown(4), false), false));
+        }
+
+        @Test
+        void resentLinesAreMarked() {
+            assertEquals(List.of("CANCELLED oseq=7 orderId=4 qty=6 resend=1"),
+                    Protocol.lines(new PrivateEvent.CancelReply("a", 7, CancelResult.cancelled(4, 6), false), true));
+        }
+
+        @Test
+        void welcomeCarriesTheLatestOseq() {
+            assertEquals("WELCOME participant=alice oseq=12", Protocol.welcome("alice", 12));
         }
 
         @Test

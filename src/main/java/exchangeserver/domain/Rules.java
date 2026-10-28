@@ -16,7 +16,9 @@ Limits are inclusive.
  */
 public final class Rules {
 
-    public static final int VERSION = 1;
+    // 2: self-trade prevention (D67), caps only for orders that would rest + BOOK_FULL (D68), market collar before
+    //    the first trade anchored on the opposite touch (D66), CANCEL_ALL (D72).
+    public static final int VERSION = 2;
 
     // Stateless (checked by OrderRequest, i.e. at the gateway).
     public static final long MAX_ORDER_QUANTITY = 1_000_000_000L;
@@ -31,6 +33,8 @@ public final class Rules {
     // inside the same band (the collar). No band until the first trade.
     public static final int PRICE_BAND_PERCENT = 10;
     public static final int MAX_OPEN_ORDERS_PER_PARTICIPANT = 10_000;
+    // All participants together (D68): bounds the book's memory however many participants exist.
+    public static final int MAX_RESTING_ORDERS = 1_000_000;
 
     private Rules() {
     }

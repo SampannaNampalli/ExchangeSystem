@@ -239,6 +239,44 @@ class OrderBookTest {
         }
     }
 
+    // Read access for the engine's fillability walk, cancel-all and snapshots (D67, D71, D72).
+    @Nested
+    class Walk {
+
+        @Test
+        void visitsInPriorityOrderAndStopsWhenAsked() {
+            book.add(limit(1, "a", Side.SELL, 101, 1));
+            book.add(limit(2, "b", Side.SELL, 100, 2));
+            book.add(limit(3, "c", Side.SELL, 100, 3));
+            List<Long> seen = new ArrayList<>();
+            book.walk(Side.SELL, o -> {
+                seen.add(o.orderId());
+                return seen.size() < 2;
+            });
+            assertEquals(List.of(2L, 3L), seen, "best price first, time priority within it, then stop");
+        }
+
+        @Test
+        void restingOrdersAreCopiesBidsFirst() {
+            book.add(limit(1, "a", Side.SELL, 101, 5));
+            book.add(limit(2, "b", Side.BUY, 99, 2));
+            book.fillBest(Side.SELL, 3);
+            List<RestingOrderView> all = book.restingOrders();
+            assertEquals(List.of(2L, 1L), all.stream().map(RestingOrderView::orderId).toList());
+            assertEquals(3, all.get(1).filledQuantity());
+            assertEquals(2, all.get(1).remainingQuantity());
+            book.checkInvariants();
+        }
+
+        @Test
+        void headParticipantIsWhoTradesNext() {
+            assertEquals(null, book.headParticipant(Side.SELL));
+            book.add(limit(1, "a", Side.SELL, 101, 1));
+            book.add(limit(2, "b", Side.SELL, 100, 1));
+            assertEquals("b", book.headParticipant(Side.SELL));
+        }
+    }
+
     @Test
     void levelViewsAreReadOnly() {
         book.add(limit(1, "a", Side.BUY, 100, 1));

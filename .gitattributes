@@ -1,0 +1,5 @@
+# Journals and snapshots are byte-exact, LF-only records with checksums (D69): never convert their line endings.
+*.journal -text
+*.journal.* -text
+# The wrapper script runs under sh on Linux/macOS: keep it LF whatever core.autocrlf says.
+mvnw text eol=lf

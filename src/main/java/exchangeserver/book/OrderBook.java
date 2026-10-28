@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 /*
 
@@ -140,6 +141,38 @@ public final class OrderBook {
         }
         changed.clear();
         return updates;
+    }
+
+    // Visits the resting orders of `side` in priority order (best level first, time priority within a level) until
+    // the visitor returns false. Read-only: the visitor gets copies. Deterministic: it walks the levels, never a
+    // hash map.
+    public void walk(Side side, Predicate<RestingOrderView> visitor) {
+        for (PriceLevel level : sideOf(side).values()) {
+            for (OrderNode n = level.headNode(); n != null; n = level.nextNode(n)) {
+                if (!visitor.test(view(n.order))) {
+                    return;
+                }
+            }
+        }
+    }
+
+    // Every resting order: bids best first, then asks best first, each level in time priority.
+    public List<RestingOrderView> restingOrders() {
+        List<RestingOrderView> all = new ArrayList<>(orders.size());
+        walk(Side.BUY, all::add);
+        walk(Side.SELL, all::add);
+        return all;
+    }
+
+    // The owner of the order that would trade next on `side`, or null if that side is empty (D67).
+    public String headParticipant(Side side) {
+        Map.Entry<Long, PriceLevel> best = sideOf(side).firstEntry();
+        return best == null ? null : best.getValue().headNode().order.getParticipant();
+    }
+
+    private static RestingOrderView view(Order o) {
+        return new RestingOrderView(o.getOrderId(), o.getParticipant(), o.getClientOrderId(), o.getSide(),
+                o.getOrderType(), o.getPrice(), o.getOriginalQuantity(), o.getFilledQuantity(), o.getTimestamp());
     }
 
     // `side` is the side of the book itself, not the side of an incoming order.

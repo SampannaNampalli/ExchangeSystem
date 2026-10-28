@@ -26,12 +26,17 @@ import static java.nio.file.StandardOpenOption.WRITE;
 The write-ahead input log. Format in JournalCodec.
 
 Durability  appendAll() returns only after its records are forced to disk: one write and one fsync for the
-            whole batch (D37, D52). The caller must not process a command before that.
+            whole batch (D37, D52). The caller must not process a command before that. A new journal's directory
+            entry is fsynced too (D69).
+Integrity   Every record carries a CRC-32C; a record whose checksum does not match is corrupt (D69).
 Recovery    open() cuts a torn last record (bytes after the last '\n') and fsyncs the cut (D38). A complete
             record that does not parse is never dropped: reading fails with the record number.
-Version     The first record names the format and the Rules version the journal was written under. open()
-            refuses a journal written under other rules (D46): replaying it would silently build a different
-            book.
+Version     The header names the format, the Rules version the journal was written under, and the base sequence
+            (the snapshot it continues from, D71). open() refuses a journal written under other rules (D46): replaying
+            it would silently build a different book. A journal with no records yet adopts the new rules: that is
+            how a rules change is crossed, after compacting with the old build (D71). The header is checked before
+            anything is changed, so a refused file is never modified (D64).
+Exclusive   open() holds a JournalLock: a second open, from this process or another, is refused (D65).
 Fail-stop   After a failed write or fsync, every later append is refused until restart (D39).
 
 Not thread-safe: one writer thread appends. read() opens its own stream, so it can run while the channel is
@@ -44,32 +49,70 @@ public final class CommandJournal implements AutoCloseable {
     // the file proves nothing: Java opens files on Windows with delete sharing, so an open file can be deleted.)
     private static final AtomicInteger OPEN = new AtomicInteger();
 
-    private final Path file;
-    private final FileChannel channel;
-    private final long truncatedBytesOnOpen;
-    private boolean failed;
-
-    private CommandJournal(Path file, FileChannel channel, long truncatedBytesOnOpen) {
-        this.file = file;
-        this.channel = channel;
-        this.truncatedBytesOnOpen = truncatedBytesOnOpen;
+    private record FirstRecord(String text, boolean complete, long fileSize) {
     }
 
-    // Opens the journal, creating it with a header if it is missing or empty.
+    private final Path file;
+    private final FileChannel channel;
+    private final JournalLock lock;         // null when the caller holds the lock
+    private final long baseSequence;
+    private final long truncatedBytesOnOpen;
+    private final int adoptedRulesFrom;     // the old rules version of an empty journal that adopted ours, or 0
+    private boolean failed;
+
+    private CommandJournal(Path file, FileChannel channel, JournalLock lock, long baseSequence, long truncatedBytesOnOpen,
+                           int adoptedRulesFrom) {
+        this.file = file;
+        this.channel = channel;
+        this.lock = lock;
+        this.baseSequence = baseSequence;
+        this.truncatedBytesOnOpen = truncatedBytesOnOpen;
+        this.adoptedRulesFrom = adoptedRulesFrom;
+    }
+
+    // Opens the journal, creating it with a header if it is missing or empty. Lock, then check, then change:
+    // nothing is written to a file this journal does not own (D64, D65).
     public static CommandJournal open(Path file, int rulesVersion) throws IOException {
         Objects.requireNonNull(file, "file");
-        long truncated = cutTornTail(file);
-        FileChannel channel = FileChannel.open(file, CREATE, WRITE, APPEND);    // APPEND: never overwrite history
+        JournalLock lock = JournalLock.acquire(file);
         try {
+            return openLocked(file, rulesVersion, lock);
+        } catch (IOException | RuntimeException e) {
+            try {
+                lock.close();
+            } catch (IOException releaseFailure) {
+                e.addSuppressed(releaseFailure);
+            }
+            throw e;
+        }
+    }
+
+    // For a caller that holds the journal's lock itself (compaction): closing this journal leaves it held.
+    public static CommandJournal open(Path file, int rulesVersion, JournalLock heldLock) throws IOException {
+        Objects.requireNonNull(file, "file");
+        Objects.requireNonNull(heldLock, "heldLock");
+        return openLocked(file, rulesVersion, null);
+    }
+
+    // ownedLock: released by close(), or null if the caller holds the lock.
+    private static CommandJournal openLocked(Path file, int rulesVersion, JournalLock ownedLock) throws IOException {
+        JournalCodec.Header header = checkHeader(file, rulesVersion);
+        int adoptedFrom = 0;
+        if (header != null && header.rulesVersion() != rulesVersion) {
+            adoptedFrom = header.rulesVersion();            // checkHeader allowed it: no records yet
+            writeFresh(file, rulesVersion, header.baseSequence());
+            header = new JournalCodec.Header(rulesVersion, header.baseSequence());
+        }
+
+        FileChannel channel = FileChannel.open(file, CREATE, WRITE, APPEND);    // APPEND: never overwrite history
+        long truncated;
+        try {
+            truncated = cutTornTail(file);
             if (channel.size() == 0) {
-                channel.write(ByteBuffer.wrap(JournalCodec.encodeHeader(rulesVersion).getBytes(UTF_8)));
+                channel.write(ByteBuffer.wrap(JournalCodec.encodeHeader(rulesVersion, 0).getBytes(UTF_8)));
                 channel.force(true);
-            } else {
-                int written = JournalCodec.decodeHeader(readFirstRecord(file));
-                if (written != rulesVersion) {
-                    throw new IllegalStateException("Journal " + file + " was written under rules version " + written
-                            + "; this build uses " + rulesVersion + ". Start a fresh journal from a snapshot.");
-                }
+                Durable.fsyncDirectory(file);           // a new file's directory entry must be durable too
+                header = new JournalCodec.Header(rulesVersion, 0);
             }
         } catch (IOException | RuntimeException e) {
             try {
@@ -80,7 +123,12 @@ public final class CommandJournal implements AutoCloseable {
             throw e;
         }
         OPEN.incrementAndGet();
-        return new CommandJournal(file, channel, truncated);
+        return new CommandJournal(file, channel, ownedLock, header.baseSequence(), truncated, adoptedFrom);
+    }
+
+    // Replaces `file` with a journal that holds only a header (compaction, D71). The caller must hold the lock.
+    public static void writeFresh(Path file, int rulesVersion, long baseSequence) throws IOException {
+        Durable.writeAtomically(file, JournalCodec.encodeHeader(rulesVersion, baseSequence));
     }
 
     public static int openJournals() {
@@ -99,7 +147,7 @@ public final class CommandJournal implements AutoCloseable {
         if (commands.isEmpty()) {
             return;
         }
-        StringBuilder sb = new StringBuilder(commands.size() * 96);
+        StringBuilder sb = new StringBuilder(commands.size() * 112);
         for (Command command : commands) {
             sb.append(JournalCodec.encode(command));
         }
@@ -151,6 +199,11 @@ public final class CommandJournal implements AutoCloseable {
         }
     }
 
+    // The last sequence number of the snapshot this journal continues from; 0 for none (D71).
+    public long baseSequence() {
+        return baseSequence;
+    }
+
     public boolean hasFailed() {
         return failed;
     }
@@ -159,20 +212,52 @@ public final class CommandJournal implements AutoCloseable {
         return truncatedBytesOnOpen;
     }
 
-    public Path getFile() {
-        return file;
+    // The rules version an empty journal was written under before it adopted this build's, or 0 (D71).
+    public int adoptedRulesFrom() {
+        return adoptedRulesFrom;
     }
 
-    // Idempotent.
+    // Idempotent. Releases the lock if this journal took it.
     @Override
     public synchronized void close() throws IOException {
         if (channel.isOpen()) {
             OPEN.decrementAndGet();
-            channel.close();
+            try {
+                channel.close();
+            } finally {
+                if (lock != null) {
+                    lock.close();
+                }
+            }
         }
     }
 
     // ---------- Recovery ----------
+
+    // Refuses, before anything is cut or written, a file that is not a journal written under these rules (D64).
+    // A file with no complete record may only be the start of a header (a crash while the journal was being
+    // created). Returns the header, or null for a missing, empty or torn-header file. A journal written under
+    // other rules is accepted only if it has no records yet (D71); the caller rewrites its header.
+    private static JournalCodec.Header checkHeader(Path file, int rulesVersion) throws IOException {
+        if (!Files.exists(file)) {
+            return null;
+        }
+        FirstRecord first = readFirstRecord(file);
+        if (!first.complete()) {
+            if (!JournalCodec.encodeHeader(rulesVersion, 0).startsWith(first.text())) {
+                throw new IllegalStateException("Journal " + file + " does not start with a journal header: \"" + first.text() + "\"");
+            }
+            return null;
+        }
+        JournalCodec.Header header = JournalCodec.decodeHeader(first.text());
+        boolean noRecords = first.fileSize() == first.text().getBytes(UTF_8).length + 1;
+        if (header.rulesVersion() != rulesVersion && !noRecords) {
+            throw new IllegalStateException("Journal " + file + " was written under rules version " + header.rulesVersion()
+                    + "; this build uses " + rulesVersion + ". Compact it with the build that wrote it (--compact); "
+                    + "this build can then start from the compacted journal and its snapshot.");
+        }
+        return header;
+    }
 
     // Cuts everything after the last '\n' and returns how many bytes were cut.
     private static long cutTornTail(Path file) throws IOException {
@@ -211,17 +296,22 @@ public final class CommandJournal implements AutoCloseable {
         return 0;
     }
 
-    private static String readFirstRecord(Path file) throws IOException {
+    private static FirstRecord readFirstRecord(Path file) throws IOException {
         ByteArrayOutputStream record = new ByteArrayOutputStream(64);
+        boolean complete = false;
         try (InputStream in = new BufferedInputStream(Files.newInputStream(file))) {
             int b;
-            while ((b = in.read()) != -1 && b != JournalCodec.END_OF_RECORD) {
+            while ((b = in.read()) != -1) {
+                if (b == JournalCodec.END_OF_RECORD) {
+                    complete = true;
+                    break;
+                }
                 record.write(b);
                 if (record.size() > 1024) {
-                    break;                      // no header is this long; decodeHeader will say so
+                    break;                      // no header is this long: incomplete, and no header's prefix
                 }
             }
         }
-        return record.toString(UTF_8);
+        return new FirstRecord(record.toString(UTF_8), complete, Files.size(file));
     }
 }

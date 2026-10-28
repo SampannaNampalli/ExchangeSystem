@@ -8,7 +8,7 @@ A stamped, journalled input: the source of truth (D12, D31). Immutable, so the o
 object that is processed cannot differ. The Java type is the kind tag; the journal writes it as a word.
 
  */
-public sealed interface Command permits NewOrderCommand, CancelOrderCommand, SkipCommand {
+public sealed interface Command permits NewOrderCommand, CancelOrderCommand, CancelAllCommand, SkipCommand, CheckCommand {
 
     long sequenceNumber();
 

@@ -8,7 +8,7 @@ import exchangeserver.domain.Side;
 import exchangeserver.engine.BookSnapshot;
 import exchangeserver.engine.EngineOutput;
 import exchangeserver.engine.OrderStatus;
-import exchangeserver.engine.RejectReason;
+import exchangeserver.engine.Reason;
 import exchangeserver.engine.Response;
 import exchangeserver.journal.CommandJournal;
 import exchangeserver.testing.MutableClock;
@@ -91,7 +91,7 @@ class ExchangeTest {
         void stateDependentRejectsAreJournalled() throws IOException {
             try (Exchange ex = open()) {
                 ex.submit(limit("a", "X", Side.BUY, 100, 1));
-                assertEquals(RejectReason.DUPLICATE_CLIENT_ORDER_ID, ex.submit(limit("a", "X", Side.BUY, 100, 1)).rejectReason());
+                assertEquals(Reason.DUPLICATE_CLIENT_ORDER_ID, ex.submit(limit("a", "X", Side.BUY, 100, 1)).reason());
                 assertEquals(CancelStatus.UNKNOWN_ORDER, ex.cancel("a", 99).status());
             }
             assertEquals(4, journalLines().size(), "header + 3 commands, rejects included (D13)");
@@ -174,7 +174,7 @@ class ExchangeTest {
             }
             try (Exchange ex = open()) {
                 Response resend = ex.submit(limit("a", "X", Side.BUY, 100, 1));
-                assertEquals(RejectReason.DUPLICATE_CLIENT_ORDER_ID, resend.rejectReason());
+                assertEquals(Reason.DUPLICATE_CLIENT_ORDER_ID, resend.reason());
                 assertEquals(original, resend.orderId());
             }
         }
@@ -286,7 +286,7 @@ class ExchangeTest {
                 Pending<Response> bad = new Pending<>(new Request.Submit(limit("a", "POISON", Side.BUY, 100, 5)));
                 Pending<Response> b = new Pending<>(new Request.Submit(limit("b", "b", Side.BUY, 100, 2)));
                 List<EngineOutput> outputs = new ArrayList<>();
-                ex.process(List.of(a, bad, b), outputs::add);
+                ex.process(List.of(a, bad, b), (output, events) -> outputs.add(output));
 
                 assertEquals(OrderStatus.RESTED, a.result.join().status());
                 CompletionException e = assertThrows(CompletionException.class, bad.result::join);
@@ -336,6 +336,20 @@ class ExchangeTest {
             assertEquals(3, journalLines().size());
         }
 
+        // D65: the tool used to append with its own sequence numbers next to the running exchange's.
+        @Test
+        void quarantineToolRefusesWhileTheExchangeIsRunning() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "ok", Side.SELL, 100, 5));
+                assertThrows(IllegalStateException.class, () -> Exchange.quarantine(journal(), 1, clock));
+                ex.submit(limit("a", "ok2", Side.SELL, 100, 5));
+            }
+            assertEquals(3, journalLines().size(), "header and two orders, no SKIP");
+            try (Exchange ex = open()) {
+                assertEquals(2, ex.lastSequenceNumber());
+            }
+        }
+
         @Test
         void errorsAreNotQuarantinedTheyPropagate() throws IOException {
             CommandInterceptor fatal = c -> {
@@ -344,6 +358,237 @@ class ExchangeTest {
             try (Exchange ex = Exchange.open(journal(), clock, fatal)) {
                 assertThrows(AssertionError.class, () -> ex.submit(limit("a", "x", Side.SELL, 100, 5)));
                 assertTrue(ex.quarantined().isEmpty());
+            }
+        }
+    }
+
+    // D70 (M5): the live run writes the digest of its outputs; replay must reproduce it.
+    @Nested
+    class Checkpoints {
+
+        private Exchange openWithCheckEvery(int interval) throws IOException {
+            return Exchange.open(journal(), clock, CommandInterceptor.NONE, new Exchange.Options(interval, 100));
+        }
+
+        @Test
+        void aCheckIsWrittenEveryIntervalAndReplayAcceptsIt() throws IOException {
+            String digest;
+            try (Exchange ex = openWithCheckEvery(2)) {
+                ex.submit(limit("a", "1", Side.SELL, 100, 5));
+                ex.submit(limit("b", "2", Side.BUY, 100, 2));
+                ex.submit(limit("a", "3", Side.SELL, 101, 5));          // stamped after a CHECK of the first two
+                digest = ex.digest();
+            }
+            List<String> lines = journalLines();
+            assertTrue(lines.get(3).startsWith("CHECK,3,"), lines.toString());
+            try (Exchange ex = openWithCheckEvery(2)) {
+                assertEquals(digest, ex.digest(), "replay rebuilt the same outputs");
+                assertEquals(4, ex.lastSequenceNumber());
+            }
+        }
+
+        @Test
+        void aChangedHistoryIsCaughtAtTheNextCheck() throws IOException {
+            try (Exchange ex = openWithCheckEvery(1)) {
+                ex.submit(limit("a", "1", Side.SELL, 100, 5));
+                ex.submit(limit("b", "2", Side.BUY, 100, 2));           // CHECK 2 covers command 1
+            }
+            // Stand-in for a code change that alters behaviour: make the engine see different input for command 1.
+            CommandInterceptor differentBehaviour = c -> { };
+            List<String> lines = journalLines();
+            String tampered = lines.get(1).replace(",SELL,LIMIT,5,100,", ",SELL,LIMIT,4,100,");
+            String body = tampered.substring(0, tampered.lastIndexOf(','));
+            lines.set(1, body + "," + exchangeserver.journal.Checksums.crcHex(body));
+            Files.writeString(journal(), String.join("\n", lines) + "\n", UTF_8);       // LF: the journal's format
+            ReplayException e = assertThrows(ReplayException.class,
+                    () -> Exchange.open(journal(), clock, differentBehaviour, new Exchange.Options(1, 100)));
+            assertEquals(ReplayException.Kind.DIVERGED, e.kind());
+            assertEquals(2, e.sequenceNumber());
+        }
+    }
+
+    // D71 (H3): a snapshot plus an empty journal replaces the whole history.
+    @Nested
+    class Compaction {
+
+        @Test
+        void restartAfterCompactionRebuildsTheSameState() throws IOException {
+            BookSnapshot before;
+            long lastSeq;
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "a1", Side.SELL, 100, 5));
+                ex.submit(limit("b", "b1", Side.SELL, 100, 3));
+                ex.submit(limit("x", "x1", Side.BUY, 100, 2));
+                ex.submit(limit("c", "c1", Side.BUY, 95, 4));
+                before = ex.snapshot(10);
+                lastSeq = ex.lastSequenceNumber();
+            }
+            Exchange.Compaction c = Exchange.compact(journal());
+            assertEquals(lastSeq, c.lastSequence());
+            assertEquals(3, c.restingOrders());
+            assertTrue(Files.exists(c.snapshot()));
+            assertTrue(Files.exists(c.archive()));
+            assertEquals(1, journalLines().size(), "only the header is left");
+
+            try (Exchange ex = open()) {
+                assertEquals(before, ex.snapshot(10));
+                assertEquals(lastSeq, ex.recovery().baseSequence());
+                assertEquals(0, ex.recovery().replayed());
+                Response r = ex.submit(limit("d", "d1", Side.BUY, 100, 4));
+                assertEquals(List.of(1L, 2L), r.trades().stream().map(t -> t.sellOrderId()).toList(), "time priority survived");
+                assertEquals(lastSeq + 1, ex.lastSequenceNumber());
+            }
+        }
+
+        @Test
+        void clientOrderIdsAreScopedToTheJournalExceptForRestingOrders() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "gone", Side.BUY, 90, 1));
+                ex.cancel("a", 1);
+                ex.submit(limit("a", "rests", Side.BUY, 90, 1));
+            }
+            Exchange.compact(journal());
+            try (Exchange ex = open()) {
+                assertEquals(OrderStatus.RESTED, ex.submit(limit("a", "gone", Side.BUY, 91, 1)).status(), "a new day");
+                assertEquals(Reason.DUPLICATE_CLIENT_ORDER_ID, ex.submit(limit("a", "rests", Side.BUY, 92, 1)).reason(),
+                        "a resting order keeps its id");
+            }
+        }
+
+        @Test
+        void outputNumberingContinuesAcrossACompaction() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "1", Side.BUY, 90, 1));
+                ex.submit(limit("a", "2", Side.BUY, 90, 1));
+            }
+            Exchange.compact(journal());
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "3", Side.BUY, 90, 1));
+                ResendResult r = ex.resend("a", 1);
+                assertEquals(3, r.lastOseq());
+                assertEquals(3, r.firstAvailable(), "a snapshot keeps the numbers, not the events");
+            }
+        }
+
+        @Test
+        void aSecondCompactionContinuesTheChainAndNothingToCompactIsReported() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "1", Side.BUY, 90, 1));
+            }
+            Exchange.compact(journal());
+            assertEquals(null, Exchange.compact(journal()), "no records since the snapshot");
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "2", Side.BUY, 91, 1));
+            }
+            Exchange.Compaction second = Exchange.compact(journal());
+            assertEquals(2, second.lastSequence());
+            try (Exchange ex = open()) {
+                assertEquals(2, ex.snapshot(10).bids().size());
+            }
+        }
+
+        @Test
+        void aCrashAfterWritingTheSnapshotLeavesTheOldJournalInCharge() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "1", Side.BUY, 90, 1));
+                ex.submit(limit("a", "2", Side.BUY, 91, 1));
+            }
+            // As if compaction wrote the snapshot and crashed before replacing the journal.
+            Files.writeString(Snapshot.path(journal(), 2), "garbage", UTF_8);
+            try (Exchange ex = open()) {
+                assertEquals(2, ex.snapshot(10).bids().size());
+                assertEquals(0, ex.recovery().baseSequence(), "the journal names its own base: none");
+            }
+        }
+
+        @Test
+        void aRulesChangeIsCrossedWithAnEmptyCompactedJournal() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "1", Side.BUY, 90, 1));
+            }
+            Exchange.compact(journal());
+            // As if the old build (rules VERSION - 1) had compacted: its empty journal carries its own version.
+            CommandJournal.writeFresh(journal(), exchangeserver.domain.Rules.VERSION - 1, 1);
+            try (Exchange ex = open()) {
+                assertEquals(exchangeserver.domain.Rules.VERSION - 1, ex.recovery().adoptedRulesFrom());
+                assertEquals(1, ex.snapshot(10).bids().size(), "the book came from the snapshot");
+            }
+        }
+
+        @Test
+        void aPoisonAfterACompactionRebuildsFromTheSnapshot() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "ok", Side.SELL, 100, 5));
+            }
+            Exchange.compact(journal());
+            try (Exchange ex = Exchange.open(journal(), clock, POISON)) {
+                assertThrows(ExchangeException.class, () -> ex.submit(limit("b", "POISON", Side.BUY, 100, 5)));
+                assertEquals(OrderStatus.FILLED, ex.submit(limit("b", "b1", Side.BUY, 100, 5)).status(),
+                        "the rebuilt ledger still has the snapshot's resting order");
+            }
+        }
+
+        @Test
+        void aCorruptSnapshotStopsStartup() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "1", Side.BUY, 90, 1));
+            }
+            Exchange.Compaction c = Exchange.compact(journal());
+            List<String> lines = Files.readAllLines(c.snapshot(), UTF_8);
+            lines.set(1, lines.get(1).replace(",90,", ",80,"));
+            Files.write(c.snapshot(), lines, UTF_8);
+            IllegalStateException e = assertThrows(IllegalStateException.class, this::reopen);
+            assertTrue(e.getMessage().contains("Corrupt snapshot"), e.getMessage());
+        }
+
+        private void reopen() throws IOException {
+            open().close();
+        }
+    }
+
+    // L1, L3: what the operator is told and allowed.
+    @Nested
+    class Operations {
+
+        @Test
+        void recoveryReportsWhatItDid() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "1", Side.BUY, 90, 1));
+                ex.submit(limit("a", "2", Side.BUY, 91, 1));
+            }
+            Files.writeString(journal(), "NEW,3,2026", UTF_8, StandardOpenOption.APPEND);
+            try (Exchange ex = open()) {
+                Exchange.Recovery r = ex.recovery();
+                assertEquals(0, r.baseSequence());
+                assertEquals(2, r.lastSequence());
+                assertEquals(2, r.replayed());
+                assertEquals(10, r.truncatedBytes());
+                assertTrue(r.quarantined().isEmpty());
+            }
+        }
+
+        @Test
+        void quarantineRefusesACommandAlreadyQuarantined() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "ok", Side.SELL, 100, 5));
+            }
+            Exchange.quarantine(journal(), 1, clock);
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> Exchange.quarantine(journal(), 1, clock));
+            assertTrue(e.getMessage().contains("already quarantined"), e.getMessage());
+            assertEquals(3, journalLines().size());
+        }
+
+        @Test
+        void cancelAllThroughTheLivePathIsJournalledAndReplayed() throws IOException {
+            try (Exchange ex = open()) {
+                ex.submit(limit("a", "1", Side.BUY, 90, 1));
+                ex.submit(limit("a", "2", Side.SELL, 110, 1));
+                assertEquals(2, ex.cancelAll("a").size());
+            }
+            assertTrue(journalLines().get(3).startsWith("CANCEL_ALL,3,"));
+            try (Exchange ex = open()) {
+                assertTrue(ex.snapshot(10).bids().isEmpty() && ex.snapshot(10).asks().isEmpty());
+                assertEquals(4, ex.resend("a", 1).lastOseq(), "two replies and two cancel replies, rebuilt");
             }
         }
     }
